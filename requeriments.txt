@@ -1,0 +1,15 @@
+# Discord
+discord.py>=2.3.2
+
+# IA / API
+groq>=0.4.0
+
+# Utilitários
+python-dotenv>=1.0.0
+
+# Sistema
+psutil>=5.9.0
+
+# Opcional (se quiser adicionar)
+# aiohttp>=3.9.0
+# requests>=2.31.0
