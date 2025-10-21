@@ -45,7 +45,7 @@ Use `!rpghelp` no Discord para ver todos os comandos organizados!
 
 1. **Clone o repositório**
 ```bash
-git clone https://github.com/seu-usuario/rpg-master-bot.git
+git clone https://github.com/Leosdc/rpg-master-bot
 cd rpg-master-bot
 ```
 
@@ -202,8 +202,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 👨‍💻 Autor
 
 **Leosdc_**
-- Discord: Leosdc_#0001
-- GitHub: [@leosdcdev](https://github.com/leosdcdev)
+- Discord: Leosdc
+- GitHub: [@leosdc](https://github.com/leosdc)
 
 ## 🙏 Agradecimentos
 
