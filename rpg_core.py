@@ -1,9 +1,9 @@
-# rpg_core.py - Corrigido
+# rpg_core.py - Corrigido para usar sistema do canal
 import random
 import re
 import discord
 from discord.ext import commands
-from config import conversation_history
+from config import conversation_history, sistemas_rpg
 from utils import chamar_groq, get_system_prompt
 
 # === Funções auxiliares ===
@@ -80,17 +80,20 @@ def register(bot):
             texto += f"{i}. **{nome}** → {valor}\n"
         await ctx.send(texto)
 
-    # --- Mestre (IA) ---
+    # --- Mestre (IA) --- CORRIGIDO AQUI
     @bot.command(name="mestre")
     async def mestre(ctx, *, pergunta: str):
         """Interaja com o Mestre de RPG (IA)."""
-        system_prompt = get_system_prompt("dnd5e")
+        # CORREÇÃO: Pega o sistema do canal atual
+        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        system_prompt = get_system_prompt(sistema_atual)
+        
         historico = conversation_history.setdefault(str(ctx.channel.id), [])
         
         # Adiciona mensagem do usuário
         historico.append({"role": "user", "content": pergunta})
         
-        # CORREÇÃO: Cria lista completa de mensagens
+        # Cria lista completa de mensagens
         mensagens_completas = [
             {"role": "system", "content": system_prompt}
         ] + historico
@@ -103,14 +106,16 @@ def register(bot):
         else:
             await ctx.send(f"⚠️ {resposta}")
 
-    # --- Plot ---
+    # --- Plot --- CORRIGIDO AQUI
     @bot.command(name="plot")
     async def plot(ctx, *, tema: str):
         """Gera uma ideia de missão ou aventura."""
-        prompt = f"Crie uma ideia de missão ou aventura para o tema: {tema}"
-        system_prompt = get_system_prompt("dnd5e")
+        # CORREÇÃO: Pega o sistema do canal atual
+        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        system_prompt = get_system_prompt(sistema_atual)
         
-        # CORREÇÃO: Passa lista de mensagens
+        prompt = f"Crie uma ideia de missão ou aventura para o tema: {tema}"
+        
         mensagens = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
@@ -119,14 +124,16 @@ def register(bot):
         resposta = await chamar_groq(mensagens, max_tokens=800)
         await ctx.send(f"📜 Ideia de aventura:\n{resposta[:1900]}")
 
-    # --- Regra ---
+    # --- Regra --- CORRIGIDO AQUI
     @bot.command(name="regra")
     async def regra(ctx, *, duvida: str):
         """Consulta uma regra específica do sistema atual."""
-        prompt = f"Explique a seguinte dúvida de RPG de mesa de forma clara e breve: {duvida}"
-        system_prompt = get_system_prompt("dnd5e")
+        # CORREÇÃO: Pega o sistema do canal atual
+        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        system_prompt = get_system_prompt(sistema_atual)
         
-        # CORREÇÃO: Passa lista de mensagens
+        prompt = f"Explique a seguinte dúvida de RPG de mesa de forma clara e breve: {duvida}"
+        
         mensagens = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
