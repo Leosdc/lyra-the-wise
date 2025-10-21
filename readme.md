@@ -202,8 +202,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 👨‍💻 Autor
 
 **Leosdc_**
-- Discord: Leosdc_#0001
-- GitHub: [@leosdcdev](https://github.com/leosdcdev)
+- Discord: leosdc
+- GitHub: [@leosdc](https://github.com/leosdc)
 
 ## 🙏 Agradecimentos
 
