@@ -104,10 +104,10 @@ rpg-master-bot/
 ├── utilidades.py              # Utilitários
 ├── admin.py                   # Comandos administrativos
 ├── requirements.txt           # Dependências
-├── .env                       # Variáveis de ambiente (NÃO SUBIR)
+├── .env                       # Variáveis de ambiente
 ├── .gitignore                 # Arquivos a ignorar
 ├── README.md                  # Este arquivo
-└── bot_data/                  # Dados salvos (NÃO SUBIR)
+└── bot_data/                  # Dados salvos
     ├── fichas_personagens.json
     ├── sistemas_rpg.json
     └── sessoes_ativas.json
@@ -202,8 +202,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 👨‍💻 Autor
 
 **Leosdc_**
-- Discord: Leosdc_#0001
-- GitHub: [@leosdcdev](https://github.com/leosdcdev)
+- Discord: leosdc
+- GitHub: [@leosdc](https://github.com/leosdc)
 
 ## 🙏 Agradecimentos
 
