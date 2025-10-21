@@ -38,11 +38,6 @@ async def on_ready():
     print(f"🎲 {bot.user} está online!")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
     
-        # Status do bot
-    await bot.change_presence(
-        activity=discord.Game(name="!rpghelp | 50+ sistemas de RPG")
-    )
-    
     # Carrega dados salvos
     carregar_dados(fichas_personagens, sistemas_rpg, sessoes_ativas)
     
