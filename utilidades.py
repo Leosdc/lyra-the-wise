@@ -90,7 +90,7 @@ def register(bot: commands.Bot):
                 "• Use `!documentacao` para ver a documentação completa\n"
                 "• Entre em contato com o desenvolvedor\n\n"
                 "**Desenvolvedor:** Leosdc_#0001\n"
-                "**GitHub:** https://github.com/leosdcdev/RPGMasterBot"
+                "**GitHub:** https://github.com/Leosdc/rpg-master-bot"
             ),
             color=discord.Color.blue()
         )
