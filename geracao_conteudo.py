@@ -1,4 +1,4 @@
-# geracao_conteudo.py — Geração de NPCs, monstros, itens, puzzles, etc.
+# geracao_conteudo.py — Geração com max_tokens aumentados
 import discord
 from discord.ext import commands
 from utils import chamar_groq, get_system_prompt
@@ -14,6 +14,15 @@ def register(bot: commands.Bot):
         """Retorna o sistema configurado para o canal."""
         return sistemas_rpg.get(channel_id, "dnd5e")
 
+    # Remove comandos que possam estar duplicados
+    comandos_para_remover = ["monstro", "monstros", "npc", "encontro", "armadilha", 
+                             "item", "tesouro", "puzzle", "vilao", "cena", "nome", "motivacao"]
+    for cmd in comandos_para_remover:
+        try:
+            bot.remove_command(cmd)
+        except Exception:
+            pass
+
     # ========== MONSTRO ==========
     @bot.command(name="monstro")
     async def monstro(ctx, *, nome: str = None):
@@ -21,11 +30,9 @@ def register(bot: commands.Bot):
         sistema = get_sistema_canal(ctx.channel.id)
         
         if nome:
-            # Primeiro tenta buscar no banco de dados
             monstro_db = buscar_monstro(nome, sistema)
             
             if monstro_db:
-                # Encontrou no banco de dados
                 texto = formatar_monstro(monstro_db)
                 embed = discord.Embed(
                     title=f"👹 {monstro_db['nome']}",
@@ -36,11 +43,9 @@ def register(bot: commands.Bot):
                 await ctx.send(embed=embed)
                 return
             
-            # Não encontrou, gera com IA
             system_prompt = get_system_prompt(sistema)
             prompt = f"Crie as estatísticas completas de combate para o monstro **{nome}** no sistema {SISTEMAS_DISPONIVEIS[sistema]['nome']}. Inclua: atributos, ataques, habilidades especiais, pontos de vida e nível de desafio. Seja detalhado e balanceado."
         else:
-            # Gera monstro aleatório
             system_prompt = get_system_prompt(sistema)
             prompt = f"Crie um monstro original e interessante para o sistema {SISTEMAS_DISPONIVEIS[sistema]['nome']}, com estatísticas completas de combate, habilidades únicas e uma breve descrição atmosférica. Seja criativo!"
         
@@ -50,7 +55,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"👹 {'Gerando' if nome else 'Criando'} monstro{' ' + nome if nome else ' aleatório'}...")
-        resposta = await chamar_groq(mensagens, max_tokens=1000)
+        resposta = await chamar_groq(mensagens, max_tokens=1500)  # AUMENTADO
         
         embed = discord.Embed(
             title=f"👹 {nome if nome else 'Monstro Gerado'}",
@@ -60,7 +65,6 @@ def register(bot: commands.Bot):
         embed.set_footer(text=f"Sistema: {SISTEMAS_DISPONIVEIS[sistema]['nome']} | Gerado por IA")
         await ctx.send(embed=embed)
 
-    # ========== LISTAR MONSTROS ==========
     @bot.command(name="monstros")
     async def listar_monstros(ctx):
         """Lista todos os monstros disponíveis no banco de dados para o sistema atual."""
@@ -80,7 +84,6 @@ def register(bot: commands.Bot):
         embed.set_footer(text=f"{len(monstros)} monstros disponíveis")
         await ctx.send(embed=embed)
 
-    # ========== NPC ==========
     @bot.command(name="npc")
     async def npc(ctx, *, descricao: str = None):
         """Gera um NPC completo."""
@@ -98,7 +101,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🎭 Gerando NPC...")
-        resposta = await chamar_groq(mensagens, max_tokens=800)
+        resposta = await chamar_groq(mensagens, max_tokens=1200)  # AUMENTADO
         
         embed = discord.Embed(
             title="🎭 NPC Gerado",
@@ -107,7 +110,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== ENCONTRO ==========
     @bot.command(name="encontro")
     async def encontro(ctx, nivel: int = None, dificuldade: str = "medio"):
         """Gera um encontro balanceado. Uso: !encontro <nível> <facil/medio/dificil>"""
@@ -115,15 +117,12 @@ def register(bot: commands.Bot):
         system_prompt = get_system_prompt(sistema)
         
         if not nivel:
-            nivel = 5  # Padrão
+            nivel = 5
         
         dif_map = {
-            "facil": "fácil",
-            "fácil": "fácil",
-            "medio": "médio",
-            "médio": "médio",
-            "dificil": "difícil",
-            "difícil": "difícil"
+            "facil": "fácil", "fácil": "fácil",
+            "medio": "médio", "médio": "médio",
+            "dificil": "difícil", "difícil": "difícil"
         }
         dificuldade = dif_map.get(dificuldade.lower(), "médio")
         
@@ -135,7 +134,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"⚔️ Gerando encontro nível {nivel} ({dificuldade})...")
-        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        resposta = await chamar_groq(mensagens, max_tokens=1800)  # AUMENTADO
         
         embed = discord.Embed(
             title=f"⚔️ Encontro - Nível {nivel} ({dificuldade.capitalize()})",
@@ -144,7 +143,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== ARMADILHA ==========
     @bot.command(name="armadilha")
     async def armadilha(ctx, dificuldade: str = "medio"):
         """Gera uma armadilha. Uso: !armadilha <facil/medio/dificil>"""
@@ -152,12 +150,9 @@ def register(bot: commands.Bot):
         system_prompt = get_system_prompt(sistema)
         
         dif_map = {
-            "facil": "fácil",
-            "fácil": "fácil",
-            "medio": "médio",
-            "médio": "médio",
-            "dificil": "difícil",
-            "difícil": "difícil"
+            "facil": "fácil", "fácil": "fácil",
+            "medio": "médio", "médio": "médio",
+            "dificil": "difícil", "difícil": "difícil"
         }
         dificuldade = dif_map.get(dificuldade.lower(), "médio")
         
@@ -169,7 +164,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"🪤 Gerando armadilha ({dificuldade})...")
-        resposta = await chamar_groq(mensagens, max_tokens=600)
+        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
         
         embed = discord.Embed(
             title=f"🪤 Armadilha ({dificuldade.capitalize()})",
@@ -178,7 +173,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== ITEM ==========
     @bot.command(name="item")
     async def item(ctx, *, tipo: str = None):
         """Gera um item mágico/especial. Uso: !item <tipo opcional>"""
@@ -196,7 +190,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("✨ Gerando item mágico...")
-        resposta = await chamar_groq(mensagens, max_tokens=700)
+        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
         
         embed = discord.Embed(
             title="✨ Item Mágico",
@@ -205,7 +199,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== TESOURO ==========
     @bot.command(name="tesouro")
     async def tesouro(ctx, nivel: int = None):
         """Gera tesouro balanceado. Uso: !tesouro <nível>"""
@@ -223,7 +216,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"💰 Gerando tesouro para nível {nivel}...")
-        resposta = await chamar_groq(mensagens, max_tokens=700)
+        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
         
         embed = discord.Embed(
             title=f"💰 Tesouro - Nível {nivel}",
@@ -232,7 +225,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== PUZZLE ==========
     @bot.command(name="puzzle")
     async def puzzle(ctx, *, tema: str = None):
         """Gera um enigma/quebra-cabeça. Uso: !puzzle <tema opcional>"""
@@ -250,7 +242,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🧩 Gerando puzzle...")
-        resposta = await chamar_groq(mensagens, max_tokens=800)
+        resposta = await chamar_groq(mensagens, max_tokens=1200)  # AUMENTADO
         
         embed = discord.Embed(
             title="🧩 Enigma",
@@ -259,7 +251,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== VILÃO ==========
     @bot.command(name="vilao")
     async def vilao(ctx, *, tipo: str = None):
         """Gera um vilão completo. Uso: !vilao <tipo opcional>"""
@@ -277,7 +268,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("😈 Gerando vilão...")
-        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        resposta = await chamar_groq(mensagens, max_tokens=1800)  # AUMENTADO
         
         embed = discord.Embed(
             title="😈 Vilão",
@@ -286,7 +277,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== CENA ==========
     @bot.command(name="cena")
     async def cena(ctx, *, descricao: str = None):
         """Descreve uma cena dramaticamente. Uso: !cena <descrição básica>"""
@@ -297,7 +287,7 @@ def register(bot: commands.Bot):
             await ctx.send("❌ Use: `!cena <descrição básica>` - Ex: `!cena taverna movimentada`")
             return
         
-        prompt = f"Descreva a seguinte cena de forma dramática e imersiva: '{descricao}'. Use linguagem evocativa, apele aos 5 sentidos, crie atmosfera e termine com um gancho para ação. Seja cinematográfico e envolvente."
+        prompt = f"Descreva a seguinte cena de forma dramática e imersiva: '{descricao}'. Use linguagem evocativa, apele aos 5 sentidos, crie atmosfera e termine com um gancho claro para ação. Seja cinematográfico e envolvente."
         
         mensagens = [
             {"role": "system", "content": system_prompt},
@@ -305,7 +295,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🎬 Criando cena...")
-        resposta = await chamar_groq(mensagens, max_tokens=600)
+        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
         
         embed = discord.Embed(
             title="🎬 Cena",
@@ -314,7 +304,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== NOME ==========
     @bot.command(name="nome")
     async def nome(ctx, *, tipo: str = "fantasia"):
         """Gera lista de nomes. Uso: !nome <tipo> - Ex: élfico, anão, orc, humano, etc"""
@@ -329,7 +318,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"📝 Gerando nomes de {tipo}...")
-        resposta = await chamar_groq(mensagens, max_tokens=400)
+        resposta = await chamar_groq(mensagens, max_tokens=500)
         
         embed = discord.Embed(
             title=f"📝 Nomes - {tipo.capitalize()}",
@@ -338,7 +327,6 @@ def register(bot: commands.Bot):
         )
         await ctx.send(embed=embed)
 
-    # ========== MOTIVAÇÃO ==========
     @bot.command(name="motivacao")
     async def motivacao(ctx):
         """Sorteia uma motivação aleatória para NPC."""

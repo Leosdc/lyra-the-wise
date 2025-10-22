@@ -98,11 +98,33 @@ def register(bot):
             {"role": "system", "content": system_prompt}
         ] + historico
 
-        resposta = await chamar_groq(mensagens_completas, max_tokens=800)
+        # CORREÇÃO: Aumentado para 2000 tokens
+        resposta = await chamar_groq(mensagens_completas, max_tokens=2000)
         
         if resposta and "Erro" not in resposta:
             historico.append({"role": "assistant", "content": resposta})
-            await ctx.send(f"🎭 {resposta[:1900]}")
+            
+            # Divide em mensagens se necessário
+            if len(resposta) <= 1900:
+                await ctx.send(f"🎭 {resposta}")
+            else:
+                partes = []
+                texto_restante = resposta
+                while texto_restante:
+                    if len(texto_restante) <= 1900:
+                        partes.append(texto_restante)
+                        break
+                    ponto_corte = texto_restante.rfind('\n', 0, 1900)
+                    if ponto_corte == -1:
+                        ponto_corte = 1900
+                    partes.append(texto_restante[:ponto_corte])
+                    texto_restante = texto_restante[ponto_corte:].lstrip()
+                
+                for i, parte in enumerate(partes, start=1):
+                    if i == 1:
+                        await ctx.send(f"🎭 {parte}")
+                    else:
+                        await ctx.send(f"🎭 *(cont. {i}/{len(partes)})* {parte}")
         else:
             await ctx.send(f"⚠️ {resposta}")
 
@@ -121,8 +143,28 @@ def register(bot):
             {"role": "user", "content": prompt}
         ]
         
-        resposta = await chamar_groq(mensagens, max_tokens=800)
-        await ctx.send(f"📜 Ideia de aventura:\n{resposta[:1900]}")
+        # CORREÇÃO: Aumentado para 1500 tokens
+        resposta = await chamar_groq(mensagens, max_tokens=1500)
+        
+        # Divide se necessário
+        if len(resposta) <= 1900:
+            await ctx.send(f"📜 **Ideia de aventura:**\n{resposta}")
+        else:
+            partes = []
+            texto_restante = resposta
+            while texto_restante:
+                if len(texto_restante) <= 1900:
+                    partes.append(texto_restante)
+                    break
+                ponto_corte = texto_restante.rfind('\n', 0, 1900)
+                if ponto_corte == -1:
+                    ponto_corte = 1900
+                partes.append(texto_restante[:ponto_corte])
+                texto_restante = texto_restante[ponto_corte:].lstrip()
+            
+            await ctx.send(f"📜 **Ideia de aventura:** (parte 1/{len(partes)})\n{partes[0]}")
+            for i, parte in enumerate(partes[1:], start=2):
+                await ctx.send(f"📜 *(continuação {i}/{len(partes)})*\n{parte}")
 
     # --- Regra --- CORRIGIDO AQUI
     @bot.command(name="regra")
@@ -139,7 +181,94 @@ def register(bot):
             {"role": "user", "content": prompt}
         ]
         
-        resposta = await chamar_groq(mensagens, max_tokens=600)
-        await ctx.send(f"⚖️ {resposta[:1900]}")
+        # CORREÇÃO: Aumentado para 1000 tokens
+        resposta = await chamar_groq(mensagens, max_tokens=1000)
+        
+        # Divide se necessário
+        if len(resposta) <= 1900:
+            await ctx.send(f"⚖️ {resposta}")
+        else:
+            partes = []
+            texto_restante = resposta
+            while texto_restante:
+                if len(texto_restante) <= 1900:
+                    partes.append(texto_restante)
+                    break
+                ponto_corte = texto_restante.rfind('\n', 0, 1900)
+                if ponto_corte == -1:
+                    ponto_corte = 1900
+                partes.append(texto_restante[:ponto_corte])
+                texto_restante = texto_restante[ponto_corte:].lstrip()
+            
+            await ctx.send(f"⚖️ {partes[0]}")
+            for parte in partes[1:]:
+                await ctx.send(f"⚖️ *(cont.)* {parte}")
+
+    # --- Sessão --- NOVO
+    @bot.command(name="sessao")
+    async def sessao(ctx, *, tema: str):
+        """Planeja uma sessão completa de RPG com o tema fornecido."""
+        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        system_prompt = get_system_prompt(sistema_atual)
+        
+        await ctx.send(f"📋 Planejando sessão completa sobre: **{tema}**...")
+        
+        prompt = f"""Crie um planejamento COMPLETO de sessão de RPG para o tema: {tema}
+
+Inclua de forma OBJETIVA e CONCISA:
+
+1. **SINOPSE** - Resumo em 2-3 frases
+
+2. **GANCHO INICIAL** - Como começar (1 parágrafo)
+
+3. **CENAS PRINCIPAIS** (3 cenas):
+   - Cena 1: Local, NPC, objetivo
+   - Cena 2: Local, NPC, objetivo  
+   - Cena 3: Local, NPC, objetivo
+
+4. **ENCONTRO/COMBATE** - 1 encontro com stats resumidas
+
+5. **RECOMPENSAS** - XP, itens, info
+
+6. **GANCHO FUTURO** - 1-2 frases
+
+7. **DICAS** - 2-3 dicas práticas
+
+Sistema: {sistema_atual.upper()}. SEJA DIRETO E COMPLETE TODAS AS SEÇÕES."""
+
+        mensagens = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ]
+        
+        # CORREÇÃO: Aumentado para 3000 tokens e adicionado aviso para completar
+        resposta = await chamar_groq(mensagens, max_tokens=3000)
+        
+        # Verifica se resposta foi cortada no meio
+        if resposta and not any(palavra in resposta[-100:].lower() for palavra in ["dica", "nota", "final", "conclusão", "fim"]):
+            # Resposta provavelmente foi cortada, avisa o usuário
+            resposta += "\n\n⚠️ *Resposta pode ter sido cortada. Use `!sessao` novamente ou peça detalhes específicos com `!mestre`*"
+        
+        # Envia em partes se necessário
+        if len(resposta) <= 1900:
+            await ctx.send(f"📋 **Planejamento de Sessão: {tema}**\n\n{resposta}")
+        else:
+            # Divide em partes de 1900 caracteres
+            partes = []
+            texto_restante = resposta
+            while texto_restante:
+                if len(texto_restante) <= 1900:
+                    partes.append(texto_restante)
+                    break
+                # Tenta cortar em uma quebra de linha próxima ao limite
+                ponto_corte = texto_restante.rfind('\n', 0, 1900)
+                if ponto_corte == -1:
+                    ponto_corte = 1900
+                partes.append(texto_restante[:ponto_corte])
+                texto_restante = texto_restante[ponto_corte:].lstrip()
+            
+            await ctx.send(f"📋 **Planejamento de Sessão: {tema}** (parte 1/{len(partes)})\n\n{partes[0]}")
+            for i, parte in enumerate(partes[1:], start=2):
+                await ctx.send(f"📋 *(continuação {i}/{len(partes)})*\n\n{parte}")
 
     print("✅ Módulo 'rpg_core' carregado com sucesso!")
