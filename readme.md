@@ -171,7 +171,7 @@ rpg-master-bot/
 │   ├── combate.py
 │   ├── mestre.py
 │   └── utilidades.py
-├── data/
+├── bot_data/
 │   ├── fichas_personagens.json
 │   ├── sistemas_rpg.json
 │   └── sessoes_ativas.json
