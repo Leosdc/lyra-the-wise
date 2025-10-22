@@ -1,6 +1,7 @@
 # sessoes_rpg.py
 # Sistema de sessões privadas de RPG com botões e gerenciamento completo
 # Compatível com a estrutura do Lyra_the_Wise_HML.py
+# CORREÇÃO: Mostra apenas fichas válidas e existentes
 
 from __future__ import annotations
 
@@ -38,8 +39,16 @@ def _user_mention(guild: discord.Guild, user_id: int) -> str:
 
 
 def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) -> List[Dict[str, Any]]:
-    """Retorna a lista de fichas (dict) do usuário."""
-    return [f for f in fichas_personagens.values() if f.get("autor") == user_id]
+    """Retorna a lista de fichas (dict) do usuário - APENAS FICHAS VÁLIDAS."""
+    fichas_validas = []
+    for chave, ficha in fichas_personagens.items():
+        # Verifica se a ficha tem todos os campos necessários e pertence ao usuário
+        if (ficha.get("autor") == user_id and 
+            ficha.get("nome") and 
+            ficha.get("sistema") and
+            ficha.get("conteudo")):
+            fichas_validas.append(ficha)
+    return fichas_validas
 
 
 def _sistema_do_canal(sistemas_rpg: Dict[int, str], channel_id: int) -> str:
@@ -80,16 +89,21 @@ async def _criar_canal_de_sessao(
     return channel
 
 
-def _formatar_lista_fichas(fichas: List[Dict[str, Any]]) -> str:
+def _formatar_lista_fichas(fichas: List[Dict[str, Any]], SISTEMAS_DISPONIVEIS: Dict) -> str:
+    """Formata lista de fichas válidas para exibição."""
     if not fichas:
         return "— Nenhuma ficha encontrada."
+    
     linhas = []
     for f in fichas[:25]:  # limitar visual
-        sistema = f.get("sistema", "dnd5e")
+        sistema_code = f.get("sistema", "dnd5e")
+        sistema_nome = SISTEMAS_DISPONIVEIS.get(sistema_code, {}).get("nome", sistema_code)
         nome = f.get("nome", "Sem nome")
-        linhas.append(f"• **{nome}** *(sistema: {sistema})*")
+        linhas.append(f"• **{nome}** *(Sistema: {sistema_nome})*")
+    
     if len(fichas) > 25:
         linhas.append(f"… e mais {len(fichas) - 25}")
+    
     return "\n".join(linhas)
 
 
@@ -268,7 +282,8 @@ def setup_sessoes(
         view = SessionControlView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt, timeout=None)
 
         # Construir embed com fichas de cada jogador
-        descr = f"Sessão criada por {mestre.mention}.\nSistema configurado: **{SISTEMAS_DISPONIVEIS.get(sistema, {}).get('nome', sistema)}**\n\n**Jogadores convidados:**\n"
+        sistema_nome = SISTEMAS_DISPONIVEIS.get(sistema, {}).get('nome', sistema)
+        descr = f"Sessão criada por {mestre.mention}.\nSistema configurado: **{sistema_nome}**\n\n**Jogadores convidados:**\n"
         for j in jogadores:
             descr += f"• {j.mention}\n"
 
@@ -280,17 +295,27 @@ def setup_sessoes(
         )
         await canal.send(embed=embed, view=view)
 
-        # Listar fichas por jogador
+        # CORREÇÃO: Listar apenas fichas VÁLIDAS por jogador
         for j in jogadores:
             fichas = _coletar_fichas_usuario(fichas_personagens, j.id)
-            lista = _formatar_lista_fichas(fichas)
-            await canal.send(
-                embed=discord.Embed(
-                    title=f"📚 Fichas de {j.display_name}",
-                    description=lista,
-                    color=discord.Color.dark_teal()
+            
+            if fichas:
+                lista = _formatar_lista_fichas(fichas, SISTEMAS_DISPONIVEIS)
+                await canal.send(
+                    embed=discord.Embed(
+                        title=f"📚 Fichas de {j.display_name}",
+                        description=lista,
+                        color=discord.Color.dark_teal()
+                    )
                 )
-            )
+            else:
+                await canal.send(
+                    embed=discord.Embed(
+                        title=f"📚 Fichas de {j.display_name}",
+                        description=f"— Nenhuma ficha encontrada.\n💡 Use `!ficha <nome>` ou `!criarficha` para criar uma nova!",
+                        color=discord.Color.orange()
+                    )
+                )
 
         await ctx.send(f"✅ Sessão criada com sucesso em {canal.mention}")
 
@@ -312,7 +337,11 @@ def setup_sessoes(
         chave_encontrada = None
         conteudo_preview = None
         for chave, ficha in fichas_personagens.items():
-            if ficha.get("autor") == ctx.author.id and ficha.get("nome", "").lower() == nome_personagem.lower():
+            # CORREÇÃO: Verifica se a ficha é válida antes de procurar
+            if (ficha.get("autor") == ctx.author.id and 
+                ficha.get("nome") and 
+                ficha.get("conteudo") and
+                ficha.get("nome", "").lower() == nome_personagem.lower()):
                 chave_encontrada = chave
                 conteudo_preview = ficha.get("conteudo", "")[:1700]
                 break
@@ -379,15 +408,24 @@ def setup_sessoes(
             except Exception:
                 pass
 
-            # Lista fichas do novo jogador
+            # CORREÇÃO: Lista apenas fichas válidas do novo jogador
             fichas = _coletar_fichas_usuario(fichas_personagens, m.id)
-            await ctx.send(
-                embed=discord.Embed(
-                    title=f"📚 Fichas de {m.display_name}",
-                    description=_formatar_lista_fichas(fichas),
-                    color=discord.Color.dark_teal()
+            if fichas:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=f"📚 Fichas de {m.display_name}",
+                        description=_formatar_lista_fichas(fichas, SISTEMAS_DISPONIVEIS),
+                        color=discord.Color.dark_teal()
+                    )
                 )
-            )
+            else:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=f"📚 Fichas de {m.display_name}",
+                        description=f"— Nenhuma ficha encontrada.\n💡 Use `!ficha <nome>` ou `!criarficha` para criar uma nova!",
+                        color=discord.Color.orange()
+                    )
+                )
 
         salvar_dados()
         if adicionados:
@@ -446,10 +484,13 @@ def setup_sessoes(
             except asyncio.TimeoutError:
                 return await ctx.send("⏰ Tempo esgotado — troca não aprovada.")
 
-        # Troca
+        # CORREÇÃO: Busca apenas fichas válidas
         chave_encontrada = None
         for chave, ficha in fichas_personagens.items():
-            if ficha.get("autor") == ctx.author.id and ficha.get("nome", "").lower() == nome_personagem.lower():
+            if (ficha.get("autor") == ctx.author.id and 
+                ficha.get("nome") and 
+                ficha.get("conteudo") and
+                ficha.get("nome", "").lower() == nome_personagem.lower()):
                 chave_encontrada = chave
                 break
 
