@@ -35,12 +35,16 @@ DATA_DIR.mkdir(exist_ok=True)
 # ==== Evento on_ready ====
 @bot.event
 async def on_ready():
+    await bot.change_presence(
+        activity=discord.Game(name="!rpghelp 🎲")
+    )
+
     print(f"🎲 {bot.user} está online!")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
-    
+
     # Carrega dados salvos
     carregar_dados(fichas_personagens, sistemas_rpg, sessoes_ativas)
-    
+
     # Inicia auto-save
     bot.loop.create_task(auto_save(bot, fichas_personagens, sistemas_rpg, sessoes_ativas))
     print("💾 Auto-save ativado!")

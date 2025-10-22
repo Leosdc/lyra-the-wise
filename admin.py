@@ -35,10 +35,6 @@ def register(bot: commands.Bot):
                     resultados.append(f"⚠️ {nome}: callback inválido")
                     continue
 
-                # Checa se há docstring
-                if not comando.callback.__doc__:
-                    resultados.append(f"ℹ️ {nome}: sem docstring (não é erro)")
-
                 # Checa parâmetros válidos
                 if not hasattr(comando, "params"):
                     erros += 1
@@ -53,4 +49,4 @@ def register(bot: commands.Bot):
         if len(resultados) > 30:
             msg += f"\n... (+{len(resultados) - 30} mais ocultos)"
 
-        await ctx.send(f"🧩 **Diagnóstico completo:**\n{resumo}\n\n```{msg}```")
+        await ctx.send(f"🧩 **Diagnóstico completo:**\n{resumo}")
