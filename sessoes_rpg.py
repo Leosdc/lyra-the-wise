@@ -590,7 +590,7 @@ def setup_sessoes(
 
         # Localiza ficha do usuário pelo nome
         chave_encontrada = None
-        conteudo_preview = None
+                               
         for chave, ficha in fichas_personagens.items():
             # CORREÇÃO: Verifica se a ficha é válida antes de procurar
             if (ficha.get("autor") == ctx.author.id and 
@@ -598,7 +598,7 @@ def setup_sessoes(
                 ficha.get("conteudo") and
                 ficha.get("nome", "").lower() == nome_personagem.lower()):
                 chave_encontrada = chave
-                conteudo_preview = ficha.get("conteudo", "")[:1700]
+                                                                   
                 break
 
         if not chave_encontrada:
@@ -608,10 +608,10 @@ def setup_sessoes(
         sessao["fichas"][str(ctx.author.id)] = chave_encontrada
         salvar_dados()
 
-        # CORREÇÃO: Mostra a ficha E notifica o grupo
+        # CORREÇÃO: Mostra apenas confirmação sem preview da ficha
         embed = discord.Embed(
             title=f"✅ Ficha Selecionada: {nome_personagem}",
-            description=conteudo_preview or "—",
+            description=f"Ficha `{nome_personagem}` selecionada com sucesso! Use `!verficha {nome_personagem}` para ver os detalhes completos.",
             color=discord.Color.green()
         )
         await ctx.send(embed=embed)

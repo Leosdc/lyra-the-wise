@@ -7,7 +7,7 @@ from discord.ext import commands
 from utils import (
     chamar_groq, get_system_prompt, key_from_name
 )
-from config import fichas_personagens, sistemas_rpg
+from config import fichas_personagens, sistemas_rpg, sessoes_ativas
 from sistemas_rpg import SISTEMAS_DISPONIVEIS, resolver_alias
 import os
 
@@ -246,17 +246,50 @@ Seja completo e balanceado para o sistema escolhido."""
         if not nome:
             await ctx.send("❌ Use `!verficha <nome>`.")
             return
-        chave, ficha = encontrar_ficha(ctx.author.id, nome)
-        if not ficha:
-            await ctx.send(f"❌ Ficha '{nome}' não encontrada!")
-            return
+														   
+					 
+																  
+				  
+        
+        # CORREÇÃO: Verifica se está em uma sessão ativa
+        sessao = sessoes_ativas.get(ctx.channel.id)
+        
+        if sessao:
+            # Está em sessão - permite ver fichas de qualquer participante
+            participantes = [sessao["mestre_id"]] + sessao["jogadores"]
+            ficha_encontrada = None
+            
+            # Primeiro tenta encontrar entre os participantes da sessão
+            for user_id in participantes:
+                chave, ficha = encontrar_ficha(user_id, nome)
+                if ficha:
+                    ficha_encontrada = ficha
+                    break
+            
+            if not ficha_encontrada:
+                await ctx.send(f"❌ Ficha '{nome}' não encontrada entre os participantes da sessão!")
+                return
 
-        embed = discord.Embed(
-            title=f"📜 {ficha['nome']} ({SISTEMAS_DISPONIVEIS[ficha['sistema']]['nome']})",
-            description=ficha["conteudo"][:4000],
-            color=discord.Color.gold(),
-        )
-        await ctx.send(embed=embed)
+            embed = discord.Embed(
+                title=f"📜 {ficha_encontrada['nome']} ({SISTEMAS_DISPONIVEIS[ficha_encontrada['sistema']]['nome']})",
+                description=ficha_encontrada["conteudo"][:4000],
+                color=discord.Color.gold(),
+            )
+            await ctx.send(embed=embed)
+            
+        else:
+            # Fora de sessão - comportamento normal (apenas próprias fichas)
+            chave, ficha = encontrar_ficha(ctx.author.id, nome)
+            if not ficha:
+                await ctx.send(f"❌ Ficha '{nome}' não encontrada!")
+                return
+
+            embed = discord.Embed(
+                title=f"📜 {ficha['nome']} ({SISTEMAS_DISPONIVEIS[ficha['sistema']]['nome']})",
+                description=ficha["conteudo"][:4000],
+                color=discord.Color.gold(),
+            )
+            await ctx.send(embed=embed)
 
     @bot.command(name="editarficha")
     async def editar_ficha(ctx, *, nome: str = None):
@@ -397,9 +430,14 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
             await ctx.send("❌ Use: `!converterficha <sistema> <nome>`")
             return
 
+        novo_sistema_original = novo_sistema
         novo_sistema = resolver_alias(novo_sistema.lower())
+        
+        # CORREÇÃO: Debug para identificar problemas
         if novo_sistema not in SISTEMAS_DISPONIVEIS:
-            await ctx.send("❌ Sistema inválido.")
+            sistemas_cyberpunk = [s for s in SISTEMAS_DISPONIVEIS.keys() if "cyber" in s or "red" in s]
+            sistemas_disponiveis = ", ".join([f"`{s}`" for s in sistemas_cyberpunk])
+            await ctx.send(f"❌ Sistema `{novo_sistema_original}` (resolvido para `{novo_sistema}`) inválido.\n💡 Sistemas cyberpunk disponíveis: {sistemas_disponiveis}")
             return
 
         chave, ficha = encontrar_ficha(ctx.author.id, nome_personagem)
@@ -431,7 +469,8 @@ FICHA ORIGINAL:
             await ctx.send(f"⚠️ Erro ao converter ficha via IA: {convertido}")
             return
 
-        novo_nome = f"{ficha['nome']} ({SISTEMAS_DISPONIVEIS[novo_sistema]['nome'][:10]})"
+        nome_sistema = SISTEMAS_DISPONIVEIS[novo_sistema]['nome'].strip()
+        novo_nome = f"{ficha['nome']} ({nome_sistema})"
         nova_chave = key_from_name(f"{ctx.author.id}_{novo_nome}")
 
         fichas_personagens[nova_chave] = {

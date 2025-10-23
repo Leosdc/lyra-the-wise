@@ -146,7 +146,7 @@ SISTEMAS_DISPONIVEIS = {
         "descricao": "Mentes que migram; corpos descartáveis; conspirações pós-humanas à sombra de horrores TITAN.",
         "categoria": "Sci-Fi Transumano",
         "dados": ["d10","d100"],
-        "atributos": ["Cognição","Intuição","Reflexos","Sagacidade","Somática","Força de Vontade"],
+        "atributos": ["Cognição","Intuição","Reflexos","Sagacidade","Somatica","Força de Vontade"],
         "classes": ["Backgrounds e facções em vez de classes rígidas"],
         "mecanicas": "d100 vs perícia; sleeves (corpos) e morphs; resleeving.",
         "nivel_max": "N/A"
@@ -456,7 +456,7 @@ SISTEMAS_DISPONIVEIS = {
         "descricao": "Engrenagens e feitiços: guerra a vapor, pistolas fumegantes e golems de ferro no campo de batalha.",
         "categoria": "Steampunk Fantasy",
         "dados": ["d6"],
-        "atributos": ["Physique","Agility","Intellect"],
+        "atributos": ["Physique","Agilidade","Intellect"],
         "classes": ["Carreiras variadas (Soldado, Pistoleiro, Mago, etc.)"],
         "mecanicas": "2d6 + skill vs alvo; Warjacks; magia arcana.",
         "nivel_max": "N/A"
@@ -482,7 +482,13 @@ ALIASES = {
     "pf1": "pathfinder1e",
     "starwars": "starwars_ffg",
     "star wars": "starwars_ffg",
-    "wfrp": "wfrp4e"
+    "wfrp": "wfrp4e",
+    "cyberpunk": "cyberpunkred",
+    "cyberpunk red": "cyberpunkred",
+    "cpred": "cyberpunkred",
+    "cp_red": "cyberpunkred",
+    "cyberpunk2020": "cyberpunk2020",
+    "cp2020": "cyberpunk2020"
 }
 
 # ===== FUNÇÕES AUXILIARES =====
