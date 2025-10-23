@@ -1,7 +1,6 @@
 # sessoes_rpg.py
 # Sistema de sessões privadas de RPG com botões e gerenciamento completo
-# Compatível com a estrutura do Lyra_the_Wise_HML.py
-# CORREÇÃO: Mostra apenas fichas válidas e existentes
+# CORREÇÃO: Sistema de continuação de história com !acao
 
 from __future__ import annotations
 
@@ -23,7 +22,8 @@ import datetime
 #   "fichas": {user_id: chave_ficha},
 #   "status": "preparando" | "em_andamento" | "pausada",
 #   "sistema": "dnd5e" | "cthulhu" | ...,
-#   "criada_em": iso_str
+#   "criada_em": iso_str,
+#   "historia": List[Dict] - NOVO: mantém contexto da aventura
 # }
 
 SESSOES_CATEGORY_NAME = "🎲 Sessões RPG"
@@ -50,7 +50,6 @@ def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) ->
         if os.path.exists(FICHAS_PATH):
             with open(FICHAS_PATH, "r", encoding="utf-8") as f:
                 fichas_do_arquivo = json.load(f)
-                # Atualiza o dicionário passado com os dados do arquivo
                 fichas_personagens.clear()
                 fichas_personagens.update(fichas_do_arquivo)
                 print(f"🔄 Fichas recarregadas do arquivo: {len(fichas_do_arquivo)} total")
@@ -62,9 +61,7 @@ def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) ->
     
     for chave, ficha in fichas_personagens.items():
         total_analisadas += 1
-        # Verifica se a ficha tem todos os campos necessários e pertence ao usuário
         if ficha.get("autor") == user_id:
-            # Debug: mostra quais fichas pertencem ao usuário
             print(f"🔍 Ficha encontrada para user {user_id}: {ficha.get('nome', 'SEM NOME')} - válida: {bool(ficha.get('nome') and ficha.get('sistema') and ficha.get('conteudo'))}")
             
             if (ficha.get("nome") and 
@@ -95,7 +92,6 @@ async def _criar_canal_de_sessao(
     bot_member: discord.Member,
     nome_sugerido: Optional[str] = None,
 ) -> discord.TextChannel:
-    # Overwrites: canal privado visível somente para mestre, jogadores e bot
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         bot_member: discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True, attach_files=True),
@@ -120,7 +116,7 @@ def _formatar_lista_fichas(fichas: List[Dict[str, Any]], SISTEMAS_DISPONIVEIS: D
         return "— Nenhuma ficha encontrada."
     
     linhas = []
-    for f in fichas[:25]:  # limitar visual
+    for f in fichas[:25]:
         sistema_code = f.get("sistema", "dnd5e")
         sistema_nome = SISTEMAS_DISPONIVEIS.get(sistema_code, {}).get("nome", sistema_code)
         nome = f.get("nome", "Sem nome")
@@ -158,6 +154,43 @@ def _embed_status_sessao(guild: discord.Guild, sessao: Dict[str, Any]) -> discor
             picks.append(f"• {_user_mention(guild, uid)} → **{chave.split('_', 1)[-1].replace('_',' ').title()}**")
         embed.add_field(name="🧾 Fichas Selecionadas", value="\n".join(picks)[:1024], inline=False)
     return embed
+
+
+# -----------------------------
+# View para Continuação da História
+# -----------------------------
+
+class ContinueStoryView(discord.ui.View):
+    """Botões para continuar a narrativa após cada resposta da IA."""
+    
+    def __init__(self, bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt):
+        super().__init__(timeout=None)  # Sem timeout para sessões longas
+        self.bot = bot
+        self.sessoes_ativas = sessoes_ativas
+        self.salvar_dados = salvar_dados
+        self.chamar_groq = chamar_groq
+        self.get_system_prompt = get_system_prompt
+    
+    @discord.ui.button(label="🎬 Continuar História", style=discord.ButtonStyle.primary, custom_id="continue_story")
+    async def continue_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Botão para o mestre continuar a narrativa."""
+        sessao = self.sessoes_ativas.get(interaction.channel.id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        # Apenas mestre pode usar este botão
+        if interaction.user.id != sessao.get("mestre_id"):
+            return await interaction.response.send_message(
+                "⚠️ Use o comando `!acao` para descrever o que seu personagem faz!",
+                ephemeral=True
+            )
+        
+        # Pede ao mestre que descreva a próxima cena
+        await interaction.response.send_message(
+            "📝 **Descreva a próxima cena ou acontecimento:**\n"
+            "Use o comando `!cenanarrada <descrição>` ou aguarde as ações dos jogadores com `!acao`.",
+            ephemeral=True
+        )
 
 
 # -----------------------------
@@ -200,8 +233,6 @@ class SessionControlView(discord.ui.View):
         sistema = sessao.get("sistema", "dnd5e")
         prompt_intro = "Gere uma **introdução épica** para a sessão de RPG, apresentando o cenário, tom e conexões entre os personagens. 3-5 parágrafos curtos. Termine com um gancho claro para a primeira cena.\n\nPersonagens:\n"
         for uid, chave in fichas.items():
-            # chave é "autorid_nome_slug"
-            # Aqui não temos a ficha inteira, então pediremos ao canal buscar via referencia (util na integração pelo módulo pai)
             prompt_intro += f"- Jogador {uid}: personagem chave '{chave}'\n"
 
         # Chama IA
@@ -211,7 +242,13 @@ class SessionControlView(discord.ui.View):
         ]
         await interaction.response.defer(thinking=True)
         intro = await self.chamar_groq(mensagens, max_tokens=900)
+        
+        # NOVO: Inicializa histórico narrativo
         sessao["status"] = "em_andamento"
+        sessao["historia"] = [
+            {"role": "system", "content": self.get_system_prompt(sistema)},
+            {"role": "assistant", "content": intro}
+        ]
         self.salvar_dados()
 
         embed = discord.Embed(
@@ -219,7 +256,16 @@ class SessionControlView(discord.ui.View):
             description=intro[:4000],
             color=discord.Color.green()
         )
-        await interaction.followup.send(embed=embed)
+        
+        # NOVO: View com botão para continuar
+        continue_view = ContinueStoryView(
+            self.bot,
+            self.sessoes_ativas,
+            self.salvar_dados,
+            self.chamar_groq,
+            self.get_system_prompt
+        )
+        await interaction.followup.send(embed=embed, view=continue_view)
 
     @discord.ui.button(label="📊 Ver Fichas", style=discord.ButtonStyle.primary)
     async def fichas_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -254,7 +300,6 @@ class SessionControlView(discord.ui.View):
         for uid in jogadores:
             if str(uid) in fichas_sel or uid in fichas_sel:
                 chave_ficha = fichas_sel.get(str(uid)) or fichas_sel.get(uid)
-                # Busca info da ficha
                 ficha_info = fichas_atualizadas.get(chave_ficha, {})
                 nome_ficha = ficha_info.get('nome', 'Ficha Desconhecida')
                 jogadores_txt.append(f"• {_user_mention(interaction.guild, uid)} — ✅ **{nome_ficha}**")
@@ -310,6 +355,144 @@ def setup_sessoes(
 ):
     """Registra comandos de sessão no bot."""
 
+    # ------------- Comando: acao (NOVO!) -------------
+    @bot.command(name="acao")
+    @commands.guild_only()
+    async def acao(ctx: commands.Context, *, descricao: str = None):
+        """Jogadores descrevem suas ações durante a sessão."""
+        if ctx.channel.id not in sessoes_ativas:
+            return await ctx.send("❌ Este comando deve ser usado **no canal da sessão**.")
+        
+        if not descricao:
+            return await ctx.send("❌ Use: `!acao <descrição do que seu personagem faz>`")
+        
+        sessao = sessoes_ativas[ctx.channel.id]
+        
+        # Verifica se a pessoa faz parte da sessão
+        if ctx.author.id != sessao["mestre_id"] and ctx.author.id not in sessao["jogadores"]:
+            return await ctx.send("⚠️ Você não faz parte desta sessão.")
+        
+        # Verifica se a sessão já começou
+        if sessao.get("status") != "em_andamento":
+            return await ctx.send("⚠️ A aventura ainda não começou! O mestre precisa iniciar a sessão.")
+        
+        # Pega o nome do personagem (se tiver ficha selecionada)
+        fichas_sel = sessao.get("fichas", {})
+        chave_ficha = fichas_sel.get(str(ctx.author.id)) or fichas_sel.get(ctx.author.id)
+        
+        if chave_ficha:
+            # Extrai o nome da ficha da chave (formato: "userid_nome")
+            nome_personagem = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
+        else:
+            nome_personagem = ctx.author.display_name
+        
+        # Formata a ação do jogador
+        acao_formatada = f"**{nome_personagem}** ({ctx.author.display_name}): {descricao}"
+        
+        # Adiciona ao histórico da sessão
+        historia = sessao.get("historia", [])
+        historia.append({
+            "role": "user",
+            "content": f"Ação de {nome_personagem}: {descricao}"
+        })
+        
+        # Envia mensagem visual
+        await ctx.send(
+            embed=discord.Embed(
+                title=f"🎭 {nome_personagem} age!",
+                description=descricao,
+                color=discord.Color.blue()
+            ).set_footer(text=f"Jogador: {ctx.author.display_name}")
+        )
+        
+        # Gera resposta narrativa da IA
+        await ctx.send("✨ *A história se desenrola...*")
+        
+        sistema = sessao.get("sistema", "dnd5e")
+        
+        # Limita histórico para não estourar tokens (últimas 10 interações)
+        historia_recente = historia[-20:] if len(historia) > 20 else historia
+        
+        # Monta mensagens para IA
+        mensagens = [
+            {"role": "system", "content": get_system_prompt(sistema)},
+        ] + historia_recente + [
+            {"role": "user", "content": f"Narre as consequências da ação de {nome_personagem}: {descricao}. Seja cinematográfico, use os 5 sentidos, e termine com um gancho claro para a próxima ação. Mantenha o ritmo da aventura. 2-4 parágrafos."}
+        ]
+        
+        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        
+        # Adiciona resposta ao histórico
+        historia.append({"role": "assistant", "content": resposta})
+        sessao["historia"] = historia
+        salvar_dados()
+        
+        # Envia resposta com botão para continuar
+        embed = discord.Embed(
+            title="📖 A História Continua...",
+            description=resposta[:4000],
+            color=discord.Color.gold()
+        )
+        
+        view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
+        await ctx.send(embed=embed, view=view)
+
+    # ------------- Comando: cenanarrada (NOVO - para o mestre) -------------
+    @bot.command(name="cenanarrada")
+    @commands.guild_only()
+    async def cena_narrada(ctx: commands.Context, *, descricao: str = None):
+        """Mestre narra uma cena e a IA expande cinematograficamente (apenas em sessões)."""
+        if ctx.channel.id not in sessoes_ativas:
+            return await ctx.send("❌ Este comando deve ser usado **no canal da sessão**. Use `!cena` para descrições gerais.")
+        
+        if not descricao:
+            return await ctx.send("❌ Use: `!cenanarrada <descrição da cena>`")
+        
+        sessao = sessoes_ativas[ctx.channel.id]
+        
+        # Apenas mestre pode narrar cenas
+        if ctx.author.id != sessao.get("mestre_id"):
+            return await ctx.send("⚠️ Apenas o **mestre** pode narrar cenas. Use `!acao` para descrever o que seu personagem faz.")
+        
+        # Verifica se a sessão já começou
+        if sessao.get("status") != "em_andamento":
+            return await ctx.send("⚠️ A aventura ainda não começou! Use o botão 'Iniciar Aventura' primeiro.")
+        
+        # Adiciona ao histórico
+        historia = sessao.get("historia", [])
+        historia.append({
+            "role": "user",
+            "content": f"Mestre descreve nova cena: {descricao}"
+        })
+        
+        await ctx.send("🎬 *Expandindo a cena...*")
+        
+        sistema = sessao.get("sistema", "dnd5e")
+        historia_recente = historia[-20:] if len(historia) > 20 else historia
+        
+        mensagens = [
+            {"role": "system", "content": get_system_prompt(sistema)},
+        ] + historia_recente + [
+            {"role": "user", "content": f"Expanda esta cena de forma cinematográfica: {descricao}. Use linguagem evocativa, apele aos 5 sentidos, crie tensão ou beleza conforme apropriado. Termine com um momento que convide ação dos jogadores. 2-4 parágrafos."}
+        ]
+        
+        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        
+        # Adiciona resposta ao histórico
+        historia.append({"role": "assistant", "content": resposta})
+        sessao["historia"] = historia
+        salvar_dados()
+        
+        # Envia resposta
+        embed = discord.Embed(
+            title="🎬 Nova Cena",
+            description=resposta[:4000],
+            color=discord.Color.purple()
+        )
+        
+        view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
+        await ctx.send(embed=embed, view=view)
+
     # ------------- Comando: iniciarsessao -------------
     @bot.command(name="iniciarsessao")
     @commands.guild_only()
@@ -320,7 +503,7 @@ def setup_sessoes(
         guild = ctx.guild
         mestre: discord.Member = ctx.author
         jogadores: List[discord.Member] = list(membros)
-        bot_member = guild.get_member(bot.user.id)  # type: ignore
+        bot_member = guild.get_member(bot.user.id)
 
         # Categoria + canal
         categoria = await _garantir_categoria(guild)
@@ -345,6 +528,7 @@ def setup_sessoes(
             "status": "preparando",
             "sistema": sistema,
             "criada_em": datetime.datetime.utcnow().isoformat(),
+            "historia": [],  # NOVO: histórico vazio
         }
         salvar_dados()
 
@@ -365,7 +549,7 @@ def setup_sessoes(
         )
         await canal.send(embed=embed, view=view)
 
-        # CORREÇÃO: Listar TODAS as fichas VÁLIDAS por jogador (independente do sistema)
+        # Lista fichas de cada jogador
         for j in jogadores:
             fichas = _coletar_fichas_usuario(fichas_personagens, j.id)
             
@@ -476,7 +660,7 @@ def setup_sessoes(
             return await ctx.send("❌ Use: `!convidarsessao @NovoJogador [@Outro]`")
 
         guild = ctx.guild
-        canal: discord.TextChannel = ctx.channel  # type: ignore
+        canal: discord.TextChannel = ctx.channel
 
         # Atualiza permissões e sessão
         adicionados = []
@@ -524,7 +708,7 @@ def setup_sessoes(
         if ctx.author.id != sessao["mestre_id"]:
             return await ctx.send("⚠️ Apenas o mestre pode remover jogadores.")
 
-        canal: discord.TextChannel = ctx.channel  # type: ignore
+        canal: discord.TextChannel = ctx.channel
         try:
             await canal.set_permissions(jogador, overwrite=None)
         except Exception:
@@ -632,7 +816,7 @@ def setup_sessoes(
             if content:
                 logs.append(f"{m.author.display_name}: {content}")
         logs = list(reversed(logs))
-        resumo_input = "\n".join(logs[-40:])  # limita tamanho
+        resumo_input = "\n".join(logs[-40:])
 
         sessao = sessoes_ativas[ctx.channel.id]
         sistema = sessao.get("sistema", "dnd5e")
@@ -659,10 +843,21 @@ def setup_sessoes(
             "• `!removerjogador @Jog` — Remove jogador\n"
             "• `!mudarficha Nome` — Troca de personagem\n"
             "• `!pausarsessao` — Pausa/retoma\n\n"
+            "**🎭 Durante a Aventura (NOVO!)**\n"
+            "• `!acao <descrição>` — Jogadores descrevem o que fazem\n"
+            "• `!cenanarrada <descrição>` — Mestre narra nova cena (expandida pela IA)\n"
+            "• Botão 'Continuar História' — Aparece após cada ação\n\n"
             "**Botões no canal da sessão**\n"
             "• 🎬 Iniciar Aventura — Inicia a narrativa (mestre)\n"
             "• 📊 Ver Fichas — Mostra status das seleções\n"
-            "• 🚪 Encerrar Sessão — Apaga o canal (mestre)"
+            "• 🎬 Continuar História — Aparece após cada ação\n"
+            "• 🚪 Encerrar Sessão — Apaga o canal (mestre)\n\n"
+            "**💡 Exemplo de Jogo:**\n"
+            "1. Mestre clica 'Iniciar Aventura'\n"
+            "2. Jogador usa `!acao examino a porta misteriosa`\n"
+            "3. IA narra as consequências\n"
+            "4. Mestre pode usar `!cenanarrada` para introduzir novas situações\n"
+            "5. Continue alternando ações e narrativas!"
         )
         await ctx.send(embed=discord.Embed(title="📖 Ajuda — Sessões de RPG", description=descr, color=discord.Color.blurple()))
 
