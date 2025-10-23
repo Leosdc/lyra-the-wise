@@ -1,14 +1,31 @@
-# fichas.py — corrigido com !criarficha interativo
+# fichas.py — CORREÇÃO: Força salvamento imediato de fichas
 import re
 import json
 import asyncio
 import discord
 from discord.ext import commands
 from utils import (
-    chamar_groq, get_system_prompt, salvar_dados, key_from_name
+    chamar_groq, get_system_prompt, key_from_name
 )
 from config import fichas_personagens, sistemas_rpg
 from sistemas_rpg import SISTEMAS_DISPONIVEIS, resolver_alias
+import os
+
+# CORREÇÃO: Importa diretamente os caminhos dos arquivos
+DATA_DIR = os.path.join(os.getcwd(), "bot_data")
+FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
+
+def salvar_fichas_agora():
+    """SALVA FICHAS IMEDIATAMENTE no arquivo JSON."""
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(FICHAS_PATH, "w", encoding="utf-8") as f:
+            json.dump(fichas_personagens, f, ensure_ascii=False, indent=2)
+        print(f"💾 FICHAS SALVAS! Total: {len(fichas_personagens)}")
+        return True
+    except Exception as e:
+        print(f"❌ ERRO ao salvar fichas: {e}")
+        return False
 
 
 def encontrar_ficha(user_id, nome):
@@ -114,7 +131,7 @@ Seja completo e balanceado para o sistema escolhido."""
                 await ctx.send(f"⚠️ Ocorreu um erro ao gerar a ficha: {conteudo}")
                 return
             
-            # Salva ficha
+            # CORREÇÃO: Salva ficha COM GARANTIA de persistência
             chave = key_from_name(f"{ctx.author.id}_{nome}")
             fichas_personagens[chave] = {
                 "nome": nome,
@@ -123,7 +140,12 @@ Seja completo e balanceado para o sistema escolhido."""
                 "autor": ctx.author.id,
                 "criada_em": "interativa"
             }
-            salvar_dados()
+            
+            # FORÇA SALVAMENTO IMEDIATO
+            if salvar_fichas_agora():
+                print(f"✅ Ficha '{nome}' salva para user {ctx.author.id}")
+            else:
+                await ctx.send("⚠️ Aviso: A ficha foi criada mas pode não ter sido salva corretamente.")
             
             # Mostra resultado
             embed = discord.Embed(
@@ -168,7 +190,12 @@ Seja completo e balanceado para o sistema escolhido."""
             "conteudo": conteudo,
             "autor": ctx.author.id
         }
-        salvar_dados()
+        
+        # FORÇA SALVAMENTO IMEDIATO
+        if salvar_fichas_agora():
+            print(f"✅ Ficha '{nome}' salva para user {ctx.author.id}")
+        else:
+            await ctx.send("⚠️ Aviso: A ficha foi criada mas pode não ter sido salva corretamente.")
 
         await ctx.send(
             embed=discord.Embed(
@@ -182,8 +209,9 @@ Seja completo e balanceado para o sistema escolhido."""
     async def minhas_fichas(ctx, sistema: str = None):
         user_id = ctx.author.id
         fichas_user = {k: v for k, v in fichas_personagens.items() if v.get("autor") == user_id}
+        
         if not fichas_user:
-            await ctx.send("❌ Você não tem fichas salvas ainda.")
+            await ctx.send(f"❌ Você não tem fichas salvas ainda.\n💡 Use `!ficha <nome>` ou `!criarficha` para criar uma!")
             return
 
         if sistema:
@@ -325,7 +353,12 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
             
             # Atualiza ficha
             fichas_personagens[chave]["conteudo"] = conteudo_novo
-            salvar_dados()
+            
+            # FORÇA SALVAMENTO IMEDIATO
+            if salvar_fichas_agora():
+                print(f"✅ Ficha '{ficha['nome']}' atualizada para user {ctx.author.id}")
+            else:
+                await ctx.send("⚠️ Aviso: A edição foi feita mas pode não ter sido salva corretamente.")
             
             embed = discord.Embed(
                 title=f"✅ Ficha Atualizada: {ficha['nome']}",
@@ -349,7 +382,13 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
             return
 
         del fichas_personagens[chave]
-        salvar_dados()
+        
+        # FORÇA SALVAMENTO IMEDIATO
+        if salvar_fichas_agora():
+            print(f"✅ Ficha '{ficha['nome']}' deletada para user {ctx.author.id}")
+        else:
+            await ctx.send("⚠️ Aviso: A ficha foi deletada mas a mudança pode não ter sido salva corretamente.")
+        
         await ctx.send(f"🗑️ Ficha **{ficha['nome']}** deletada com sucesso.")
 
     @bot.command(name="converterficha")
@@ -403,7 +442,12 @@ FICHA ORIGINAL:
             "convertida_de": atual,
         }
 
-        salvar_dados()
+        # FORÇA SALVAMENTO IMEDIATO
+        if salvar_fichas_agora():
+            print(f"✅ Ficha convertida '{novo_nome}' salva para user {ctx.author.id}")
+        else:
+            await ctx.send("⚠️ Aviso: A conversão foi feita mas pode não ter sido salva corretamente.")
+
         await ctx.send(
             embed=discord.Embed(
                 title="✅ Ficha Convertida!",

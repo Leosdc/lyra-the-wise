@@ -40,14 +40,39 @@ def _user_mention(guild: discord.Guild, user_id: int) -> str:
 
 def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) -> List[Dict[str, Any]]:
     """Retorna a lista de fichas (dict) do usuário - APENAS FICHAS VÁLIDAS."""
+    # CORREÇÃO CRÍTICA: Recarrega fichas do arquivo antes de listar
+    import json
+    import os
+    DATA_DIR = os.path.join(os.getcwd(), "bot_data")
+    FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
+    
+    try:
+        if os.path.exists(FICHAS_PATH):
+            with open(FICHAS_PATH, "r", encoding="utf-8") as f:
+                fichas_do_arquivo = json.load(f)
+                # Atualiza o dicionário passado com os dados do arquivo
+                fichas_personagens.clear()
+                fichas_personagens.update(fichas_do_arquivo)
+                print(f"🔄 Fichas recarregadas do arquivo: {len(fichas_do_arquivo)} total")
+    except Exception as e:
+        print(f"⚠️ Erro ao recarregar fichas: {e}")
+    
     fichas_validas = []
+    total_analisadas = 0
+    
     for chave, ficha in fichas_personagens.items():
+        total_analisadas += 1
         # Verifica se a ficha tem todos os campos necessários e pertence ao usuário
-        if (ficha.get("autor") == user_id and 
-            ficha.get("nome") and 
-            ficha.get("sistema") and
-            ficha.get("conteudo")):
-            fichas_validas.append(ficha)
+        if ficha.get("autor") == user_id:
+            # Debug: mostra quais fichas pertencem ao usuário
+            print(f"🔍 Ficha encontrada para user {user_id}: {ficha.get('nome', 'SEM NOME')} - válida: {bool(ficha.get('nome') and ficha.get('sistema') and ficha.get('conteudo'))}")
+            
+            if (ficha.get("nome") and 
+                ficha.get("sistema") and
+                ficha.get("conteudo")):
+                fichas_validas.append(ficha)
+    
+    print(f"📊 Total de fichas analisadas: {total_analisadas}, Fichas do usuário {user_id}: {len(fichas_validas)}")
     return fichas_validas
 
 
@@ -202,7 +227,52 @@ class SessionControlView(discord.ui.View):
         if not sessao:
             return await interaction.response.send_message("❌ Sessão não encontrada neste canal.", ephemeral=True)
 
-        embed = _embed_status_sessao(interaction.guild, sessao)
+        # CORREÇÃO: Recarrega fichas antes de mostrar
+        import json
+        import os
+        DATA_DIR = os.path.join(os.getcwd(), "bot_data")
+        FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
+        
+        fichas_atualizadas = {}
+        try:
+            if os.path.exists(FICHAS_PATH):
+                with open(FICHAS_PATH, "r", encoding="utf-8") as f:
+                    fichas_atualizadas = json.load(f)
+                print(f"🔄 [Botão] Fichas recarregadas: {len(fichas_atualizadas)}")
+        except Exception as e:
+            print(f"⚠️ Erro ao recarregar fichas no botão: {e}")
+
+        # Cria embed customizado com fichas recarregadas
+        jogadores = sessao.get("jogadores", [])
+        fichas_sel = sessao.get("fichas", {})
+        sistema = sessao.get("sistema", "dnd5e")
+        status = sessao.get("status", "preparando")
+        mestre_id = sessao.get("mestre_id")
+        mestre_txt = _user_mention(interaction.guild, mestre_id)
+
+        jogadores_txt = []
+        for uid in jogadores:
+            if str(uid) in fichas_sel or uid in fichas_sel:
+                chave_ficha = fichas_sel.get(str(uid)) or fichas_sel.get(uid)
+                # Busca info da ficha
+                ficha_info = fichas_atualizadas.get(chave_ficha, {})
+                nome_ficha = ficha_info.get('nome', 'Ficha Desconhecida')
+                jogadores_txt.append(f"• {_user_mention(interaction.guild, uid)} — ✅ **{nome_ficha}**")
+            else:
+                jogadores_txt.append(f"• {_user_mention(interaction.guild, uid)} — ⏳ sem ficha")
+
+        embed = discord.Embed(
+            title="🎮 Status da Sessão",
+            description=f"**Sistema**: `{sistema}`\n**Status**: **{status.upper()}**\n**Mestre**: {mestre_txt}",
+            color=discord.Color.purple()
+        )
+        embed.add_field(
+            name="👥 Jogadores e Fichas", 
+            value="\n".join(jogadores_txt) if jogadores_txt else "—", 
+            inline=False
+        )
+        embed.set_footer(text="Use !verficha <nome> para ver detalhes de uma ficha")
+        
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @discord.ui.button(label="🚪 Encerrar Sessão", style=discord.ButtonStyle.danger)
@@ -295,18 +365,19 @@ def setup_sessoes(
         )
         await canal.send(embed=embed, view=view)
 
-        # CORREÇÃO: Listar apenas fichas VÁLIDAS por jogador
+        # CORREÇÃO: Listar TODAS as fichas VÁLIDAS por jogador (independente do sistema)
         for j in jogadores:
             fichas = _coletar_fichas_usuario(fichas_personagens, j.id)
             
             if fichas:
                 lista = _formatar_lista_fichas(fichas, SISTEMAS_DISPONIVEIS)
+                total_fichas = len(fichas)
                 await canal.send(
                     embed=discord.Embed(
-                        title=f"📚 Fichas de {j.display_name}",
+                        title=f"📚 Fichas de {j.display_name} ({total_fichas} encontrada{'s' if total_fichas != 1 else ''})",
                         description=lista,
                         color=discord.Color.dark_teal()
-                    )
+                    ).set_footer(text="💡 Use !selecionarficha <nome> para escolher sua ficha")
                 )
             else:
                 await canal.send(
@@ -353,13 +424,23 @@ def setup_sessoes(
         sessao["fichas"][str(ctx.author.id)] = chave_encontrada
         salvar_dados()
 
-        # Mostra a ficha
+        # CORREÇÃO: Mostra a ficha E notifica o grupo
         embed = discord.Embed(
             title=f"✅ Ficha Selecionada: {nome_personagem}",
             description=conteudo_preview or "—",
             color=discord.Color.green()
         )
         await ctx.send(embed=embed)
+        
+        # Notifica quantos jogadores já selecionaram
+        jogadores_total = len(sessao.get("jogadores", []))
+        fichas_selecionadas = len(sessao.get("fichas", {}))
+        
+        if fichas_selecionadas >= jogadores_total:
+            await ctx.send("🎉 **Todos os jogadores selecionaram suas fichas!** O mestre pode iniciar a aventura.")
+        else:
+            faltam = jogadores_total - fichas_selecionadas
+            await ctx.send(f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} selecionar ficha...")
 
     # ------------- Comando: sessoes -------------
     @bot.command(name="sessoes")
@@ -408,15 +489,16 @@ def setup_sessoes(
             except Exception:
                 pass
 
-            # CORREÇÃO: Lista apenas fichas válidas do novo jogador
+            # CORREÇÃO: Lista TODAS as fichas válidas do novo jogador
             fichas = _coletar_fichas_usuario(fichas_personagens, m.id)
             if fichas:
+                total_fichas = len(fichas)
                 await ctx.send(
                     embed=discord.Embed(
-                        title=f"📚 Fichas de {m.display_name}",
+                        title=f"📚 Fichas de {m.display_name} ({total_fichas} encontrada{'s' if total_fichas != 1 else ''})",
                         description=_formatar_lista_fichas(fichas, SISTEMAS_DISPONIVEIS),
                         color=discord.Color.dark_teal()
-                    )
+                    ).set_footer(text="💡 Use !selecionarficha <nome> para escolher sua ficha")
                 )
             else:
                 await ctx.send(

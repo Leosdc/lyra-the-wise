@@ -24,10 +24,8 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 # ==== Estruturas em memória ====
-fichas_personagens = {}
-sistemas_rpg = {}
-sessoes_ativas = {}
-conversation_history = {}
+# CORREÇÃO: Importa os dicionários compartilhados do config
+from config import fichas_personagens, sistemas_rpg, sessoes_ativas
 
 DATA_DIR = Path("bot_data")
 DATA_DIR.mkdir(exist_ok=True)
@@ -42,8 +40,10 @@ async def on_ready():
     print(f"🎲 {bot.user} está online!")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
 
-    # Carrega dados salvos
+    # CORREÇÃO CRÍTICA: Carrega dados ANTES de tudo
+    print("📂 Carregando dados salvos...")
     carregar_dados(fichas_personagens, sistemas_rpg, sessoes_ativas)
+    print(f"✅ Dados carregados! Fichas: {len(fichas_personagens)}, Sistemas: {len(sistemas_rpg)}, Sessões: {len(sessoes_ativas)}")
 
     # Inicia auto-save
     bot.loop.create_task(auto_save(bot, fichas_personagens, sistemas_rpg, sessoes_ativas))
