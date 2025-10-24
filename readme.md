@@ -154,6 +154,6 @@ GitHub: [@Leosdc](https://github.com/Leosdc)
 
 📜 Licença: **MIT License**  
 
-⭐ Se este projeto te ajudou, dê uma estrela, ou então, [compre um café](https://ko-fi.com/leosdc) para mim! 
+⭐ Se este projeto te ajudou, dê uma estrela, ou então, ☕ [compre um café](https://ko-fi.com/leosdc) para mim! 
 
 Feito com ❤️ para a comunidade de RPG de mesa.
