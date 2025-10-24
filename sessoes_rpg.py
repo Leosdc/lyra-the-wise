@@ -1,6 +1,6 @@
 # sessoes_rpg.py
-# Sistema de sessões privadas de RPG com botões e gerenciamento completo
-# CORREÇÃO: Sistema de continuação de história com !acao
+# Sistema de sessões privadas de RPG com rolagens interativas
+# NOVO: IA solicita rolagens automaticamente durante a aventura!
 
 from __future__ import annotations
 
@@ -9,9 +9,10 @@ from discord.ext import commands
 from typing import Dict, List, Optional, Any
 import asyncio
 import datetime
+import re
 
 # -----------------------------
-# Estrutura de dados esperada
+# Estrutura de sessão
 # -----------------------------
 # sessoes_ativas[channel_id] = {
 #   "guild_id": int,
@@ -23,7 +24,7 @@ import datetime
 #   "status": "preparando" | "em_andamento" | "pausada",
 #   "sistema": "dnd5e" | "cthulhu" | ...,
 #   "criada_em": iso_str,
-#   "historia": List[Dict] - NOVO: mantém contexto da aventura
+#   "historia": List[Dict] - mantém contexto da aventura
 # }
 
 SESSOES_CATEGORY_NAME = "🎲 Sessões RPG"
@@ -40,7 +41,7 @@ def _user_mention(guild: discord.Guild, user_id: int) -> str:
 
 def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) -> List[Dict[str, Any]]:
     """Retorna a lista de fichas (dict) do usuário - APENAS FICHAS VÁLIDAS."""
-    # CORREÇÃO CRÍTICA: Recarrega fichas do arquivo antes de listar
+																	  
     import json
     import os
     DATA_DIR = os.path.join(os.getcwd(), "bot_data")
@@ -52,24 +53,24 @@ def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) ->
                 fichas_do_arquivo = json.load(f)
                 fichas_personagens.clear()
                 fichas_personagens.update(fichas_do_arquivo)
-                print(f"🔄 Fichas recarregadas do arquivo: {len(fichas_do_arquivo)} total")
+                print(f"🔄 Fichas recarregadas: {len(fichas_do_arquivo)} total")
     except Exception as e:
         print(f"⚠️ Erro ao recarregar fichas: {e}")
     
     fichas_validas = []
-    total_analisadas = 0
-    
+						
+	
     for chave, ficha in fichas_personagens.items():
-        total_analisadas += 1
+							 
         if ficha.get("autor") == user_id:
-            print(f"🔍 Ficha encontrada para user {user_id}: {ficha.get('nome', 'SEM NOME')} - válida: {bool(ficha.get('nome') and ficha.get('sistema') and ficha.get('conteudo'))}")
-            
+																																																													 
+			
             if (ficha.get("nome") and 
                 ficha.get("sistema") and
                 ficha.get("conteudo")):
                 fichas_validas.append(ficha)
     
-    print(f"📊 Total de fichas analisadas: {total_analisadas}, Fichas do usuário {user_id}: {len(fichas_validas)}")
+    print(f"📊 User {user_id}: {len(fichas_validas)} ficha(s) válida(s)")
     return fichas_validas
 
 
@@ -153,6 +154,138 @@ def _embed_status_sessao(guild: discord.Guild, sessao: Dict[str, Any]) -> discor
 
 
 # -----------------------------
+# View para Rolagens Interativas (NOVO!)
+# -----------------------------
+
+class RollRequestView(discord.ui.View):
+    """Botões para rolar dados quando solicitado pela IA."""
+    
+    def __init__(self, bot, sessoes_ativas, salvar_dados, channel_id, roll_type, players_needed):
+        super().__init__(timeout=300)  # 5 minutos para rolar
+        self.bot = bot
+        self.sessoes_ativas = sessoes_ativas
+        self.salvar_dados = salvar_dados
+        self.channel_id = channel_id
+        self.roll_type = roll_type  # Ex: "1d20+3", "2d6"
+        self.players_needed = players_needed  # Lista de user_ids que precisam rolar
+        self.rolls_done = {}  # user_id -> resultado
+    
+    @discord.ui.button(label="🎲 Rolar Dados", style=discord.ButtonStyle.success, custom_id="roll_dice")
+    async def roll_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Jogador rola os dados solicitados."""
+        if interaction.user.id not in self.players_needed:
+            return await interaction.response.send_message(
+                "⚠️ Esta rolagem não é para você!",
+                ephemeral=True
+            )
+        
+        if interaction.user.id in self.rolls_done:
+            return await interaction.response.send_message(
+                f"✅ Você já rolou: **{self.rolls_done[interaction.user.id]}**",
+                ephemeral=True
+            )
+        
+        # Importa função de rolagem
+        from rpg_core import rolar_dados
+        texto, total = rolar_dados(self.roll_type)
+        
+        if total is None:
+            return await interaction.response.send_message(
+                f"❌ Erro ao processar rolagem: {texto}",
+                ephemeral=True
+            )
+        
+        # Registra resultado
+        self.rolls_done[interaction.user.id] = total
+        
+        # Responde ao jogador
+        await interaction.response.send_message(
+            f"🎲 **{interaction.user.display_name}** rolou:\n{texto}",
+            ephemeral=False
+        )
+        
+        # Verifica se todos rolaram
+        if len(self.rolls_done) >= len(self.players_needed):
+            # Todos rolaram - continua a história
+            sessao = self.sessoes_ativas.get(self.channel_id)
+            if sessao:
+                # Desabilita botão
+                button.disabled = True
+                await interaction.message.edit(view=self)
+                
+                # Prepara resumo das rolagens
+                resumo_rolls = "\n".join([
+                    f"• {interaction.guild.get_member(uid).display_name if interaction.guild.get_member(uid) else f'Jogador {uid}'}: **{resultado}**"
+                    for uid, resultado in self.rolls_done.items()
+                ])
+                
+                await interaction.channel.send(
+                    embed=discord.Embed(
+                        title="📊 Todas as Rolagens Concluídas!",
+                        description=f"**Resultados:**\n{resumo_rolls}\n\n✨ *A história continua...*",
+                        color=discord.Color.gold()
+                    )
+                )
+                
+                # Continua narrativa automaticamente
+                await self._continue_story(interaction.channel, sessao)
+        else:
+            # Ainda faltam jogadores
+            faltam = len(self.players_needed) - len(self.rolls_done)
+            await interaction.channel.send(
+                f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} rolar..."
+            )
+    
+    async def _continue_story(self, channel, sessao):
+        """Continua a história após todas as rolagens."""
+        from utils import chamar_groq, get_system_prompt
+        
+        sistema = sessao.get("sistema", "dnd5e")
+        historia = sessao.get("historia", [])
+        
+        # Adiciona contexto das rolagens
+        resumo_rolls = "\n".join([
+            f"Jogador {uid} rolou: {resultado}"
+            for uid, resultado in self.rolls_done.items()
+        ])
+        
+        historia.append({
+            "role": "user",
+            "content": f"Resultados das rolagens ({self.roll_type}):\n{resumo_rolls}\n\nNarre as consequências destas rolagens de forma cinematográfica. Considere os valores obtidos e descreva o resultado de forma envolvente. 2-3 parágrafos."
+        })
+        
+        # Limita histórico
+        historia_recente = historia[-20:] if len(historia) > 20 else historia
+        
+        mensagens = [
+            {"role": "system", "content": get_system_prompt(sistema)},
+        ] + historia_recente
+        
+        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        
+        # Adiciona ao histórico
+        historia.append({"role": "assistant", "content": resposta})
+        sessao["historia"] = historia
+        self.salvar_dados()
+        
+        # Envia resposta
+        embed = discord.Embed(
+            title="📖 A História Continua...",
+            description=resposta[:4000],
+            color=discord.Color.gold()
+        )
+        
+        view = ContinueStoryView(
+            self.bot,
+            self.sessoes_ativas,
+            self.salvar_dados,
+            chamar_groq,
+            get_system_prompt
+        )
+        await channel.send(embed=embed, view=view)
+
+
+# -----------------------------
 # View para Continuação da História
 # -----------------------------
 
@@ -190,7 +323,7 @@ class ContinueStoryView(discord.ui.View):
 
 
 # -----------------------------
-# Views (Botões)
+# Views (Botões de Controle)
 # -----------------------------
 
 class SessionControlView(discord.ui.View):
@@ -239,7 +372,7 @@ class SessionControlView(discord.ui.View):
         await interaction.response.defer(thinking=True)
         intro = await self.chamar_groq(mensagens, max_tokens=900)
         
-        # NOVO: Inicializa histórico narrativo
+        # Inicializa histórico narrativo
         sessao["status"] = "em_andamento"
         sessao["historia"] = [
             {"role": "system", "content": self.get_system_prompt(sistema)},
@@ -253,7 +386,7 @@ class SessionControlView(discord.ui.View):
             color=discord.Color.green()
         )
         
-        # NOVO: View com botão para continuar
+        # View com botão para continuar
         continue_view = ContinueStoryView(
             self.bot,
             self.sessoes_ativas,
@@ -269,7 +402,7 @@ class SessionControlView(discord.ui.View):
         if not sessao:
             return await interaction.response.send_message("❌ Sessão não encontrada neste canal.", ephemeral=True)
 
-        # CORREÇÃO: Recarrega fichas antes de mostrar
+        # Recarrega fichas antes de mostrar
         import json
         import os
         DATA_DIR = os.path.join(os.getcwd(), "bot_data")
@@ -280,7 +413,7 @@ class SessionControlView(discord.ui.View):
             if os.path.exists(FICHAS_PATH):
                 with open(FICHAS_PATH, "r", encoding="utf-8") as f:
                     fichas_atualizadas = json.load(f)
-                print(f"🔄 [Botão] Fichas recarregadas: {len(fichas_atualizadas)}")
+                print(f"🔄 [Botão Ver Fichas] Recarregadas: {len(fichas_atualizadas)} fichas")
         except Exception as e:
             print(f"⚠️ Erro ao recarregar fichas no botão: {e}")
 
@@ -351,7 +484,7 @@ def setup_sessoes(
 ):
     """Registra comandos de sessão no bot."""
 
-    # ------------- Comando: acao (NOVO!) -------------
+    # ------------- Comando: acao (COM ROLAGENS!) -------------
     @bot.command(name="acao")
     @commands.guild_only()
     async def acao(ctx: commands.Context, *, descricao: str = None):
@@ -377,7 +510,7 @@ def setup_sessoes(
         chave_ficha = fichas_sel.get(str(ctx.author.id)) or fichas_sel.get(ctx.author.id)
         
         if chave_ficha:
-            # Extrai o nome da ficha da chave (formato: "userid_nome")
+																	  
             nome_personagem = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
         else:
             nome_personagem = ctx.author.display_name
@@ -406,14 +539,14 @@ def setup_sessoes(
         
         sistema = sessao.get("sistema", "dnd5e")
         
-        # Limita histórico para não estourar tokens (últimas 10 interações)
+        # Limita histórico para não estourar tokens (últimas 20 interações)
         historia_recente = historia[-20:] if len(historia) > 20 else historia
         
-        # Monta mensagens para IA
+        # Monta mensagens para IA com instrução para solicitar rolagens
         mensagens = [
-            {"role": "system", "content": get_system_prompt(sistema)},
+            {"role": "system", "content": get_system_prompt(sistema) + "\n\n**IMPORTANTE:** Quando apropriado, solicite rolagens de dados aos jogadores. Use o formato exato:\n[ROLL: tipo_de_dado, jogadores]\nExemplos:\n- [ROLL: 1d20+3, todos] - todos rolam\n- [ROLL: 2d6, " + nome_personagem + "] - apenas este personagem\n- [ROLL: 1d20, todos] - múltiplos jogadores\n\nSOLICITE rolagens em situações de: combate, testes de perícia, percepção, furtividade, etc."},
         ] + historia_recente + [
-            {"role": "user", "content": f"Narre as consequências da ação de {nome_personagem}: {descricao}. Seja cinematográfico, use os 5 sentidos, e termine com um gancho claro para a próxima ação. Mantenha o ritmo da aventura. 2-4 parágrafos."}
+            {"role": "user", "content": f"Narre as consequências da ação de {nome_personagem}: {descricao}. Seja cinematográfico, use os 5 sentidos. Se a ação requer teste de habilidade/combate/perícia, SOLICITE a rolagem apropriada usando [ROLL: dado, jogadores]. Termine com gancho claro. 2-4 parágrafos."}
         ]
         
         resposta = await chamar_groq(mensagens, max_tokens=1200)
@@ -423,21 +556,89 @@ def setup_sessoes(
         sessao["historia"] = historia
         salvar_dados()
         
-        # Envia resposta com botão para continuar
-        embed = discord.Embed(
-            title="📖 A História Continua...",
-            description=resposta[:4000],
-            color=discord.Color.gold()
-        )
+        # NOVO: Detecta se há solicitação de rolagem
+        roll_match = re.search(r'\[ROLL:\s*([^,\]]+),\s*([^\]]+)\]', resposta, re.IGNORECASE)
+												 
+										
+									  
+		 
         
-        view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
-        await ctx.send(embed=embed, view=view)
+        if roll_match:
+            roll_type = roll_match.group(1).strip()
+            players_str = roll_match.group(2).strip()
+            
+            # Remove a tag [ROLL:...] da resposta exibida
+            resposta_limpa = re.sub(r'\[ROLL:[^\]]+\]', '', resposta).strip()
+            
+            # Determina quem deve rolar
+            if players_str.lower() in ['todos', 'all', 'grupo', 'party']:
+                players_needed = sessao.get("jogadores", [])
+            else:
+                # Tenta encontrar personagens mencionados
+                players_needed = []
+                for jogador_id in sessao.get("jogadores", []):
+                    fichas_sel = sessao.get("fichas", {})
+                    chave_ficha = fichas_sel.get(str(jogador_id)) or fichas_sel.get(jogador_id)
+                    if chave_ficha:
+                        nome_ficha = chave_ficha.split('_', 1)[-1].replace('_', ' ').lower()
+                        if nome_ficha in players_str.lower():
+                            players_needed.append(jogador_id)
+                
+                # Se não encontrou ninguém específico, assume todos
+                if not players_needed:
+                    players_needed = sessao.get("jogadores", [])
+            
+            # Envia narrativa
+            embed = discord.Embed(
+                title="📖 A História Continua...",
+                description=resposta_limpa[:4000],
+                color=discord.Color.gold()
+            )
+            await ctx.send(embed=embed)
+            
+            # Cria embed de solicitação de rolagem
+            jogadores_nomes = []
+            for uid in players_needed:
+                membro = ctx.guild.get_member(uid)
+                if membro:
+                    jogadores_nomes.append(membro.mention)
+            
+            roll_embed = discord.Embed(
+                title="🎲 Rolagem Necessária!",
+                description=(
+                    f"**Tipo de Rolagem:** `{roll_type}`\n"
+                    f"**Jogadores:** {', '.join(jogadores_nomes) if jogadores_nomes else 'Todos'}\n\n"
+                    f"Clique no botão abaixo para rolar seus dados!"
+                ),
+                color=discord.Color.blue()
+            )
+            
+            view = RollRequestView(
+                bot, 
+                sessoes_ativas, 
+                salvar_dados, 
+                ctx.channel.id,
+                roll_type,
+                players_needed
+            )
+            await ctx.send(embed=roll_embed, view=view)
+            
+        else:
+            # Sem rolagem solicitada - continua normal
+            embed = discord.Embed(
+                title="📖 A História Continua...",
+                description=resposta[:4000],
+                color=discord.Color.gold()
+            )
+            
+            view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
+            await ctx.send(embed=embed, view=view)
 
-    # ------------- Comando: cenanarrada (NOVO - para o mestre) -------------
+    # ------------- Comando: cenanarrada (COM ROLAGENS!) -------------
     @bot.command(name="cenanarrada")
     @commands.guild_only()
     async def cena_narrada(ctx: commands.Context, *, descricao: str = None):
-        """Mestre narra uma cena e a IA expande cinematograficamente (apenas em sessões)."""
+        """Mestre narra uma cena e a IA expande cinematograficamente."""
         if ctx.channel.id not in sessoes_ativas:
             return await ctx.send("❌ Este comando deve ser usado **no canal da sessão**. Use `!cena` para descrições gerais.")
         
@@ -467,9 +668,9 @@ def setup_sessoes(
         historia_recente = historia[-20:] if len(historia) > 20 else historia
         
         mensagens = [
-            {"role": "system", "content": get_system_prompt(sistema)},
+            {"role": "system", "content": get_system_prompt(sistema) + "\n\n**IMPORTANTE:** Quando apropriado, solicite rolagens de dados aos jogadores. Use o formato exato:\n[ROLL: tipo_de_dado, jogadores]\nExemplos:\n- [ROLL: 1d20+3, todos] - todos rolam\n- [ROLL: 2d6, jogador_específico] - apenas um\n\nSOLICITE rolagens em situações de: combate, percepção, investigação, furtividade, etc."},
         ] + historia_recente + [
-            {"role": "user", "content": f"Expanda esta cena de forma cinematográfica: {descricao}. Use linguagem evocativa, apele aos 5 sentidos, crie tensão ou beleza conforme apropriado. Termine com um momento que convide ação dos jogadores. 2-4 parágrafos."}
+            {"role": "user", "content": f"Expanda esta cena de forma cinematográfica: {descricao}. Use linguagem evocativa, apele aos 5 sentidos. Se a situação requer rolagens (percepção, combate, etc), SOLICITE usando [ROLL: dado, jogadores]. Termine com momento que convide ação. 2-4 parágrafos."}
         ]
         
         resposta = await chamar_groq(mensagens, max_tokens=1200)
@@ -479,15 +680,83 @@ def setup_sessoes(
         sessao["historia"] = historia
         salvar_dados()
         
-        # Envia resposta
-        embed = discord.Embed(
-            title="🎬 Nova Cena",
-            description=resposta[:4000],
-            color=discord.Color.purple()
-        )
+        # NOVO: Detecta se há solicitação de rolagem
+        roll_match = re.search(r'\[ROLL:\s*([^,\]]+),\s*([^\]]+)\]', resposta, re.IGNORECASE)
+								   
+										
+										
+		 
         
-        view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
-        await ctx.send(embed=embed, view=view)
+        if roll_match:
+            roll_type = roll_match.group(1).strip()
+            players_str = roll_match.group(2).strip()
+            
+            # Remove a tag [ROLL:...] da resposta exibida
+            resposta_limpa = re.sub(r'\[ROLL:[^\]]+\]', '', resposta).strip()
+            
+            # Determina quem deve rolar
+            if players_str.lower() in ['todos', 'all', 'grupo', 'party']:
+                players_needed = sessao.get("jogadores", [])
+            else:
+                # Tenta encontrar personagens mencionados
+                players_needed = []
+                for jogador_id in sessao.get("jogadores", []):
+                    fichas_sel = sessao.get("fichas", {})
+                    chave_ficha = fichas_sel.get(str(jogador_id)) or fichas_sel.get(jogador_id)
+                    if chave_ficha:
+                        nome_ficha = chave_ficha.split('_', 1)[-1].replace('_', ' ').lower()
+                        if nome_ficha in players_str.lower():
+                            players_needed.append(jogador_id)
+                
+                # Se não encontrou ninguém específico, assume todos
+                if not players_needed:
+                    players_needed = sessao.get("jogadores", [])
+            
+            # Envia narrativa
+            embed = discord.Embed(
+                title="🎬 Nova Cena",
+                description=resposta_limpa[:4000],
+                color=discord.Color.purple()
+            )
+            await ctx.send(embed=embed)
+            
+            # Cria embed de solicitação de rolagem
+            jogadores_nomes = []
+            for uid in players_needed:
+                membro = ctx.guild.get_member(uid)
+                if membro:
+                    jogadores_nomes.append(membro.mention)
+            
+            roll_embed = discord.Embed(
+                title="🎲 Rolagem Necessária!",
+                description=(
+                    f"**Tipo de Rolagem:** `{roll_type}`\n"
+                    f"**Jogadores:** {', '.join(jogadores_nomes) if jogadores_nomes else 'Todos'}\n\n"
+                    f"Clique no botão abaixo para rolar seus dados!"
+                ),
+                color=discord.Color.blue()
+            )
+            
+            view = RollRequestView(
+                bot, 
+                sessoes_ativas, 
+                salvar_dados, 
+                ctx.channel.id,
+                roll_type,
+                players_needed
+            )
+            await ctx.send(embed=roll_embed, view=view)
+            
+        else:
+            # Sem rolagem solicitada - continua normal
+            embed = discord.Embed(
+                title="🎬 Nova Cena",
+                description=resposta[:4000],
+                color=discord.Color.purple()
+            )
+            
+            view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
+            await ctx.send(embed=embed, view=view)
 
     # ------------- Comando: iniciarsessao -------------
     @bot.command(name="iniciarsessao")
@@ -524,14 +793,14 @@ def setup_sessoes(
             "status": "preparando",
             "sistema": sistema,
             "criada_em": datetime.datetime.utcnow().isoformat(),
-            "historia": [],  # NOVO: histórico vazio
+            "historia": [],
         }
         salvar_dados()
 
         # Mensagem inicial com botões
         view = SessionControlView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt, timeout=None)
 
-        # Construir embed com fichas de cada jogador
+        # Construir embed
         sistema_nome = SISTEMAS_DISPONIVEIS.get(sistema, {}).get('nome', sistema)
         descr = f"Sessão criada por {mestre.mention}.\nSistema configurado: **{sistema_nome}**\n\n**Jogadores convidados:**\n"
         for j in jogadores:
@@ -586,15 +855,15 @@ def setup_sessoes(
 
         # Localiza ficha do usuário pelo nome
         chave_encontrada = None
-                               
+							   
         for chave, ficha in fichas_personagens.items():
-            # CORREÇÃO: Verifica se a ficha é válida antes de procurar
+																		  
             if (ficha.get("autor") == ctx.author.id and 
                 ficha.get("nome") and 
                 ficha.get("conteudo") and
                 ficha.get("nome", "").lower() == nome_personagem.lower()):
                 chave_encontrada = chave
-                                                                   
+																   
                 break
 
         if not chave_encontrada:
@@ -604,7 +873,7 @@ def setup_sessoes(
         sessao["fichas"][str(ctx.author.id)] = chave_encontrada
         salvar_dados()
 
-        # CORREÇÃO: Mostra apenas confirmação sem preview da ficha
+        # Confirmação
         embed = discord.Embed(
             title=f"✅ Ficha Selecionada: {nome_personagem}",
             description=f"Ficha `{nome_personagem}` selecionada com sucesso! Use `!verficha {nome_personagem}` para ver os detalhes completos.",
@@ -669,7 +938,7 @@ def setup_sessoes(
             except Exception:
                 pass
 
-            # CORREÇÃO: Lista TODAS as fichas válidas do novo jogador
+            # Lista fichas do novo jogador
             fichas = _coletar_fichas_usuario(fichas_personagens, m.id)
             if fichas:
                 total_fichas = len(fichas)
@@ -730,7 +999,7 @@ def setup_sessoes(
         em_andamento = sessao.get("status") == "em_andamento"
         mestre_id = sessao.get("mestre_id")
 
-        # Se já iniciou, precisa de aprovação do mestre (via reação)
+        # Se já iniciou, precisa de aprovação do mestre
         if em_andamento and ctx.author.id != mestre_id:
             msg = await ctx.send(f"⚠️ {_user_mention(ctx.guild, mestre_id)}, aprova a troca de ficha de {ctx.author.mention}? ✅/❌")
             await msg.add_reaction("✅")
@@ -746,7 +1015,7 @@ def setup_sessoes(
             except asyncio.TimeoutError:
                 return await ctx.send("⏰ Tempo esgotado — troca não aprovada.")
 
-        # CORREÇÃO: Busca apenas fichas válidas
+        # Busca ficha
         chave_encontrada = None
         for chave, ficha in fichas_personagens.items():
             if (ficha.get("autor") == ctx.author.id and 
@@ -839,21 +1108,33 @@ def setup_sessoes(
             "• `!removerjogador @Jog` — Remove jogador\n"
             "• `!mudarficha Nome` — Troca de personagem\n"
             "• `!pausarsessao` — Pausa/retoma\n\n"
-            "**🎭 Durante a Aventura (NOVO!)**\n"
+            "**🎭 Durante a Aventura (Sistema Interativo!)**\n"
             "• `!acao <descrição>` — Jogadores descrevem o que fazem\n"
-            "• `!cenanarrada <descrição>` — Mestre narra nova cena (expandida pela IA)\n"
+            "• `!cenanarrada <descrição>` — Mestre narra nova cena\n"
+            "• **🎲 Rolagens Automáticas:** Quando a IA solicitar rolagens, um botão aparecerá!\n"
+            "  - Clique em 'Rolar Dados' quando solicitado\n"
+            "  - O sistema aguarda TODOS rolarem antes de continuar\n"
+            "  - Os resultados são mostrados e a história prossegue automaticamente\n"
             "• Botão 'Continuar História' — Aparece após cada ação\n\n"
             "**Botões no canal da sessão**\n"
             "• 🎬 Iniciar Aventura — Inicia a narrativa (mestre)\n"
             "• 📊 Ver Fichas — Mostra status das seleções\n"
+            "• 🎲 Rolar Dados — Aparece quando a IA solicita rolagens\n"
             "• 🎬 Continuar História — Aparece após cada ação\n"
             "• 🚪 Encerrar Sessão — Apaga o canal (mestre)\n\n"
-            "**💡 Exemplo de Jogo:**\n"
+            "**💡 Exemplo de Jogo com Rolagens:**\n"
             "1. Mestre clica 'Iniciar Aventura'\n"
-            "2. Jogador usa `!acao examino a porta misteriosa`\n"
-            "3. IA narra as consequências\n"
-            "4. Mestre pode usar `!cenanarrada` para introduzir novas situações\n"
-            "5. Continue alternando ações e narrativas!"
+            "2. Jogador usa `!acao examino a porta trancada`\n"
+            "3. IA narra: 'A porta está trancada... [SOLICITA ROLAGEM 1d20+Percepção]'\n"
+            "4. Botão 🎲 aparece para o jogador rolar\n"
+            "5. Jogador clica, rola 18+3 = 21\n"
+            "6. IA continua: 'Com esse resultado excepcional, você nota...'\n"
+            "7. História flui naturalmente!\n\n"
+            "**🎯 Dicas para Mestres:**\n"
+            "• A IA pedirá rolagens em situações apropriadas (combate, perícia, etc)\n"
+            "• Use `!cenanarrada` para introduzir desafios que exigem testes\n"
+            "• O sistema aguarda automaticamente todos os jogadores rolarem\n"
+            "• Você pode usar `!rolar` manualmente a qualquer momento também"
         )
         await ctx.send(embed=discord.Embed(title="📖 Ajuda — Sessões de RPG", description=descr, color=discord.Color.blurple()))
 
