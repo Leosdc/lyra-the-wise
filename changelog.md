@@ -4,6 +4,7 @@
 ### 🎭 Adicionado - Sistema de Narrativa Contínua
 - `!acao`: Jogadores descrevem ações, IA narra consequências com contexto contínuo.
 - `!cenanarrada`: Mestre narra cenas expandidas cinematograficamente pela IA.
+- `!rolar dados`: Mestre solicita que os dados sejam lançados por todos os participantes, tornando a aventura ainda mais emocionante.
 - Histórico de 20 interações por sessão para manter coerência narrativa.
 - Botão **"Continuar História"** para fluidez da aventura.
 
