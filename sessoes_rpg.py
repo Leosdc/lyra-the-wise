@@ -359,10 +359,18 @@ class SessionControlView(discord.ui.View):
             return await interaction.response.send_message(f"⏳ Ainda faltam fichas: {faltantes_txt}", ephemeral=True)
 
         # Monta resumo das fichas selecionadas para a IA
+        from config import fichas_personagens
+        
         sistema = sessao.get("sistema", "dnd5e")
         prompt_intro = "Gere uma **introdução épica** para a sessão de RPG, apresentando o cenário, tom e conexões entre os personagens. 3-5 parágrafos curtos. Termine com um gancho claro para a primeira cena.\n\nPersonagens:\n"
+        
         for uid, chave in fichas.items():
-            prompt_intro += f"- Jogador {uid}: personagem chave '{chave}'\n"
+            # Busca nome real da ficha
+            ficha_info = fichas_personagens.get(chave, {})
+            nome_personagem = ficha_info.get('nome', 'Personagem Desconhecido')
+            conteudo = ficha_info.get('conteudo', '')
+            resumo = conteudo[:200] + "..." if len(conteudo) > 200 else conteudo
+            prompt_intro += f"- **{nome_personagem}**: {resumo}\n"
 
         # Chama IA
         mensagens = [

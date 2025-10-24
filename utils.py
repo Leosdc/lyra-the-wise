@@ -113,9 +113,38 @@ async def chamar_groq(mensagens, max_tokens=1000):
         )
         return response.choices[0].message.content
     except Exception as e:
-        print(f"⚠️ Erro em chamar_groq: {e}")
+        erro_str = str(e)
+        print(f"⚠️ Erro em chamar_groq: {erro_str}")
         print(f"⚠️ Mensagens recebidas: {mensagens}")
-        return f"⚠️ Ocorreu um erro ao consultar a IA: {str(e)}"
+        
+        # Tratamento específico de rate limit
+        if "rate_limit" in erro_str.lower() or "429" in erro_str:
+            # Extrai tempo de espera se disponível
+            import re
+            tempo_match = re.search(r'(\d+)m(\d+)', erro_str)
+            tempo_msg = ""
+            if tempo_match:
+                minutos = tempo_match.group(1)
+                segundos = tempo_match.group(2)
+                tempo_msg = f"⏰ Tente novamente em **{minutos} minutos e {segundos} segundos**.\n\n"
+            
+            return (
+                "⏳ **Limite de tokens atingido!**\n\n"
+                "A Lyra usou muita energia hoje e precisa descansar um pouco. "
+                f"{tempo_msg}"
+                "💡 **Dicas:**\n"
+                "• Use comandos mais curtos e específicos\n"
+                "• Aguarde a renovação do limite diário\n"
+                "• Use `!limpar` para reduzir o histórico de conversa\n"
+                "• Considere fazer upgrade em https://console.groq.com/settings/billing"
+            )
+        
+        # Outros erros genéricos
+        return (
+            "⚠️ **Erro ao consultar a IA**\n\n"
+            "Algo inesperado aconteceu. Tente novamente em alguns instantes.\n"
+            f"*Detalhes técnicos: {erro_str[:150]}...*"
+        )
 
 def get_system_prompt(sistema="dnd5e"):
     """Retorna o prompt de sistema com identidade da Lyra."""

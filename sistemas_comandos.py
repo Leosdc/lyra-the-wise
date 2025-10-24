@@ -10,10 +10,10 @@ def register(bot: commands.Bot):
     @bot.command(name="sistema")
     async def sistema(ctx, novo_sistema: str = None):
         """Mostra ou muda SEU sistema de RPG pessoal."""
-        user_id = ctx.author.id  # MUDANÇA: agora usa user_id
+        user_id = ctx.author.id
 
         if novo_sistema is None:
-            atual = sistemas_rpg.get(user_id, "dnd5e")  # MUDANÇA: busca por usuário
+            atual = sistemas_rpg.get(user_id, "dnd5e")
             nome = SISTEMAS_DISPONIVEIS.get(atual, {}).get("nome", "Desconhecido")
             await ctx.send(
                 f"📘 **Seu sistema atual:** {nome} (`{atual}`)\n"
@@ -26,7 +26,12 @@ def register(bot: commands.Bot):
             await ctx.send("❌ Sistema não encontrado! Use `!sistemas` para ver a lista completa.")
             return
 
-        sistemas_rpg[user_id] = novo_sistema  # MUDANÇA: salva por usuário
+        sistemas_rpg[user_id] = novo_sistema
+        
+        # ✅ CORREÇÃO: Salva imediatamente no arquivo
+        from utils import salvar_dados
+        salvar_dados(sistemas_rpg=sistemas_rpg)
+        
         nome = SISTEMAS_DISPONIVEIS[novo_sistema]["nome"]
         await ctx.send(
             f"✅ Seu sistema foi alterado para **{nome}** (`{novo_sistema}`).\n"
