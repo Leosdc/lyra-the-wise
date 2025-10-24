@@ -84,8 +84,8 @@ def register(bot):
     @bot.command(name="mestre")
     async def mestre(ctx, *, pergunta: str):
         """Interaja com o Mestre de RPG (IA)."""
-        # CORREÇÃO: Pega o sistema do canal atual
-        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        # Pega o sistema DO USUÁRIO
+        sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
         historico = conversation_history.setdefault(str(ctx.channel.id), [])
@@ -128,12 +128,12 @@ def register(bot):
         else:
             await ctx.send(f"⚠️ {resposta}")
 
-    # --- Plot --- CORRIGIDO AQUI
+    # --- Plot ---
     @bot.command(name="plot")
     async def plot(ctx, *, tema: str):
         """Gera uma ideia de missão ou aventura."""
-        # CORREÇÃO: Pega o sistema do canal atual
-        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        # Pega o sistema DO USUÁRIO
+        sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
         prompt = f"Crie uma ideia de missão ou aventura para o tema: {tema}"
@@ -170,8 +170,8 @@ def register(bot):
     @bot.command(name="regra")
     async def regra(ctx, *, duvida: str):
         """Consulta uma regra específica do sistema atual."""
-        # CORREÇÃO: Pega o sistema do canal atual
-        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        # Pega o sistema DO USUÁRIO
+        sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
         prompt = f"Explique a seguinte dúvida de RPG de mesa de forma clara e breve: {duvida}"
@@ -208,7 +208,7 @@ def register(bot):
     @bot.command(name="sessao")
     async def sessao(ctx, *, tema: str):
         """Planeja uma sessão completa de RPG com o tema fornecido."""
-        sistema_atual = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
         await ctx.send(f"📋 Planejando sessão completa sobre: **{tema}**...")

@@ -10,9 +10,9 @@ import random
 def register(bot: commands.Bot):
     """Registra comandos de geração de conteúdo."""
 
-    def get_sistema_canal(channel_id):
-        """Retorna o sistema configurado para o canal."""
-        return sistemas_rpg.get(channel_id, "dnd5e")
+    def get_sistema_usuario(user_id):
+        """Retorna o sistema configurado para o USUÁRIO."""
+        return sistemas_rpg.get(user_id, "dnd5e")
 
     # Remove comandos que possam estar duplicados
     comandos_para_remover = ["monstro", "monstros", "npc", "encontro", "armadilha", 
@@ -27,7 +27,7 @@ def register(bot: commands.Bot):
     @bot.command(name="monstro")
     async def monstro(ctx, *, nome: str = None):
         """Busca ou gera um monstro. Uso: !monstro <nome> ou !monstro para gerar novo"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         
         if nome:
             monstro_db = buscar_monstro(nome, sistema)
@@ -68,7 +68,7 @@ def register(bot: commands.Bot):
     @bot.command(name="monstros")
     async def listar_monstros(ctx):
         """Lista todos os monstros disponíveis no banco de dados para o sistema atual."""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         monstros = listar_monstros_por_sistema(sistema)
         
         if not monstros:
@@ -87,7 +87,7 @@ def register(bot: commands.Bot):
     @bot.command(name="npc")
     async def npc(ctx, *, descricao: str = None):
         """Gera um NPC completo."""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if descricao:
@@ -113,7 +113,7 @@ def register(bot: commands.Bot):
     @bot.command(name="encontro")
     async def encontro(ctx, nivel: int = None, dificuldade: str = "medio"):
         """Gera um encontro balanceado. Uso: !encontro <nível> <facil/medio/dificil>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if not nivel:
@@ -146,7 +146,7 @@ def register(bot: commands.Bot):
     @bot.command(name="armadilha")
     async def armadilha(ctx, dificuldade: str = "medio"):
         """Gera uma armadilha. Uso: !armadilha <facil/medio/dificil>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         dif_map = {
@@ -176,7 +176,7 @@ def register(bot: commands.Bot):
     @bot.command(name="item")
     async def item(ctx, *, tipo: str = None):
         """Gera um item mágico/especial. Uso: !item <tipo opcional>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if tipo:
@@ -202,7 +202,7 @@ def register(bot: commands.Bot):
     @bot.command(name="tesouro")
     async def tesouro(ctx, nivel: int = None):
         """Gera tesouro balanceado. Uso: !tesouro <nível>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if not nivel:
@@ -228,7 +228,7 @@ def register(bot: commands.Bot):
     @bot.command(name="puzzle")
     async def puzzle(ctx, *, tema: str = None):
         """Gera um enigma/quebra-cabeça. Uso: !puzzle <tema opcional>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if tema:
@@ -254,7 +254,7 @@ def register(bot: commands.Bot):
     @bot.command(name="vilao")
     async def vilao(ctx, *, tipo: str = None):
         """Gera um vilão completo. Uso: !vilao <tipo opcional>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if tipo:
@@ -280,7 +280,7 @@ def register(bot: commands.Bot):
     @bot.command(name="cena")
     async def cena(ctx, *, descricao: str = None):
         """Descreve uma cena dramaticamente. Uso: !cena <descrição básica>"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         if not descricao:
@@ -307,7 +307,7 @@ def register(bot: commands.Bot):
     @bot.command(name="nome")
     async def nome(ctx, *, tipo: str = "fantasia"):
         """Gera lista de nomes. Uso: !nome <tipo> - Ex: élfico, anão, orc, humano, etc"""
-        sistema = get_sistema_canal(ctx.channel.id)
+        sistema = get_sistema_usuario(ctx.author.id)
         system_prompt = get_system_prompt(sistema)
         
         prompt = f"Gere uma lista de 10 nomes criativos do tipo '{tipo}' apropriados para {SISTEMAS_DISPONIVEIS[sistema]['nome']}. Varie entre nomes masculinos e femininos. Apenas liste os nomes, sem explicações."

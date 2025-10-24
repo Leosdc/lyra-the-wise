@@ -11,7 +11,7 @@ groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 DATA_DIR = os.path.join(os.getcwd(), "bot_data")
 os.makedirs(DATA_DIR, exist_ok=True)
 FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
-SISTEMAS_PATH = os.path.join(DATA_DIR, "sistemas_rpg.json")
+SISTEMAS_PATH = os.path.join(DATA_DIR, "sistemas_usuarios.json")
 SESSOES_PATH = os.path.join(DATA_DIR, "sessoes_ativas.json")
 
 # ==================== IDENTIDADE DA LYRA ====================

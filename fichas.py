@@ -29,12 +29,23 @@ def salvar_fichas_agora():
 
 
 def encontrar_ficha(user_id, nome):
-    nome_proc = re.sub(r'[^a-z0-9_]+', '', nome.lower())
+    """Busca ficha do usuário. Prioriza match exato, depois busca parcial."""
+    nome_lower = nome.lower().strip()
+    
+    # 1ª tentativa: Match EXATO (ignora case)
     for k, v in fichas_personagens.items():
         if v.get("autor") == user_id:
-            nome_limpo = re.sub(r'[^a-z0-9_]+', '', v["nome"].lower())
+            if v.get("nome", "").lower().strip() == nome_lower:
+                return k, v
+    
+    # 2ª tentativa: Match parcial (comportamento antigo)
+    nome_proc = re.sub(r'[^a-z0-9_]+', '', nome_lower)
+    for k, v in fichas_personagens.items():
+        if v.get("autor") == user_id:
+            nome_limpo = re.sub(r'[^a-z0-9_]+', '', v.get("nome", "").lower())
             if nome_proc in nome_limpo or nome_limpo in nome_proc:
                 return k, v
+    
     return None, None
 
 
@@ -53,7 +64,7 @@ def register(bot: commands.Bot):
     @bot.command(name="criarficha")
     async def criar_ficha_interativa(ctx):
         """Cria uma ficha através de perguntas interativas."""
-        sistema = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        sistema = sistemas_rpg.get(ctx.author.id, "dnd5e")  # Sistema do usuário
         system_prompt = get_system_prompt(sistema)
         
         await ctx.send(f"📝 **Criação Interativa de Ficha** - Sistema: {SISTEMAS_DISPONIVEIS[sistema]['nome']}\n\n"
@@ -166,7 +177,7 @@ Seja completo e balanceado para o sistema escolhido."""
             await ctx.send("❌ Use `!ficha <nome>` para criar uma ficha automática ou `!criarficha` para modo interativo.")
             return
 
-        sistema = sistemas_rpg.get(ctx.channel.id, "dnd5e")
+        sistema = sistemas_rpg.get(ctx.author.id, "dnd5e")  # Sistema do usuário
         system_prompt = get_system_prompt(sistema)
 
         historico = [

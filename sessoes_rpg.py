@@ -73,10 +73,6 @@ def _coletar_fichas_usuario(fichas_personagens: Dict[str, Any], user_id: int) ->
     return fichas_validas
 
 
-def _sistema_do_canal(sistemas_rpg: Dict[int, str], channel_id: int) -> str:
-    return sistemas_rpg.get(channel_id, "dnd5e")
-
-
 async def _garantir_categoria(guild: discord.Guild) -> discord.CategoryChannel:
     cat = discord.utils.get(guild.categories, name=SESSOES_CATEGORY_NAME)
     if cat:
@@ -517,7 +513,7 @@ def setup_sessoes(
         )
 
         # Inicializa sessão
-        sistema = _sistema_do_canal(sistemas_rpg, ctx.channel.id)
+        sistema = sistemas_rpg.get(mestre.id, "dnd5e")
         sessoes_ativas[canal.id] = {
             "guild_id": guild.id,
             "channel_id": canal.id,

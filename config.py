@@ -22,11 +22,12 @@ DATA_DIR.mkdir(exist_ok=True)
 FICHAS_FILE = DATA_DIR / "fichas_personagens.json"
 SISTEMAS_FILE = DATA_DIR / "sistemas_rpg.json"
 SESSOES_FILE = DATA_DIR / "sessoes_ativas.json"
+SISTEMAS_FILE = DATA_DIR / "sistemas_usuarios.json"
 
 # CORREÇÃO CRÍTICA: Estados compartilhados GLOBAIS
 # Estes dicionários são a ÚNICA fonte de verdade para todo o bot
 conversation_history = {}  # por canal
-sistemas_rpg = {}          # channel_id -> sistema
+sistemas_rpg = {}          # user_id -> sistema
 fichas_personagens = {}    # chave -> ficha
 sessoes_ativas = {}        # channel_id -> sessão
 

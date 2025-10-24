@@ -9,22 +9,29 @@ def register(bot: commands.Bot):
 
     @bot.command(name="sistema")
     async def sistema(ctx, novo_sistema: str = None):
-        """Mostra ou muda o sistema de RPG do canal."""
-        canal_id = ctx.channel.id
+        """Mostra ou muda SEU sistema de RPG pessoal."""
+        user_id = ctx.author.id  # MUDANÇA: agora usa user_id
 
         if novo_sistema is None:
-            atual = sistemas_rpg.get(canal_id, "dnd5e")
+            atual = sistemas_rpg.get(user_id, "dnd5e")  # MUDANÇA: busca por usuário
             nome = SISTEMAS_DISPONIVEIS.get(atual, {}).get("nome", "Desconhecido")
-            await ctx.send(f"📘 Sistema atual neste canal: **{nome}** (`{atual}`)\nUse `!sistema <código>` para alterar.")
+            await ctx.send(
+                f"📘 **Seu sistema atual:** {nome} (`{atual}`)\n"
+                f"Use `!sistema <código>` para alterar.\n"
+                f"💡 Seu sistema é pessoal e será usado em todos os comandos de IA."
+            )
             return
 
         if novo_sistema not in SISTEMAS_DISPONIVEIS:
             await ctx.send("❌ Sistema não encontrado! Use `!sistemas` para ver a lista completa.")
             return
 
-        sistemas_rpg[canal_id] = novo_sistema
+        sistemas_rpg[user_id] = novo_sistema  # MUDANÇA: salva por usuário
         nome = SISTEMAS_DISPONIVEIS[novo_sistema]["nome"]
-        await ctx.send(f"✅ Sistema alterado para **{nome}** (`{novo_sistema}`).")
+        await ctx.send(
+            f"✅ Seu sistema foi alterado para **{nome}** (`{novo_sistema}`).\n"
+            f"🎲 Todos os comandos de IA agora usarão este sistema."
+        )
 
     @bot.command(name="sistemas")
     async def sistemas(ctx):
