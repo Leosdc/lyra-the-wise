@@ -105,7 +105,7 @@ A anciã sábia integrada ao bot:
 ### Passos
 ```bash
 git clone https://github.com/Leosdc/lyra-the-wise
-cd rpg-master-bot
+cd lyra-the-wise
 pip install -r requirements.txt
 ```
 
