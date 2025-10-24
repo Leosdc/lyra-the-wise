@@ -1,4 +1,4 @@
-# 🎲 RPG Master Bot
+# 🎲 Lyra, the Wise
 
 Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**, **IA integrada (Lyra, the Wise)** e **sessões privadas com narrativa contínua**.
 
@@ -104,7 +104,7 @@ A anciã sábia integrada ao bot:
 
 ### Passos
 ```bash
-git clone https://github.com/Leosdc/rpg-master-bot
+git clone https://github.com/Leosdc/lyra-the-wise
 cd rpg-master-bot
 pip install -r requirements.txt
 ```
@@ -153,5 +153,7 @@ Discord: `Leosdc_`
 GitHub: [@Leosdc](https://github.com/Leosdc)
 
 📜 Licença: **MIT License**  
-⭐ Se este projeto te ajudou, dê uma estrela!  
+
+⭐ Se este projeto te ajudou, dê uma estrela, ou então, [compre um café](https://ko-fi.com/leosdc) para mim! 
+
 Feito com ❤️ para a comunidade de RPG de mesa.
