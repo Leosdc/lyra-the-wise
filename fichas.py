@@ -1,4 +1,4 @@
-# fichas.py — CORREÇÃO: Força salvamento imediato de fichas
+# fichas.py
 import re
 import json
 import asyncio
@@ -11,7 +11,6 @@ from config import fichas_personagens, sistemas_rpg, sessoes_ativas
 from sistemas_rpg import SISTEMAS_DISPONIVEIS, resolver_alias
 import os
 
-# CORREÇÃO: Importa diretamente os caminhos dos arquivos
 DATA_DIR = os.path.join(os.getcwd(), "bot_data")
 FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
 
@@ -60,7 +59,7 @@ def register(bot: commands.Bot):
         except Exception:
             pass
 
-    # ========== CRIAR FICHA INTERATIVA (NOVO) ==========
+    # ========== CRIAR FICHA INTERATIVA ==========
     @bot.command(name="criarficha")
     async def criar_ficha_interativa(ctx):
         """Cria uma ficha através de perguntas interativas."""
@@ -142,7 +141,6 @@ Seja completo e balanceado para o sistema escolhido."""
                 await ctx.send(f"⚠️ Ocorreu um erro ao gerar a ficha: {conteudo}")
                 return
             
-            # CORREÇÃO: Salva ficha COM GARANTIA de persistência
             chave = key_from_name(f"{ctx.author.id}_{nome}")
             fichas_personagens[chave] = {
                 "nome": nome,
@@ -152,13 +150,11 @@ Seja completo e balanceado para o sistema escolhido."""
                 "criada_em": "interativa"
             }
             
-            # FORÇA SALVAMENTO IMEDIATO
             if salvar_fichas_agora():
                 print(f"✅ Ficha '{nome}' salva para user {ctx.author.id}")
             else:
                 await ctx.send("⚠️ Aviso: A ficha foi criada mas pode não ter sido salva corretamente.")
             
-            # Mostra resultado
             embed = discord.Embed(
                 title=f"✅ Ficha Criada: {nome}",
                 description=conteudo[:4000],
@@ -202,7 +198,6 @@ Seja completo e balanceado para o sistema escolhido."""
             "autor": ctx.author.id
         }
         
-        # FORÇA SALVAMENTO IMEDIATO
         if salvar_fichas_agora():
             print(f"✅ Ficha '{nome}' salva para user {ctx.author.id}")
         else:
@@ -262,7 +257,6 @@ Seja completo e balanceado para o sistema escolhido."""
 																  
 				  
         
-        # CORREÇÃO: Verifica se está em uma sessão ativa
         sessao = sessoes_ativas.get(ctx.channel.id)
         
         if sessao:
@@ -398,7 +392,6 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
             # Atualiza ficha
             fichas_personagens[chave]["conteudo"] = conteudo_novo
             
-            # FORÇA SALVAMENTO IMEDIATO
             if salvar_fichas_agora():
                 print(f"✅ Ficha '{ficha['nome']}' atualizada para user {ctx.author.id}")
             else:
@@ -427,7 +420,6 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
 
         del fichas_personagens[chave]
         
-        # FORÇA SALVAMENTO IMEDIATO
         if salvar_fichas_agora():
             print(f"✅ Ficha '{ficha['nome']}' deletada para user {ctx.author.id}")
         else:
@@ -444,7 +436,6 @@ Retorne a ficha completa atualizada, mantendo o formato original."""
         novo_sistema_original = novo_sistema
         novo_sistema = resolver_alias(novo_sistema.lower())
         
-        # CORREÇÃO: Debug para identificar problemas
         if novo_sistema not in SISTEMAS_DISPONIVEIS:
             sistemas_cyberpunk = [s for s in SISTEMAS_DISPONIVEIS.keys() if "cyber" in s or "red" in s]
             sistemas_disponiveis = ", ".join([f"`{s}`" for s in sistemas_cyberpunk])

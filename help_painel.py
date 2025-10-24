@@ -1,4 +1,4 @@
-# help_painel.py — versão completa com administração restaurada
+# help_painel.py
 import discord
 from discord.ext import commands
 from discord.ui import View, button

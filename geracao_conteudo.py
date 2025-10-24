@@ -1,4 +1,4 @@
-# geracao_conteudo.py — Geração com max_tokens aumentados
+# geracao_conteudo.py
 import discord
 from discord.ext import commands
 from utils import chamar_groq, get_system_prompt
@@ -8,7 +8,6 @@ from monstros_database import buscar_monstro, listar_monstros_por_sistema, forma
 import random
 
 def register(bot: commands.Bot):
-    """Registra comandos de geração de conteúdo."""
 
     def get_sistema_usuario(user_id):
         """Retorna o sistema configurado para o USUÁRIO."""

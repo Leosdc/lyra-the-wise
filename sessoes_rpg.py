@@ -1,6 +1,5 @@
 # sessoes_rpg.py
 # Sistema de sessões privadas de RPG com rolagens interativas
-# NOVO: IA solicita rolagens automaticamente durante a aventura!
 
 from __future__ import annotations
 
@@ -564,7 +563,6 @@ def setup_sessoes(
         sessao["historia"] = historia
         salvar_dados()
         
-        # NOVO: Detecta se há solicitação de rolagem
         roll_match = re.search(r'\[ROLL:\s*([^,\]]+),\s*([^\]]+)\]', resposta, re.IGNORECASE)
 												 
 										

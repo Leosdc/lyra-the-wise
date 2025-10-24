@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 from pathlib import Path
 
-# Importa utils PRIMEIRO
 from utils import (
     carregar_dados,
     salvar_dados,
@@ -12,7 +11,6 @@ from utils import (
     get_system_prompt
 )
 
-# Importa sistemas
 from sistemas_rpg import SISTEMAS_DISPONIVEIS
 
 # ==== Configuração do Bot ====
@@ -24,7 +22,6 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 # ==== Estruturas em memória ====
-# CORREÇÃO: Importa os dicionários compartilhados do config
 from config import fichas_personagens, sistemas_rpg, sessoes_ativas
 
 DATA_DIR = Path("bot_data")
@@ -40,7 +37,6 @@ async def on_ready():
     print(f"🎲 {bot.user} está online!")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
 
-    # CORREÇÃO CRÍTICA: Carrega dados ANTES de tudo
     print("📂 Carregando dados salvos...")
     carregar_dados(fichas_personagens, sistemas_rpg, sessoes_ativas)
     print(f"✅ Dados carregados! Fichas: {len(fichas_personagens)}, Sistemas: {len(sistemas_rpg)}, Sessões: {len(sessoes_ativas)}")
@@ -147,7 +143,7 @@ except Exception as e:
     traceback.print_exc()
 
 try:
-    # 9. Sistema de sessões (ÚLTIMO, pois depende de tudo)
+    # 9. Sistema de sessões
     from sessoes_rpg import setup_sessoes
     
     # Cria wrapper de salvar_dados compatível com sessões
@@ -192,7 +188,6 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_message(message):
     """Processa mensagens e comandos."""
-    # Ignora mensagens do próprio bot
     if message.author == bot.user:
         return
     

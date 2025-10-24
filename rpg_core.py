@@ -1,4 +1,4 @@
-# rpg_core.py - Corrigido para usar sistema do canal
+# rpg_core.py
 import random
 import re
 import discord
@@ -80,25 +80,21 @@ def register(bot):
             texto += f"{i}. **{nome}** → {valor}\n"
         await ctx.send(texto)
 
-    # --- Mestre (IA) --- CORRIGIDO AQUI
+    # --- Mestre (IA) ---
     @bot.command(name="mestre")
     async def mestre(ctx, *, pergunta: str):
         """Interaja com o Mestre de RPG (IA)."""
-        # Pega o sistema DO USUÁRIO
         sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
         historico = conversation_history.setdefault(str(ctx.channel.id), [])
         
-        # Adiciona mensagem do usuário
         historico.append({"role": "user", "content": pergunta})
         
-        # Cria lista completa de mensagens
         mensagens_completas = [
             {"role": "system", "content": system_prompt}
         ] + historico
 
-        # CORREÇÃO: Aumentado para 2000 tokens
         resposta = await chamar_groq(mensagens_completas, max_tokens=2000)
         
         if resposta and "Erro" not in resposta:
@@ -132,7 +128,6 @@ def register(bot):
     @bot.command(name="plot")
     async def plot(ctx, *, tema: str):
         """Gera uma ideia de missão ou aventura."""
-        # Pega o sistema DO USUÁRIO
         sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
@@ -143,10 +138,8 @@ def register(bot):
             {"role": "user", "content": prompt}
         ]
         
-        # CORREÇÃO: Aumentado para 1500 tokens
         resposta = await chamar_groq(mensagens, max_tokens=1500)
         
-        # Divide se necessário
         if len(resposta) <= 1900:
             await ctx.send(f"📜 **Ideia de aventura:**\n{resposta}")
         else:
@@ -170,7 +163,6 @@ def register(bot):
     @bot.command(name="regra")
     async def regra(ctx, *, duvida: str):
         """Consulta uma regra específica do sistema atual."""
-        # Pega o sistema DO USUÁRIO
         sistema_atual = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema_atual)
         
@@ -181,7 +173,6 @@ def register(bot):
             {"role": "user", "content": prompt}
         ]
         
-        # CORREÇÃO: Aumentado para 1000 tokens
         resposta = await chamar_groq(mensagens, max_tokens=1000)
         
         # Divide se necessário
@@ -241,7 +232,6 @@ Sistema: {sistema_atual.upper()}. SEJA DIRETO E COMPLETE TODAS AS SEÇÕES."""
             {"role": "user", "content": prompt}
         ]
         
-        # CORREÇÃO: Aumentado para 3000 tokens e adicionado aviso para completar
         resposta = await chamar_groq(mensagens, max_tokens=3000)
         
         # Verifica se resposta foi cortada no meio

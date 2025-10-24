@@ -28,7 +28,6 @@ def register(bot: commands.Bot):
 
         sistemas_rpg[user_id] = novo_sistema
         
-        # ✅ CORREÇÃO: Salva imediatamente no arquivo
         from utils import salvar_dados
         salvar_dados(sistemas_rpg=sistemas_rpg)
         

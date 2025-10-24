@@ -1,4 +1,4 @@
-# utilidades.py — comandos utilitários e administrativos (sem duplicatas)
+# utilidades.py — comandos utilitários e administrativos
 import os
 import discord
 from discord.ext import commands
