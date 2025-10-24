@@ -124,7 +124,7 @@ python main.py
 
 ## 🧩 Estrutura do Projeto
 ```
-rpg-master-bot/
+lyra-the-wise/
 ├── main.py
 ├── config.py
 ├── utils.py
