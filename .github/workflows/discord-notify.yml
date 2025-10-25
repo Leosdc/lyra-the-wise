@@ -9,7 +9,7 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Discord of new commit
+      - name: Send Discord Notification
         uses: Ilshidur/action-discord@v2
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -17,5 +17,5 @@ jobs:
             📦 **Novo commit no repositório `${{ github.repository }}`**
             👤 Autor: `${{ github.actor }}`
             📝 Mensagem: `${{ github.event.head_commit.message }}`
-            🔗 [Ver commit](${{ github.event.head_commit.url }})
             🌿 Branch: `${{ github.ref_name }}`
+            🔗 [Ver commit](${{ github.event.head_commit.url }})
