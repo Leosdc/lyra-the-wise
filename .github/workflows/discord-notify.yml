@@ -16,6 +16,6 @@ jobs:
           message: |
             📦 **Novo push no repositório `${{ github.repository }}`**
             👤 Autor: `${{ github.actor }}`
-            📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
+            📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de novos commit' }}
             🌿 Branch: `${{ github.ref_name }}`
             🔗 [Ver repositório](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }})
