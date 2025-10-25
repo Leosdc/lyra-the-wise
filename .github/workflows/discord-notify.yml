@@ -45,21 +45,27 @@ jobs:
           git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança detectada."
           git push || true
 
-      # 4️⃣ Cria e envia a tag automaticamente
+      # 4️⃣ Cria e envia a tag automaticamente (com autenticação segura)
       - name: Criar tag automática
         if: env.SKIP != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git tag $VERSION
-          git push origin $VERSION
-          echo "🏷️ Tag $VERSION criada e enviada."
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
+          echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
 
-      # 5️⃣ Lê o último changelog
+      # 5️⃣ Lê o último changelog com fallback automático
       - name: Obter changelog recente
         if: env.SKIP != 'true'
         run: |
           LATEST_CHANGELOG=$(awk '/^## /{if (NR!=1) exit} {print}' changelog.md)
+          if [ -z "$LATEST_CHANGELOG" ]; then
+            echo "⚠️ Nenhum changelog encontrado. Usando fallback."
+            LATEST_CHANGELOG="Nenhum changelog disponível nesta versão."
+          fi
           echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -77,7 +83,7 @@ jobs:
               "username": "The Bard",
               "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
               "embeds": [{
-                "title": "🎯 Nova versão `${{ env.VERSION }}` publicada automaticamente!",
+                "title": "🧙 Nova versão `${{ env.VERSION }}` publicada automaticamente!",
                 "color": 11259375,
                 "fields": [
                   {
@@ -112,4 +118,4 @@ jobs:
       # 7️⃣ Confirmação final no log
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada, README atualizado e notificação enviada com sucesso!"
+        run: echo "✅ Versão $VERSION publicada, tag enviada e notificação entregue com sucesso!"
