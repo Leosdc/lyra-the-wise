@@ -5,32 +5,55 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/Version-2.3.0-purple.svg)
+![Version](https://img.shields.io/badge/Version-2.4.0-purple.svg)
 
 
-## 🆕 Atualização — Versão 2.3.0 (2025-10-26)
+## 🆕 Atualização — Versão 2.4.0 (2025-10-27)
 
-### ⚔️ Novos Recursos
-- **Botões interativos de decisão:**  
-  `🎲 Rolar Dados`, `🚫 Não Fazer Nada`, `✏️ Outra Ação`
-- **Novo botão de mestre:** `⚔️ Rolar Iniciativa`  
-  → Gera automaticamente a ordem de ação dos jogadores (🥇🥈🥉)
-- **IA contextual aprimorada:**  
-  Continua a história automaticamente conforme as escolhas dos jogadores
+### 📋 Sistema de Fichas Estruturadas
+- Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
+- Cada sistema (D&D 5e, Pathfinder 2e, Cthulhu, Shadowrun, Vampire V5, etc.) possui **campos e recursos próprios**
+- Inclusão de atributos específicos:
+  - D&D: HP, MP, Dados de Vida, Espaços de Magia
+  - Cthulhu: Sanidade Máxima/Atual, Magia, Movimento
+  - Shadowrun: Essência, Magia, Ressonância
+  - Vampire: Humanidade, Fome, Pontos de Sangue
+- Visualização interativa com botões:
+  - `◀️ Anterior`, `▶️ Próxima`, `❌ Fechar`
+- Compatível com fichas antigas (legado) e novo formato 📋 estruturado
 
-### ✍️ Melhorias
-- **Estilo Narrativo Conciso** reformulado  
-  → Agora realmente curto (máx. 4–5 frases) e direto ao ponto  
-- **Comando `!ajudasessao`** totalmente refeito  
-  → Novo guia com fluxo completo, exemplos e explicações detalhadas
+### 🧠 IA Aprimorada - Fichas Mais Completas
+- `!criarficha` agora faz **8 perguntas detalhadas**
+- Prompt reescrito para **forçar preenchimento de todos os campos**
+- IA expande e enriquece as respostas do jogador
+- Tokens aumentados de 2000 → **2500**
+- Parser JSON robusto com fallback inteligente (nunca retorna vazio)
 
-### 🧠 Qualidade de Vida
-- Melhor feedback visual nos botões  
-- Descrições narrativas mais consistentes entre estilos  
-- Sessões continuam salvas automaticamente a cada 5 minutos
+### 🧩 Novo - Comando `!converterficha`
+- Permite converter fichas entre sistemas mantendo equilíbrio e contexto narrativo
+- Detecta automaticamente formato (texto ou estruturado)
+- Converte atributos e recursos para o novo sistema mantendo proporções
+- Exemplo:
+  ```bash
+  !converterficha cthulhu Theresia Van Astrea
+  ```
 
+### 💾 Melhorado - Persistência e Encoding
+- Salvamento forçado com **UTF-8 seguro**
+- Correção automática de campos com encoding corrompido (ex: "raÃ§a" → "raça")
+- Recuperação automática de fichas quebradas
+- Logs detalhados no console para debugging
 
-⚠️ **Status:** Em desenvolvimento ativo — o bot ainda contém bugs e pode apresentar instabilidades.
+### ⚙️ Compatibilidade Total
+- Todos os comandos existentes continuam funcionais:
+  - `!criarficha`, `!verficha`, `!editarficha`, `!minhasfichas`, `!exportarficha`, `!converterficha`
+- Fichas antigas (legado) continuam sendo lidas e listadas normalmente
+- Indicador visual 📋 (estruturada) ou 📄 (legado)
+
+### 🧠 Experiência do Usuário
+- Feedback de criação mostrando **percentual de completude**
+- Dicas contextuais sugerindo `!editarficha` se <70%
+- Exibição mais limpa e legível, página por página
 
 ---
 
@@ -219,7 +242,7 @@ lyra-the-wise/
 ├── config.py                 # Configurações globais
 ├── utils.py                  # Funções auxiliares
 ├── sistemas_rpg.py           # Banco de dados de sistemas
-├── fichas.py                 # Sistema de fichas
+├── fichas_estruturadas.py    # Novo sistema de fichas estruturadas
 ├── sessoes_rpg.py            # Sistema de sessões (com estilo narrativo)
 ├── rpg_core.py               # Comandos principais
 ├── geracao_conteudo.py       # Geração de NPCs, monstros, etc

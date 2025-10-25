@@ -250,7 +250,7 @@ def register(bot: commands.Bot):
             f"📝 **Criação de Ficha Estruturada** - Sistema: {SISTEMAS_DISPONIVEIS[sistema]['nome']}\n\n"
             f"Vou fazer perguntas para criar sua ficha de forma organizada.\n"
             f"Digite `cancelar` a qualquer momento para parar.\n\n"
-            f"**1/5** - Qual o **nome** do seu personagem?"
+            f"**1/8** - Qual o **nome** do seu personagem?"
         )
         
         def check(m):
@@ -264,124 +264,190 @@ def register(bot: commands.Bot):
             nome = msg.content
             
             # Raça/Ancestralidade
-            await ctx.send(f"**2/5** - Qual a **raça/ancestralidade** de {nome}?")
+            await ctx.send(f"**2/8** - Qual a **raça/ancestralidade** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=60.0)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             raca = msg.content
             
             # Classe/Arquétipo
-            await ctx.send(f"**3/5** - Qual a **classe/profissão** de {nome}?")
+            await ctx.send(f"**3/8** - Qual a **classe/profissão** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=60.0)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             classe = msg.content
             
+            # Nível/Idade
+            await ctx.send(f"**4/8** - Qual o **nível ou idade** de {nome}? (Ex: Nível 5, ou 28 anos)")
+            msg = await bot.wait_for('message', check=check, timeout=60.0)
+            if msg.content.lower() == 'cancelar':
+                return await ctx.send("❌ Criação de ficha cancelada.")
+            nivel = msg.content
+            
             # Conceito/Personalidade
-            await ctx.send(f"**4/5** - Descreva a **personalidade ou conceito** de {nome}:")
+            await ctx.send(f"**5/8** - Descreva a **personalidade** de {nome} (3-5 traços):")
             msg = await bot.wait_for('message', check=check, timeout=90.0)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             conceito = msg.content
             
+            # Aparência
+            await ctx.send(f"**6/8** - Descreva a **aparência física** de {nome}:")
+            msg = await bot.wait_for('message', check=check, timeout=90.0)
+            if msg.content.lower() == 'cancelar':
+                return await ctx.send("❌ Criação de ficha cancelada.")
+            aparencia = msg.content
+            
             # Background/História
-            await ctx.send(f"**5/5** - Qual o **background ou história** de {nome}?")
+            await ctx.send(f"**7/8** - Qual o **background ou origem** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=120.0)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             historia = msg.content
             
+            # Objetivos/Motivações
+            await ctx.send(f"**8/8** - Quais os **objetivos ou motivações** de {nome}?")
+            msg = await bot.wait_for('message', check=check, timeout=90.0)
+            if msg.content.lower() == 'cancelar':
+                return await ctx.send("❌ Criação de ficha cancelada.")
+            objetivos = msg.content
+            
             # Gera ficha estruturada com IA
             await ctx.send(f"✨ Gerando ficha estruturada de **{nome}** com IA...")
             
             # Monta prompt específico para formato estruturado
-            prompt = f"""Crie uma ficha de personagem COMPLETA e ESTRUTURADA para o sistema {SISTEMAS_DISPONIVEIS[sistema]['nome']}.
+            prompt = f"""Crie uma ficha de personagem COMPLETA, DETALHADA e BALANCEADA para {SISTEMAS_DISPONIVEIS[sistema]['nome']}.
 
-Nome: {nome}
-Raça/Ancestralidade: {raca}
-Classe/Profissão: {classe}
-Personalidade/Conceito: {conceito}
-Background/História: {historia}
+**INFORMAÇÕES FORNECIDAS PELO JOGADOR:**
+- Nome: {nome}
+- Raça/Ancestralidade: {raca}
+- Classe/Profissão: {classe}
+- Nível/Idade: {nivel}
+- Personalidade: {conceito}
+- Aparência Física: {aparencia}
+- Background/Origem: {historia}
+- Objetivos/Motivações: {objetivos}
 
-IMPORTANTE: Retorne a ficha no formato JSON estruturado abaixo. Use EXATAMENTE esta estrutura:
+**INSTRUÇÕES OBRIGATÓRIAS:**
+1. EXPANDA todas as informações - transforme respostas curtas em descrições ricas
+2. CALCULE todos os valores numéricos apropriados ao nível
+3. PREENCHA 100% dos campos - NENHUM campo pode ficar vazio, com "—" ou "A definir"
+4. CRIE equipamento inicial completo e apropriado
+5. ADICIONE habilidades de classe do nível apropriado
+6. DESENVOLVA história em 3-4 parágrafos envolventes
+
+**FORMATO JSON OBRIGATÓRIO - PREENCHA TODOS OS CAMPOS:**
 
 {{
   "basico": {{
-    "campo1": "valor1",
-    "campo2": "valor2"
+    "Nome": "{nome}",
+    "Raça": "[EXPANDIR {raca} com detalhes de sub-raça]",
+    "Classe": "[EXPANDIR {classe} com arquétipo/caminho]",
+    "Nível": "[EXTRAIR número de: {nivel}]",
+    "Antecedente": "[CRIAR baseado em: {historia}]",
+    "Alinhamento": "[DEFINIR baseado na personalidade]"
   }},
   "atributos": {{
-    "Força": valor,
-    "Destreza": valor
+    "Força": [VALOR 8-18],
+    "Destreza": [VALOR 8-18],
+    "Constituição": [VALOR 8-18],
+    "Inteligência": [VALOR 8-18],
+    "Sabedoria": [VALOR 8-18],
+    "Carisma": [VALOR 8-18]
   }},
   "recursos": {{
-    "HP Máximo": valor,
-    "HP Atual": valor
+    "HP Máximo": [CALCULAR: dado_classe × nível + CON×nível],
+    "HP Atual": [IGUAL ao HP Máximo],
+    "Dados de Vida": "[Ex: 5d8 para Paladino nível 5]",
+    "Proficiência": "[+2 até nível 4, +3 para nível 5-8, +4 para 9-12, +5 para 13-16, +6 para 17-20]"
   }},
-  "combate": {{}},
-  "equipamento": {{}},
-  "magia": {{}},
-  "historia": {{}}
+  "combate": {{
+    "CA": [CALCULAR: 10 + mod_DES + armadura],
+    "Iniciativa": [modificador de Destreza com sinal: +2, -1, etc],
+    "Velocidade": "9m",
+    "Ataques": ["[ARMA 1]: +[bônus] para acertar, [dano]+[mod]", "[ARMA 2]: +[bônus] para acertar, [dano]+[mod]"]
+  }},
+  "equipamento": {{
+    "Armas": ["[LISTAR 2-3 armas apropriadas com bônus mágico se nível alto]"],
+    "Armadura": "[TIPO de armadura apropriada (ex: Cota de Malha, Armadura de Placas +1)]",
+    "Itens": ["[LISTAR 6-10 itens: poções, ferramentas, itens mundanos]"],
+    "Dinheiro": "[QUANTIDADE apropriada] PO"
+  }},
+  "magia": {{
+    "Nível de Conjurador": "[NÚMERO ou 'Não possui']",
+    "CD de Magia": "[CALCULAR: 8 + proficiência + modificador_atributo ou 'N/A']",
+    "Bônus de Ataque": "[proficiência + modificador ou 'N/A']",
+    "Espaços de Magia": "[Ex: 4/3/2 ou por nível conforme classe ou 'N/A']",
+    "Magias Conhecidas": ["[LISTAR 8-12 magias apropriadas ao nível e classe, ou 'Não possui magias']"]
+  }},
+  "historia": {{
+    "Personalidade": "[EXPANDIR {conceito} em 2-3 frases detalhadas]",
+    "Ideais": "[CRIAR 1-2 ideais baseados na personalidade e background]",
+    "Vínculos": "[CRIAR 1-2 vínculos baseados em {historia} e {objetivos}]",
+    "Defeitos": "[CRIAR 1-2 defeitos interessantes e balanceados]",
+    "História": "[ESCREVER 3-4 parágrafos completos integrando: {aparencia}, {historia}, {objetivos} de forma coesa e envolvente]"
+  }}
 }}
 
-Preencha TODOS os campos relevantes para {SISTEMAS_DISPONIVEIS[sistema]['nome']}. Seja completo e balanceado."""
+**VALIDAÇÃO FINAL OBRIGATÓRIA:**
+✓ TODOS os campos têm valores reais (não "—", "A definir", ou vazios)
+✓ Atributos somam entre 70-78 (método padrão 4d6 descartando menor)
+✓ HP calculado corretamente conforme dado de vida da classe
+✓ CA inclui armadura apropriada
+✓ Ataques têm bônus de ataque e dano calculados
+✓ Equipamento faz sentido para o nível e classe
+✓ Magias apropriadas para nível de conjurador
+✓ História é rica, coerente e bem desenvolvida
+
+**RETORNE APENAS O JSON PURO - SEM TEXTO ANTES OU DEPOIS, SEM MARKDOWN, SEM EXPLICAÇÕES.**"""
 
             historico = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ]
             
-            conteudo_bruto = await chamar_groq(historico, max_tokens=2000)
-            
-            if not conteudo_bruto or "Erro" in conteudo_bruto:
-                await ctx.send(f"⚠️ Erro ao gerar ficha: {conteudo_bruto}")
-                return
+            conteudo_bruto = await chamar_groq(historico, max_tokens=2500)  # ← MUDE 2000 para 2500
             
             # Tenta parsear JSON estruturado
             secoes_estruturadas = None
             try:
-                # Remove possíveis marcações de código e espaços
                 conteudo_limpo = conteudo_bruto.strip()
                 
-                # Remove blocos de código markdown
+                # Remove markdown
                 if "```" in conteudo_limpo:
-                    # Pega conteúdo entre ```
-                    partes = conteudo_limpo.split("```")
-                    for parte in partes:
-                        parte = parte.strip()
-                        if parte.startswith("json"):
-                            parte = parte[4:].strip()
-                        if parte.startswith("{") and parte.endswith("}"):
-                            conteudo_limpo = parte
-                            break
+                    import re
+                    json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', conteudo_limpo, re.DOTALL)
+                    if json_match:
+                        conteudo_limpo = json_match.group(1)
                 
-                # Tenta parsear
+                # Extrai JSON
+                inicio = conteudo_limpo.find('{')
+                fim = conteudo_limpo.rfind('}') + 1
+                if inicio >= 0 and fim > inicio:
+                    conteudo_limpo = conteudo_limpo[inicio:fim]
+                
+                # Parseia
                 secoes_estruturadas = json.loads(conteudo_limpo)
                 
-                # Valida se tem pelo menos uma seção
-                if not secoes_estruturadas or not isinstance(secoes_estruturadas, dict):
-                    raise ValueError("JSON vazio ou inválido")
+                # Valida
+                if not isinstance(secoes_estruturadas, dict) or not secoes_estruturadas:
+                    raise ValueError("JSON inválido")
                 
-                print(f"✅ JSON parseado com sucesso! Seções: {list(secoes_estruturadas.keys())}")
+                print(f"✅ JSON OK! {len(secoes_estruturadas)} seções")
                 
-            except (json.JSONDecodeError, ValueError) as e:
-                print(f"⚠️ Erro ao parsear JSON: {e}")
-                print(f"Conteúdo recebido (primeiros 500 chars): {conteudo_bruto[:500]}")
-                
-                # Tenta extrair manualmente campos básicos do texto
+            except Exception as e:
+                print(f"⚠️ Erro JSON: {e}")
+                # Fallback básico
                 secoes_estruturadas = {
-                    "basico": {"Nome": nome, "Raça": raca, "Classe": classe},
-                    "atributos": {},
+                    "basico": {"Nome": nome, "Raça": raca, "Classe": classe, "Nível": nivel},
+                    "atributos": {"Força": 10, "Destreza": 10, "Constituição": 10, "Inteligência": 10, "Sabedoria": 10, "Carisma": 10},
                     "recursos": {},
                     "combate": {},
                     "equipamento": {},
-                    "historia": {"Personalidade": conceito, "História": historia}
+                    "magia": {},
+                    "historia": {"Personalidade": conceito, "Aparência": aparencia, "História": historia, "Objetivos": objetivos}
                 }
-                
-                await ctx.send(
-                    "⚠️ **Aviso:** A IA não retornou formato JSON válido.\n"
-                    "Criei uma ficha básica, mas recomendo usar `!editarficha` para completar os dados."
-                )
+                await ctx.send("⚠️ IA teve dificuldades. Criada ficha básica. Use `!editarficha` para completar!")
             
             # Salva ficha
             chave = key_from_name(f"{ctx.author.id}_{nome}")
@@ -793,16 +859,34 @@ Preencha TODOS os campos apropriados para {SISTEMAS_DISPONIVEIS[novo_sistema]['n
                 conteudo_atual = ficha.get("conteudo", "")
                 formato = "texto"
             
-            prompt = f"""Edite a seguinte ficha de personagem conforme a instrução do jogador.
-Mantenha toda a estrutura e informações não mencionadas. Apenas altere o que foi solicitado.
+            prompt = f"""Você deve editar uma ficha de personagem de {SISTEMAS_DISPONIVEIS[sistema]['nome']}.
 
-FICHA ATUAL ({formato}):
-{conteudo_atual}
-
-INSTRUÇÃO DE EDIÇÃO:
+**INSTRUÇÃO DO JOGADOR:**
 {instrucao}
 
-Retorne a ficha completa atualizada no MESMO formato ({"JSON estruturado" if formato == "JSON estruturado" else "texto"})."""
+**FICHA ATUAL (formato {formato}):**
+{conteudo_atual}
+
+**REGRAS CRÍTICAS:**
+1. MANTENHA toda a estrutura JSON original
+2. Apenas ALTERE os campos mencionados na instrução
+3. PRESERVE todos os outros valores inalterados
+4. Se adicionar itens/equipamento, ADICIONE à lista existente (não substitua tudo)
+5. PREENCHA campos vazios se a instrução pedir
+
+**IMPORTANTE:** 
+- Se formato é JSON, retorne JSON PURO (sem ```json ou markdown)
+- TODOS os campos não mencionados devem permanecer EXATAMENTE iguais
+- Valores calculados (HP, CA) só mudam se atributos mudarem
+
+**RETORNE APENAS O JSON COMPLETO ATUALIZADO, SEM TEXTO EXTRA:**"""
+
+            historico = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ]
+            
+            conteudo_novo = await chamar_groq(historico, max_tokens=2500)
 
             historico = [
                 {"role": "system", "content": system_prompt},

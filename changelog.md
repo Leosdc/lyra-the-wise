@@ -1,5 +1,51 @@
 # 📜 Changelog
 
+## [2.4.0] - 2025-10-27
+### 📋 Adicionado - Sistema de Fichas Estruturadas
+- Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
+- Cada sistema (D&D 5e, Pathfinder 2e, Cthulhu, Shadowrun, Vampire V5, etc.) possui **campos e recursos próprios**
+- Inclusão de atributos específicos:
+  - D&D: HP, MP, Dados de Vida, Espaços de Magia
+  - Cthulhu: Sanidade Máxima/Atual, Magia, Movimento
+  - Shadowrun: Essência, Magia, Ressonância
+  - Vampire: Humanidade, Fome, Pontos de Sangue
+- Visualização interativa com botões:
+  - `◀️ Anterior`, `▶️ Próxima`, `❌ Fechar`
+- Compatível com fichas antigas (legado) e novo formato 📋 estruturado
+
+### 🧠 IA Aprimorada - Fichas Mais Completas
+- `!criarficha` agora faz **8 perguntas detalhadas**
+- Prompt reescrito para **forçar preenchimento de todos os campos**
+- IA expande e enriquece as respostas do jogador
+- Tokens aumentados de 2000 → **2500**
+- Parser JSON robusto com fallback inteligente (nunca retorna vazio)
+
+### 🧩 Novo - Comando `!converterficha`
+- Permite converter fichas entre sistemas mantendo equilíbrio e contexto narrativo
+- Detecta automaticamente formato (texto ou estruturado)
+- Converte atributos e recursos para o novo sistema mantendo proporções
+- Exemplo:
+
+
+### 💾 Melhorado - Persistência e Encoding
+- Salvamento forçado com **UTF-8 seguro**
+- Correção automática de campos com encoding corrompido (ex: "raÃ§a" → "raça")
+- Recuperação automática de fichas quebradas
+- Logs detalhados no console para debugging
+
+### ⚙️ Compatibilidade Total
+- Todos os comandos existentes continuam funcionais:
+- `!criarficha`, `!verficha`, `!editarficha`, `!minhasfichas`, `!exportarficha`, `!converterficha`
+- Fichas antigas (legado) continuam sendo lidas e listadas normalmente
+- Indicador visual 📋 (estruturada) ou 📄 (legado)
+
+### 🧠 Experiência do Usuário
+- Feedback de criação mostrando **percentual de completude**
+- Dicas contextuais sugerindo `!editarficha` se <70%
+- Exibição mais limpa e legível, página por página
+
+---
+
 ## [2.3.0] - 2025-10-26
 ### ⚔️ Adicionado - Sistema de Ações Interativas
 - Novos botões nas rolagens: `🎲 Rolar Dados`, `🚫 Não Fazer Nada`, `✏️ Outra Ação`
