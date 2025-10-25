@@ -260,7 +260,11 @@ class RollRequestView(discord.ui.View):
             {"role": "system", "content": get_system_prompt(sistema)},
         ] + historia_recente
         
-        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        # Define tokens baseado no estilo da sessão
+        estilo = sessao.get("estilo_narrativo", "extenso")
+        max_tokens = 1200 if estilo == "extenso" else 500
+
+        resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
         # Adiciona ao histórico
         historia.append({"role": "assistant", "content": resposta})
@@ -283,6 +287,126 @@ class RollRequestView(discord.ui.View):
         )
         await channel.send(embed=embed, view=view)
 
+class NarrativeStyleView(discord.ui.View):
+    """View para o mestre escolher o estilo narrativo da Lyra."""
+    
+    def __init__(self, bot: commands.Bot, sessao_store: Dict[int, Dict[str, Any]], salvar_dados_cb, chamar_groq_cb, get_system_prompt_cb, channel_id: int):
+        super().__init__(timeout=60)
+        self.bot = bot
+        self.sessoes_ativas = sessao_store
+        self.salvar_dados = salvar_dados_cb
+        self.chamar_groq = chamar_groq_cb
+        self.get_system_prompt = get_system_prompt_cb
+        self.channel_id = channel_id
+    
+    @discord.ui.button(label="📖 Narrativa Extensa", style=discord.ButtonStyle.primary, custom_id="narrative_long")
+    async def narrative_long(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Narrativa detalhada e imersiva (3-5 parágrafos)."""
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        if interaction.user.id != sessao.get("mestre_id"):
+            return await interaction.response.send_message("⚠️ Apenas o **mestre** pode escolher o estilo narrativo.", ephemeral=True)
+        
+        sessao["estilo_narrativo"] = "extenso"
+        self.salvar_dados()
+        
+        await interaction.response.send_message(
+            "✅ **Estilo Narrativo Definido: EXTENSO**\n\n"
+            "📖 Lyra contará histórias detalhadas e imersivas, com:\n"
+            "• 3-5 parágrafos completos\n"
+            "• Descrições ricas dos 5 sentidos\n"
+            "• Narrativa cinematográfica e atmosférica\n"
+            "• Maior profundidade emocional e contextual\n\n"
+            "💡 *Ideal para sessões focadas em roleplay e imersão.*",
+            ephemeral=False
+        )
+        await self._start_adventure(interaction)
+    
+    @discord.ui.button(label="📝 Narrativa Concisa", style=discord.ButtonStyle.secondary, custom_id="narrative_short")
+    async def narrative_short(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Narrativa objetiva e direta (1-2 parágrafos)."""
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        if interaction.user.id != sessao.get("mestre_id"):
+            return await interaction.response.send_message("⚠️ Apenas o **mestre** pode escolher o estilo narrativo.", ephemeral=True)
+        
+        sessao["estilo_narrativo"] = "conciso"
+        self.salvar_dados()
+        
+        await interaction.response.send_message(
+            "✅ **Estilo Narrativo Definido: CONCISO**\n\n"
+            "📝 Lyra será objetiva e direta, com:\n"
+            "• 1-2 parágrafos curtos\n"
+            "• Foco em ação e informação essencial\n"
+            "• Narrativa ágil e dinâmica\n"
+            "• Respostas mais rápidas\n\n"
+            "💡 *Ideal para sessões focadas em combate e progressão rápida.*",
+            ephemeral=False
+        )
+        await self._start_adventure(interaction)
+    
+    async def _start_adventure(self, interaction: discord.Interaction):
+        """Inicia a aventura após escolha do estilo narrativo."""
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        from config import fichas_personagens
+        
+        sistema = sessao.get("sistema", "dnd5e")
+        estilo = sessao.get("estilo_narrativo", "extenso")
+        fichas = sessao.get("fichas", {})
+        
+        # Define parâmetros baseado no estilo
+        if estilo == "extenso":
+            max_tokens = 1500
+            instrucao_tamanho = "3-5 parágrafos completos e detalhados"
+            instrucao_estilo = "Seja MUITO descritiva, imersiva e cinematográfica. Use linguagem evocativa, apele aos 5 sentidos, crie atmosfera profunda."
+        else:
+            max_tokens = 600
+            instrucao_tamanho = "1-2 parágrafos curtos e diretos"
+            instrucao_estilo = "Seja objetiva e concisa. Foque no essencial: situação, desafio imediato e gancho para ação."
+        
+        prompt_intro = f"Gere uma introdução épica para a sessão de RPG, apresentando o cenário, tom e conexões entre os personagens. {instrucao_tamanho}. {instrucao_estilo} Termine com um gancho claro para a primeira cena.\n\nPersonagens:\n"
+        
+        for uid, chave in fichas.items():
+            ficha_info = fichas_personagens.get(chave, {})
+            nome_personagem = ficha_info.get('nome', 'Personagem Desconhecido')
+            conteudo = ficha_info.get('conteudo', '')
+            resumo = conteudo[:200] + "..." if len(conteudo) > 200 else conteudo
+            prompt_intro += f"- **{nome_personagem}**: {resumo}\n"
+        
+        mensagens = [
+            {"role": "system", "content": self.get_system_prompt(sistema)},
+            {"role": "user", "content": prompt_intro}
+        ]
+        
+        await interaction.channel.send("🎬 *Lyra está tecendo a história...*")
+        intro = await self.chamar_groq(mensagens, max_tokens=max_tokens)
+        
+        sessao["status"] = "em_andamento"
+        sessao["historia"] = [
+            {"role": "system", "content": self.get_system_prompt(sistema)},
+            {"role": "assistant", "content": intro}
+        ]
+        self.salvar_dados()
+        
+        embed = discord.Embed(
+            title="🎬 Aventura Iniciada!",
+            description=intro[:4000],
+            color=discord.Color.green()
+        )
+        embed.set_footer(text=f"Estilo Narrativo: {estilo.upper()}")
+        
+        continue_view = ContinueStoryView(
+            self.bot,
+            self.sessoes_ativas,
+            self.salvar_dados,
+            self.chamar_groq,
+            self.get_system_prompt
+        )
+        await interaction.channel.send(embed=embed, view=continue_view)
 
 # -----------------------------
 # View para Continuação da História
@@ -357,51 +481,33 @@ class SessionControlView(discord.ui.View):
             faltantes_txt = ", ".join([_user_mention(interaction.guild, uid) for uid in faltando])
             return await interaction.response.send_message(f"⏳ Ainda faltam fichas: {faltantes_txt}", ephemeral=True)
 
-        # Monta resumo das fichas selecionadas para a IA
-        from config import fichas_personagens
-        
-        sistema = sessao.get("sistema", "dnd5e")
-        prompt_intro = "Gere uma **introdução épica** para a sessão de RPG, apresentando o cenário, tom e conexões entre os personagens. 3-5 parágrafos curtos. Termine com um gancho claro para a primeira cena.\n\nPersonagens:\n"
-        
-        for uid, chave in fichas.items():
-            # Busca nome real da ficha
-            ficha_info = fichas_personagens.get(chave, {})
-            nome_personagem = ficha_info.get('nome', 'Personagem Desconhecido')
-            conteudo = ficha_info.get('conteudo', '')
-            resumo = conteudo[:200] + "..." if len(conteudo) > 200 else conteudo
-            prompt_intro += f"- **{nome_personagem}**: {resumo}\n"
-
-        # Chama IA
-        mensagens = [
-            {"role": "system", "content": self.get_system_prompt(sistema)},
-            {"role": "user", "content": prompt_intro}
-        ]
-        await interaction.response.defer(thinking=True)
-        intro = await self.chamar_groq(mensagens, max_tokens=900)
-        
-        # Inicializa histórico narrativo
-        sessao["status"] = "em_andamento"
-        sessao["historia"] = [
-            {"role": "system", "content": self.get_system_prompt(sistema)},
-            {"role": "assistant", "content": intro}
-        ]
-        self.salvar_dados()
-
-        embed = discord.Embed(
-            title="🎬 Aventura Iniciada!",
-            description=intro[:4000],
-            color=discord.Color.green()
+        # Mostra view para escolher estilo narrativo
+        await interaction.response.send_message(
+            embed=discord.Embed(
+                title="📖 Escolha o Estilo Narrativo",
+                description=(
+                    "Como você quer que **Lyra, a Sábia** conte a história?\n\n"
+                    "**📖 Narrativa Extensa:**\n"
+                    "• 3-5 parágrafos detalhados\n"
+                    "• Descrições ricas e imersivas\n"
+                    "• Ideal para roleplay e exploração\n\n"
+                    "**📝 Narrativa Concisa:**\n"
+                    "• 1-2 parágrafos objetivos\n"
+                    "• Foco em ação e progressão\n"
+                    "• Ideal para combate e ritmo rápido"
+                ),
+                color=discord.Color.gold()
+            ).set_footer(text="Escolha abaixo o estilo que preferir"),
+            view=NarrativeStyleView(
+                self.bot,
+                self.sessoes_ativas,
+                self.salvar_dados,
+                self.chamar_groq,
+                self.get_system_prompt,
+                interaction.channel.id
+            ),
+            ephemeral=False
         )
-        
-        # View com botão para continuar
-        continue_view = ContinueStoryView(
-            self.bot,
-            self.sessoes_ativas,
-            self.salvar_dados,
-            self.chamar_groq,
-            self.get_system_prompt
-        )
-        await interaction.followup.send(embed=embed, view=continue_view)
 
     @discord.ui.button(label="📊 Ver Fichas", style=discord.ButtonStyle.primary)
     async def fichas_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -545,6 +651,16 @@ def setup_sessoes(
         await ctx.send("✨ *A história se desenrola...*")
         
         sistema = sessao.get("sistema", "dnd5e")
+        estilo = sessao.get("estilo_narrativo", "extenso")
+        
+        if estilo == "extenso":
+            max_tokens = 1200
+            instrucao_tamanho = "2-4 parágrafos detalhados"
+            instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
+        else:
+            max_tokens = 500
+            instrucao_tamanho = "1-2 parágrafos curtos"
+            instrucao_estilo = "Seja objetivo e direto ao ponto. Foque no essencial."
         
         # Limita histórico para não estourar tokens (últimas 20 interações)
         historia_recente = historia[-20:] if len(historia) > 20 else historia
@@ -553,10 +669,10 @@ def setup_sessoes(
         mensagens = [
             {"role": "system", "content": get_system_prompt(sistema) + "\n\n**IMPORTANTE:** Quando apropriado, solicite rolagens de dados aos jogadores. Use o formato exato:\n[ROLL: tipo_de_dado, jogadores]\nExemplos:\n- [ROLL: 1d20+3, todos] - todos rolam\n- [ROLL: 2d6, " + nome_personagem + "] - apenas este personagem\n- [ROLL: 1d20, todos] - múltiplos jogadores\n\nSOLICITE rolagens em situações de: combate, testes de perícia, percepção, furtividade, etc."},
         ] + historia_recente + [
-            {"role": "user", "content": f"Narre as consequências da ação de {nome_personagem}: {descricao}. Seja cinematográfico, use os 5 sentidos. Se a ação requer teste de habilidade/combate/perícia, SOLICITE a rolagem apropriada usando [ROLL: dado, jogadores]. Termine com gancho claro. 2-4 parágrafos."}
+            {"role": "user", "content": f"Narre as consequências da ação de {nome_personagem}: {descricao}. {instrucao_tamanho}. {instrucao_estilo} Se a ação requer teste de habilidade/combate/perícia, SOLICITE a rolagem apropriada usando [ROLL: dado, jogadores]. Termine com gancho claro."}
         ]
         
-        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
         # Adiciona resposta ao histórico
         historia.append({"role": "assistant", "content": resposta})
@@ -600,6 +716,7 @@ def setup_sessoes(
                 description=resposta_limpa[:4000],
                 color=discord.Color.gold()
             )
+            embed.set_footer(text=f"Estilo: {estilo.upper()}")
             await ctx.send(embed=embed)
             
             # Cria embed de solicitação de rolagem
@@ -634,8 +751,10 @@ def setup_sessoes(
             embed = discord.Embed(
                 title="📖 A História Continua...",
                 description=resposta[:4000],
-                color=discord.Color.gold()
+                color=discord.Color.purple()
             )
+            embed.set_footer(text=f"Estilo: {estilo.upper()}")
+            await ctx.send(embed=embed)
             
             view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
             await ctx.send(embed=embed, view=view)
@@ -671,15 +790,26 @@ def setup_sessoes(
         await ctx.send("🎬 *Expandindo a cena...*")
         
         sistema = sessao.get("sistema", "dnd5e")
+        estilo = sessao.get("estilo_narrativo", "extenso")
+        
+        if estilo == "extenso":
+            max_tokens = 1200
+            instrucao_tamanho = "2-4 parágrafos detalhados"
+            instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
+        else:
+            max_tokens = 500
+            instrucao_tamanho = "1-2 parágrafos curtos"
+            instrucao_estilo = "Seja objetivo e direto ao ponto. Foque no essencial."
+
         historia_recente = historia[-20:] if len(historia) > 20 else historia
         
         mensagens = [
             {"role": "system", "content": get_system_prompt(sistema) + "\n\n**IMPORTANTE:** Quando apropriado, solicite rolagens de dados aos jogadores. Use o formato exato:\n[ROLL: tipo_de_dado, jogadores]\nExemplos:\n- [ROLL: 1d20+3, todos] - todos rolam\n- [ROLL: 2d6, jogador_específico] - apenas um\n\nSOLICITE rolagens em situações de: combate, percepção, investigação, furtividade, etc."},
         ] + historia_recente + [
-            {"role": "user", "content": f"Expanda esta cena de forma cinematográfica: {descricao}. Use linguagem evocativa, apele aos 5 sentidos. Se a situação requer rolagens (percepção, combate, etc), SOLICITE usando [ROLL: dado, jogadores]. Termine com momento que convide ação. 2-4 parágrafos."}
+            {"role": "user", "content": f"Expanda esta cena de forma cinematográfica: {descricao}. {instrucao_tamanho}. {instrucao_estilo} Se a situação requer rolagens (percepção, combate, etc), SOLICITE usando [ROLL: dado, jogadores]. Termine com momento que convide ação."}
         ]
         
-        resposta = await chamar_groq(mensagens, max_tokens=1200)
+        resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
         # Adiciona resposta ao histórico
         historia.append({"role": "assistant", "content": resposta})
@@ -724,6 +854,7 @@ def setup_sessoes(
                 description=resposta_limpa[:4000],
                 color=discord.Color.purple()
             )
+            embed.set_footer(text=f"Estilo: {estilo.upper()}")
             await ctx.send(embed=embed)
             
             # Cria embed de solicitação de rolagem
@@ -760,6 +891,7 @@ def setup_sessoes(
                 description=resposta[:4000],
                 color=discord.Color.purple()
             )
+            embed.set_footer(text=f"Estilo: {estilo.upper()}")
             
             view = ContinueStoryView(bot, sessoes_ativas, salvar_dados, chamar_groq, get_system_prompt)
             await ctx.send(embed=embed, view=view)

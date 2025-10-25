@@ -1,5 +1,36 @@
 # 📜 Changelog
 
+## [2.2.0] - 2025-10-26
+### 🎨 Adicionado - Sistema de Estilo Narrativo
+- **Escolha de Estilo ao Iniciar Aventura**: Mestre escolhe entre Narrativa Extensa ou Concisa
+- **📖 Narrativa Extensa**: 
+  - 3-5 parágrafos completos e detalhados
+  - Descrições ricas dos 5 sentidos
+  - Atmosfera cinematográfica e imersiva
+  - 1200-1500 tokens por resposta
+  - Ideal para sessões focadas em roleplay
+- **📝 Narrativa Concisa**:
+  - 1-2 parágrafos curtos e objetivos
+  - Foco em ação e informação essencial
+  - Ritmo ágil e dinâmico
+  - 500-600 tokens por resposta
+  - Ideal para combate e progressão rápida
+- Estilo aplicado automaticamente em `!acao` e `!cenanarrada`
+- Footer visual mostrando estilo ativo (EXTENSO/CONCISO)
+- Sistema de rolagens interativas respeitando o estilo escolhido
+
+### 🎲 Melhorado - Sistema de Rolagens
+- Rolagens automáticas agora respeitam o estilo narrativo
+- Narrativa pós-rolagem adapta tamanho conforme configuração
+- Melhor integração entre dados e história contínua
+
+### 🎭 Interno
+- Refatoração da classe `NarrativeStyleView`
+- Parâmetros dinâmicos de tokens baseados em estilo
+- Consistência de tom narrativo em toda a sessão
+
+---
+
 ## [2.1.0] - 2025-10-23
 ### 🎭 Adicionado - Sistema de Narrativa Contínua
 - `!acao`: Jogadores descrevem ações, IA narra consequências com contexto contínuo.
