@@ -26,7 +26,6 @@
 - Converte atributos e recursos para o novo sistema mantendo proporções
 - Exemplo:
 
-
 ### 💾 Melhorado - Persistência e Encoding
 - Salvamento forçado com **UTF-8 seguro**
 - Correção automática de campos com encoding corrompido (ex: "raÃ§a" → "raça")
