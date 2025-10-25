@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Notify (Lyra Final v2)
+name: 🤖 Auto Version & Discord Notify (Lyra Styled)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # necessário para criar tags e atualizar o README
+  contents: write
 
 jobs:
   auto_version:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # 2️⃣ Detecta número de versão no commit (ex: v2.4.0 ou v2.4.0!)
+      # 2️⃣ Detecta número de versão no commit
       - name: Detectar número de versão no commit
         id: version
         run: |
@@ -33,7 +33,7 @@ jobs:
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 3️⃣ Atualiza badge de versão no README.md
+      # 3️⃣ Atualiza badge de versão no README
       - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
@@ -45,7 +45,7 @@ jobs:
           git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança detectada."
           git push || true
 
-      # 4️⃣ Cria e envia a tag automaticamente (modo híbrido)
+      # 4️⃣ Cria tag automaticamente (modo híbrido)
       - name: Criar tag automática (modo híbrido)
         if: env.SKIP != 'true'
         env:
@@ -57,14 +57,12 @@ jobs:
           COMMIT_MSG="${{ github.event.head_commit.message }}"
           FORCE_TAG=false
 
-          # Detecta se o commit contém um "!" após a versão (ex: v2.5.0!)
           if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+! ]]; then
             FORCE_TAG=true
             VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
             echo "⚡ Modo forçado ativado — tag ${VERSION} será substituída."
           fi
 
-          # Verifica se a tag existe no repositório remoto
           if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
             if [ "$FORCE_TAG" = true ]; then
               git tag -f $VERSION
@@ -80,34 +78,35 @@ jobs:
             echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
           fi
 
-      # 5️⃣ Extrai SOMENTE o último changelog completo
-      - name: Obter changelog recente
+      # 5️⃣ Extrai changelog completo e aplica truncamento elegante
+      - name: Obter changelog mais recente
         if: env.SKIP != 'true'
         run: |
-          echo "📖 Extraindo último changelog completo..."
-          # Captura bloco entre o primeiro "## " e o próximo (ou fim do arquivo)
           LATEST_CHANGELOG=$(awk '
             /^## / {
-              if (found) exit; 
-              found=1; next
+              if (found) exit;
+              found=1; next;
             }
             found
           ' changelog.md)
-
-          # Remove espaços extras e linhas vazias iniciais
-          LATEST_CHANGELOG=$(echo "$LATEST_CHANGELOG" | sed '/^[[:space:]]*$/d')
 
           if [ -z "$LATEST_CHANGELOG" ]; then
             echo "⚠️ Nenhum changelog encontrado. Usando fallback."
             LATEST_CHANGELOG="Nenhum changelog disponível nesta versão."
           fi
 
+          # Truncamento elegante com aviso
+          LENGTH=${#LATEST_CHANGELOG}
+          if [ $LENGTH -gt 1500 ]; then
+            LATEST_CHANGELOG="${LATEST_CHANGELOG:0:1500}\n\n... _(changelog truncado — veja o completo no GitHub)_"
+          fi
+
           echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "📜 Último changelog preparado (somente o mais recente)."
+          echo "📜 Último changelog preparado (com truncamento elegante)."
 
-      # 6️⃣ Envia mensagem formatada (Markdown estilizado para Discord)
+      # 6️⃣ Envia notificação com visual profissional (embed simulada)
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         uses: Ilshidur/action-discord@master
@@ -115,18 +114,20 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🧙 **Nova versão `${{ env.VERSION }}` publicada automaticamente!**
-            📦 **Repositório:** [${{ github.repository }}](https://github.com/${{ github.repository }})
-            👤 **Autor:** ${{ github.actor }}
-            🕐 **Data:** `${{ github.event.head_commit.timestamp }}`
-            🪶 **Changelog:**
+            🧙 **Atualização detectada em [${{ github.repository }}](https://github.com/${{ github.repository }})**
+            👤 **Autor:** `${{ github.actor }}`
+            📝 **Commit:** `${{ github.event.head_commit.message }}`
+            🌿 **Branch:** `${{ github.ref_name }}`
+            🔗 [Ver commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+
+            🗒️ **Últimas alterações:**
             ```md
             ${{ env.LATEST_CHANGELOG }}
             ```
-            🔗 [Ver no GitHub](https://github.com/${{ github.repository }}/releases/tag/${{ env.VERSION }})
+
             🧩 *Lyra the Wise • Build automático do GitHub Actions*
 
-      # 7️⃣ Confirmação final no log
+      # 7️⃣ Confirmação final
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada, tag criada (ou forçada) e notificação entregue!"
+        run: echo "✅ Versão $VERSION publicada e changelog enviado (com truncamento elegante)."
