@@ -14,28 +14,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Extrai apenas o bloco da última versão no CHANGELOG.md
+      # 2️⃣ Extrai apenas o bloco da última versão no changelog.md
       - name: Extract latest changelog entry
         id: changelog
         run: |
           # Encontra o início da primeira versão (a mais recente)
-          start_line=$(grep -n '^## \[' CHANGELOG.md | head -n 1 | cut -d: -f1)
+          start_line=$(grep -n '^## \[' changelog.md | head -n 1 | cut -d: -f1)
 
           # Encontra o início da próxima versão (para saber onde parar)
-          next_line=$(grep -n '^## \[' CHANGELOG.md | sed -n '2p' | cut -d: -f1)
+          next_line=$(grep -n '^## \[' changelog.md | sed -n '2p' | cut -d: -f1)
 
           if [ -z "$next_line" ]; then
             # Se não houver próxima versão, pega até o final do arquivo
-            end_line=$(wc -l < CHANGELOG.md)
+            end_line=$(wc -l < changelog.md)
           else
             end_line=$((next_line - 1))
           fi
 
           # Extrai apenas esse intervalo e salva em variável
-          content=$(sed -n "${start_line},${end_line}p" CHANGELOG.md)
+          content=$(sed -n "${start_line},${end_line}p" changelog.md)
 
           # Exporta para ambiente
-          echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "LATEST_changelog<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
@@ -54,5 +54,5 @@ jobs:
 
             📜 **Últimas alterações:**
             ```
-            ${{ env.LATEST_CHANGELOG }}
+            ${{ env.LATEST_changelog }}
             ```
