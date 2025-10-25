@@ -8,7 +8,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Version](https://img.shields.io/badge/Version-v2.4.0-purple.svg)
 
 
-## 🆕 Atualização — Versão 2.4.0 (2025-10-27)
+## 🆕 Atualização — Versão 2.4.0 (2025-10-25)
 
 ### 📋 Sistema de Fichas Estruturadas
 - Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
