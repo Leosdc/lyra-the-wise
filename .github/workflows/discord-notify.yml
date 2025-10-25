@@ -1,9 +1,21 @@
-uses: Ilshidur/action-discord@v2
-with:
-  webhook: ${{ secrets.DISCORD_WEBHOOK }}
-  message: |
-    📦 **Novo commit no repositório `${{ github.repository }}`**
-    👤 Autor: `${{ github.actor }}`
-    📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
-    🌿 Branch: `${{ github.ref_name }}`
-    🔗 [Ver commit](${{ github.event.head_commit.url }})
+name: Discord Notify   # nome do workflow (livre)
+on:                    # gatilhos (push, pull_request, etc)
+  push:
+    branches:
+      - main
+      - master
+
+jobs:                  # início dos jobs obrigatoriamente
+  notify:              # nome do job
+    runs-on: ubuntu-latest
+    steps:             # etapas que o job vai executar
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@v2
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          message: |
+            📦 **Novo commit no repositório `${{ github.repository }}`**
+            👤 Autor: `${{ github.actor }}`
+            📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
+            🌿 Branch: `${{ github.ref_name }}`
+            🔗 [Ver commit](${{ github.event.head_commit.url }})
