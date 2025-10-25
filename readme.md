@@ -84,44 +84,6 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ---
 
-## 🎨 **Lyra, the Wise**
-A anciã sábia integrada ao bot:
-
-- 🌟 Personalidade calorosa e encorajadora  
-- 📚 Conhecimento vasto sobre 50+ sistemas  
-- 🎭 Narrativas ricas e imersivas  
-- 💡 Conselhos práticos para mestres  
-- 🇧🇷 Sempre responde em português do Brasil  
-
----
-
-## ⚙️ Instalação
-
-### Pré-requisitos
-- Python 3.10+  
-- Conta no [Discord Developer Portal](https://discord.com/developers/applications)  
-- API Key do [Groq](https://console.groq.com)
-
-### Passos
-```bash
-git clone https://github.com/Leosdc/lyra-the-wise
-cd lyra-the-wise
-pip install -r requirements.txt
-```
-
-Crie o arquivo `.env`:
-```
-DISCORD_BOT_TOKEN=seu_token_aqui
-GROQ_API_KEY=sua_chave_groq_aqui
-```
-
-Execute:
-```bash
-python main.py
-```
-
----
-
 ## 🧩 Estrutura do Projeto
 ```
 lyra-the-wise/
