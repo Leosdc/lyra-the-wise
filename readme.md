@@ -295,6 +295,7 @@ Contribuições são bem-vindas! Para contribuir:
 
 **Leonardo (Leosdc_)**  
 - Discord: `Leosdc_`  
+- Canal do Discord: [Taverna](https://discord.gg/SdWnWJ6w)
 - GitHub: [@Leosdc](https://github.com/Leosdc)
 
 ---
