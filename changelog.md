@@ -1,5 +1,34 @@
 # 📜 Changelog
 
+## [2.3.0] - 2025-10-26
+### ⚔️ Adicionado - Sistema de Ações Interativas
+- Novos botões nas rolagens: `🎲 Rolar Dados`, `🚫 Não Fazer Nada`, `✏️ Outra Ação`
+- Jogadores agora podem escolher entre agir, ignorar ou realizar outra ação
+- IA continua a narrativa automaticamente com base na decisão tomada
+
+### ⚔️ Adicionado - Botão de Iniciativa
+- Botão **“⚔️ Rolar Iniciativa”** dentro de “Continuar História”
+- Exclusivo para o mestre
+- Define automaticamente a ordem de ação dos jogadores (🥇🥈🥉)
+- Resultado registrado no histórico da IA
+
+### ✍️ Melhorado - Estilo Narrativo Conciso
+- Redução de tokens para 350–400
+- Agora limitado a **1 parágrafo curto (máx. 4–5 frases)**
+- Linguagem objetiva e direta, ideal para combate e ritmo rápido
+
+### 📘 Atualizado - Comando `!ajudasessao`
+- Novo guia completo cobrindo todos os botões e fluxos de sessão
+- Explicações detalhadas dos estilos narrativos
+- Exemplo completo de partida com todas as features
+
+### 🧠 Qualidade de Vida
+- Feedback visual aprimorado nos botões
+- Consistência de tom entre estilos Extenso e Conciso
+- Salvamento automático mantido a cada 5 minutos
+
+---
+
 ## [2.2.0] - 2025-10-26
 ### 🎨 Adicionado - Sistema de Estilo Narrativo
 - **Escolha de Estilo ao Iniciar Aventura**: Mestre escolhe entre Narrativa Extensa ou Concisa

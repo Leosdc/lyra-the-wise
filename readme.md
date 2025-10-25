@@ -5,7 +5,30 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/Version-2.2.0-purple.svg)
+![Version](https://img.shields.io/badge/Version-2.3.0-purple.svg)
+
+
+## 🆕 Atualização — Versão 2.3.0 (2025-10-26)
+
+### ⚔️ Novos Recursos
+- **Botões interativos de decisão:**  
+  `🎲 Rolar Dados`, `🚫 Não Fazer Nada`, `✏️ Outra Ação`
+- **Novo botão de mestre:** `⚔️ Rolar Iniciativa`  
+  → Gera automaticamente a ordem de ação dos jogadores (🥇🥈🥉)
+- **IA contextual aprimorada:**  
+  Continua a história automaticamente conforme as escolhas dos jogadores
+
+### ✍️ Melhorias
+- **Estilo Narrativo Conciso** reformulado  
+  → Agora realmente curto (máx. 4–5 frases) e direto ao ponto  
+- **Comando `!ajudasessao`** totalmente refeito  
+  → Novo guia com fluxo completo, exemplos e explicações detalhadas
+
+### 🧠 Qualidade de Vida
+- Melhor feedback visual nos botões  
+- Descrições narrativas mais consistentes entre estilos  
+- Sessões continuam salvas automaticamente a cada 5 minutos
+
 
 ⚠️ **Status:** Em desenvolvimento ativo — o bot ainda contém bugs e pode apresentar instabilidades.
 
