@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Notify (Lyra Styled)
+name: 🤖 Auto Version & Discord Embed (Lyra Full)
 
 on:
   push:
@@ -14,38 +14,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clona o repositório
+      # 1️⃣ Checkout
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # 2️⃣ Detecta número de versão no commit
+      # 2️⃣ Detectar número de versão
       - name: Detectar número de versão no commit
         id: version
         run: |
           COMMIT_MSG="${{ github.event.head_commit.message }}"
-          echo "🧩 Mensagem do commit: $COMMIT_MSG"
           if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
-            echo "✅ Versão detectada: $VERSION"
             echo "VERSION=$VERSION" >> $GITHUB_ENV
           else
-            echo "⚠️ Nenhuma versão detectada — commit normal."
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 3️⃣ Atualiza badge de versão no README
+      # 3️⃣ Atualizar badge no README
       - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
-          echo "🪄 Atualizando badge de versão no README.md..."
           sed -i -E "s/Version-[0-9]+\.[0-9]+\.[0-9]+/Version-${VERSION}/" readme.md
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add readme.md
-          git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança detectada."
+          git commit -m "Atualiza badge para ${VERSION}" || true
           git push || true
 
-      # 4️⃣ Cria tag automaticamente (modo híbrido)
+      # 4️⃣ Criar/atualizar tag
       - name: Criar tag automática (modo híbrido)
         if: env.SKIP != 'true'
         env:
@@ -60,26 +56,24 @@ jobs:
           if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+! ]]; then
             FORCE_TAG=true
             VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
-            echo "⚡ Modo forçado ativado — tag ${VERSION} será substituída."
+            echo "⚡ Modo forçado — reetiquetando ${VERSION}"
           fi
 
           if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
             if [ "$FORCE_TAG" = true ]; then
               git tag -f $VERSION
               git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
-              echo "🏷️ Tag $VERSION recriada (forçada)."
             else
-              echo "⚠️ A tag $VERSION já existe. Pulando criação (modo normal)."
+              echo "Tag existente — pulando criação."
               exit 0
             fi
           else
             git tag $VERSION
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
-            echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
           fi
 
-      # 5️⃣ Extrai changelog completo e aplica truncamento elegante
-      - name: Obter changelog mais recente
+      # 5️⃣ Extrair changelog completo da última versão
+      - name: Obter changelog completo
         if: env.SKIP != 'true'
         run: |
           LATEST_CHANGELOG=$(awk '
@@ -91,43 +85,57 @@ jobs:
           ' changelog.md)
 
           if [ -z "$LATEST_CHANGELOG" ]; then
-            echo "⚠️ Nenhum changelog encontrado. Usando fallback."
-            LATEST_CHANGELOG="Nenhum changelog disponível nesta versão."
-          fi
-
-          # Truncamento elegante com aviso
-          LENGTH=${#LATEST_CHANGELOG}
-          if [ $LENGTH -gt 1500 ]; then
-            LATEST_CHANGELOG="${LATEST_CHANGELOG:0:1500}\n\n... _(changelog truncado — veja o completo no GitHub)_"
+            LATEST_CHANGELOG="Nenhum changelog encontrado."
           fi
 
           echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "📜 Último changelog preparado (com truncamento elegante)."
 
-      # 6️⃣ Envia notificação com visual profissional (embed simulada)
-      - name: Enviar notificação ao Discord
+      # 6️⃣ Enviar embed completo via cURL (JSON oficial)
+      - name: Enviar notificação ao Discord (Embed)
         if: env.SKIP != 'true'
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: |
-            🧙 **Atualização detectada em [${{ github.repository }}](https://github.com/${{ github.repository }})**
-            👤 **Autor:** `${{ github.actor }}`
-            📝 **Commit:** `${{ github.event.head_commit.message }}`
-            🌿 **Branch:** `${{ github.ref_name }}`
-            🔗 [Ver commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+        run: |
+          echo "💬 Enviando embed completo para o Discord..."
 
-            🗒️ **Últimas alterações:**
-            ```md
-            ${{ env.LATEST_CHANGELOG }}
-            ```
+          PAYLOAD=$(jq -n --arg repo "${{ github.repository }}" \
+            --arg actor "${{ github.actor }}" \
+            --arg msg "${{ github.event.head_commit.message }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg sha "${{ github.sha }}" \
+            --arg version "${{ env.VERSION }}" \
+            --arg changelog "${{ env.LATEST_CHANGELOG }}" \
+            --arg date "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+            '{
+              "username": "The Bard",
+              "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
+              "embeds": [
+                {
+                  "title": "🧙 Nova versão \($version) publicada automaticamente!",
+                  "color": 11259375,
+                  "fields": [
+                    { "name": "📦 Repositório", "value": "[\($repo)](https://github.com/\($repo))", "inline": true },
+                    { "name": "👤 Autor", "value": $actor, "inline": true },
+                    { "name": "🕐 Data", "value": $date, "inline": false },
+                    { "name": "🪶 Changelog", "value": "```md\n\($changelog)\n```", "inline": false }
+                  ],
+                  "thumbnail": {
+                    "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"
+                  },
+                  "footer": {
+                    "text": "Lyra the Wise • Build automático do GitHub Actions"
+                  },
+                  "url": "https://github.com/\($repo)/releases/tag/\($version)"
+                }
+              ]
+            }')
 
-            🧩 *Lyra the Wise • Build automático do GitHub Actions*
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "${{ secrets.DISCORD_WEBHOOK }}"
 
-      # 7️⃣ Confirmação final
+      # 7️⃣ Confirmação
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada e changelog enviado (com truncamento elegante)."
+        run: echo "✅ Versão ${VERSION} publicada com sucesso e changelog completo enviado!"
