@@ -246,7 +246,7 @@ FORMA, DECORRENTE DE, FORA DE OU EM CONEXÃO COM O SOFTWARE OU O USO OU OUTRAS
 NEGOCIAÇÕES NO SOFTWARE.
 ```
 
-Ver arquivo [LICENSE](LICENSE) para o texto completo.
+Ver arquivo [https://github.com/Leosdc/lyra-the-wise/blob/main/License.txt](LICENSE) para o texto completo.
 
 ---
 
