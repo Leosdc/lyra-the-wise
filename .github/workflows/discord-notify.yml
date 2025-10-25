@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Notify (Lyra Style)
+name: 🤖 Auto Version & Discord Notify (Lyra Hybrid)
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # 2️⃣ Detecta número de versão no commit (ex: v2.4.0)
+      # 2️⃣ Detecta número de versão no commit (ex: v2.4.0 ou v2.4.0!)
       - name: Detectar número de versão no commit
         id: version
         run: |
@@ -45,17 +45,40 @@ jobs:
           git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança detectada."
           git push || true
 
-      # 4️⃣ Cria e envia a tag automaticamente (com autenticação segura)
-      - name: Criar tag automática
+      # 4️⃣ Cria e envia a tag automaticamente (modo híbrido)
+      - name: Criar tag automática (modo híbrido)
         if: env.SKIP != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git tag $VERSION
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
-          echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
+
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          FORCE_TAG=false
+
+          # Detecta se o commit contém um "!" após a versão (ex: v2.5.0!)
+          if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+! ]]; then
+            FORCE_TAG=true
+            VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
+            echo "⚡ Modo forçado ativado — tag ${VERSION} será substituída."
+          fi
+
+          # Verifica se a tag existe no repositório remoto
+          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
+            if [ "$FORCE_TAG" = true ]; then
+              git tag -f $VERSION
+              git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
+              echo "🏷️ Tag $VERSION recriada (forçada)."
+            else
+              echo "⚠️ A tag $VERSION já existe. Pulando criação (modo normal)."
+              exit 0
+            fi
+          else
+            git tag $VERSION
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
+            echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
+          fi
 
       # 5️⃣ Lê o último changelog com fallback automático
       - name: Obter changelog recente
@@ -118,4 +141,4 @@ jobs:
       # 7️⃣ Confirmação final no log
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada, tag enviada e notificação entregue com sucesso!"
+        run: echo "✅ Versão $VERSION publicada, tag criada (ou forçada) e notificação entregue!"
