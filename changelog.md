@@ -1,6 +1,6 @@
 # 📜 Changelog
 
-## [2.4.0] - 2025-10-27
+## [2.4.0] - 2025-10-25
 ### 📋 Adicionado - Sistema de Fichas Estruturadas
 - Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
 - Cada sistema (D&D 5e, Pathfinder 2e, Cthulhu, Shadowrun, Vampire V5, etc.) possui **campos e recursos próprios**
