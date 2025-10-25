@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Final Safe)
+name: 🤖 Auto Version & Discord Embed (Lyra Safe Final)
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 3️⃣ Atualizar badge no README
+      # 3️⃣ Atualizar badge de versão
       - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
@@ -41,15 +41,14 @@ jobs:
           git commit -m "Atualiza badge para ${VERSION}" || true
           git push || true
 
-      # 4️⃣ Criar tag automática segura (sem forçar push)
-      - name: Criar tag automática (modo seguro)
+      # 4️⃣ Criar tag (modo seguro, sem travar se já existir)
+      - name: Criar tag automática segura
         if: env.SKIP != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-
           if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
             echo "⚠️ Tag $VERSION já existe. Pulando criação."
           else
@@ -57,7 +56,7 @@ jobs:
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
           fi
 
-      # 5️⃣ Extrair changelog completo da última versão
+      # 5️⃣ Capturar último changelog
       - name: Obter changelog completo
         if: env.SKIP != 'true'
         run: |
@@ -73,59 +72,61 @@ jobs:
             LATEST_CHANGELOG="Nenhum changelog encontrado."
           fi
 
-          echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Escape completo (inclui emojis, !, acentos)
+          ESCAPED_CHANGELOG=$(printf '%s' "$LATEST_CHANGELOG" | jq -Rsa .)
 
-      # 6️⃣ Enviar embed completo via cURL (fix JSON seguro)
-      - name: Enviar notificação ao Discord (Embed)
+          echo "LATEST_CHANGELOG=$ESCAPED_CHANGELOG" >> $GITHUB_ENV
+          echo "✅ Changelog preparado com escape seguro."
+
+      # 6️⃣ Enviar embed para o Discord
+      - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         run: |
           echo "💬 Preparando payload para o Discord..."
 
-          ESCAPED_CHANGELOG=$(echo "${{ env.LATEST_CHANGELOG }}" | jq -Rs .)
+          # Extrai valores
+          CHANGELOG=$(echo ${{ env.LATEST_CHANGELOG }} | jq -r .)
+          VERSION="${{ env.VERSION }}"
+          REPO="${{ github.repository }}"
+          ACTOR="${{ github.actor }}"
+          SHA="${{ github.sha }}"
+          DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
+          # Monta embed com JSON real
           PAYLOAD=$(jq -n \
-            --arg repo "${{ github.repository }}" \
-            --arg actor "${{ github.actor }}" \
-            --arg msg "${{ github.event.head_commit.message }}" \
-            --arg branch "${{ github.ref_name }}" \
-            --arg sha "${{ github.sha }}" \
-            --arg version "${{ env.VERSION }}" \
-            --arg date "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
-            --argjson changelog "$ESCAPED_CHANGELOG" \
+            --arg username "The Bard" \
+            --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
+            --arg version "$VERSION" \
+            --arg repo "$REPO" \
+            --arg actor "$ACTOR" \
+            --arg date "$DATE" \
+            --arg sha "$SHA" \
+            --arg changelog "$CHANGELOG" \
             '{
-              "username": "The Bard",
-              "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
+              "username": $username,
+              "avatar_url": $avatar,
               "embeds": [
                 {
-                  "title": "🧙 Nova versão \($version) publicada automaticamente!",
+                  "title": ("🧙 Nova versão " + $version + " publicada automaticamente!"),
                   "color": 11259375,
                   "fields": [
-                    { "name": "📦 Repositório", "value": "[\($repo)](https://github.com/\($repo))", "inline": true },
-                    { "name": "👤 Autor", "value": $actor, "inline": true },
-                    { "name": "🕐 Data", "value": $date, "inline": false },
-                    { "name": "🪶 Changelog", "value": ("```md\n" + $changelog + "\n```"), "inline": false }
+                    {"name": "📦 Repositório", "value": ("[" + $repo + "](https://github.com/" + $repo + ")"), "inline": true},
+                    {"name": "👤 Autor", "value": $actor, "inline": true},
+                    {"name": "🕐 Data", "value": $date, "inline": false},
+                    {"name": "🪶 Changelog", "value": ("```md\n" + $changelog + "\n```"), "inline": false}
                   ],
-                  "thumbnail": {
-                    "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"
-                  },
-                  "footer": {
-                    "text": "Lyra the Wise • Build automático do GitHub Actions"
-                  },
-                  "url": "https://github.com/\($repo)/commit/\($sha)"
+                  "thumbnail": {"url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"},
+                  "footer": {"text": "Lyra the Wise • Build automático do GitHub Actions"},
+                  "url": ("https://github.com/" + $repo + "/commit/" + $sha)
                 }
               ]
             }')
 
-          echo "📦 Trecho do payload JSON:"
-          echo "$PAYLOAD" | head -n 20
-
-          echo "🚀 Enviando para o Discord..."
+          echo "📦 Payload final pronto."
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}" \
             --fail --show-error --silent || (echo "❌ Falha ao enviar para o Discord" && exit 1)
 
       # 7️⃣ Confirmação
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão ${VERSION} publicada com sucesso e changelog completo enviado!"
+        run: echo "✅ Versão ${VERSION} publicada e changelog enviado com sucesso!"
