@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Safe Final)
+name: 🤖 Auto Version & Discord Embed (Lyra Safe vFinal)
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 3️⃣ Atualizar badge de versão
+      # 3️⃣ Atualizar badge de versão no README
       - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
@@ -41,8 +41,8 @@ jobs:
           git commit -m "Atualiza badge para ${VERSION}" || true
           git push || true
 
-      # 4️⃣ Criar tag (modo seguro, sem travar se já existir)
-      - name: Criar tag automática segura
+      # 4️⃣ Criar tag automática segura
+      - name: Criar tag automática (modo seguro)
         if: env.SKIP != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,43 +56,41 @@ jobs:
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
           fi
 
-      # 5️⃣ Capturar último changelog
-      - name: Obter changelog completo
+      # 5️⃣ Extrair changelog e salvar em arquivo seguro
+      - name: Extrair changelog mais recente
         if: env.SKIP != 'true'
         run: |
-          LATEST_CHANGELOG=$(awk '
+          echo "🔍 Extraindo changelog mais recente..."
+          awk '
             /^## / {
               if (found) exit;
               found=1; next;
             }
             found
-          ' changelog.md)
+          ' changelog.md > changelog_temp.md
 
-          if [ -z "$LATEST_CHANGELOG" ]; then
-            LATEST_CHANGELOG="Nenhum changelog encontrado."
+          if [ ! -s changelog_temp.md ]; then
+            echo "Nenhum changelog encontrado." > changelog_temp.md
           fi
 
-          # Escape completo (inclui emojis, !, acentos)
-          ESCAPED_CHANGELOG=$(printf '%s' "$LATEST_CHANGELOG" | jq -Rsa .)
+          echo "✅ changelog_temp.md criado com sucesso."
+          head -n 10 changelog_temp.md
 
-          echo "LATEST_CHANGELOG=$ESCAPED_CHANGELOG" >> $GITHUB_ENV
-          echo "✅ Changelog preparado com escape seguro."
-
-      # 6️⃣ Enviar embed para o Discord
+      # 6️⃣ Enviar embed completo via cURL (escape seguro)
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         run: |
           echo "💬 Preparando payload para o Discord..."
 
-          # Extrai valores
-          CHANGELOG=$(echo ${{ env.LATEST_CHANGELOG }} | jq -r .)
+          # Escapa conteúdo do changelog (leitura direta do arquivo)
+          ESCAPED_CHANGELOG=$(jq -Rs . < changelog_temp.md)
+
           VERSION="${{ env.VERSION }}"
           REPO="${{ github.repository }}"
           ACTOR="${{ github.actor }}"
           SHA="${{ github.sha }}"
           DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-          # Monta embed com JSON real
           PAYLOAD=$(jq -n \
             --arg username "The Bard" \
             --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
@@ -101,7 +99,7 @@ jobs:
             --arg actor "$ACTOR" \
             --arg date "$DATE" \
             --arg sha "$SHA" \
-            --arg changelog "$CHANGELOG" \
+            --argjson changelog "$ESCAPED_CHANGELOG" \
             '{
               "username": $username,
               "avatar_url": $avatar,
@@ -122,11 +120,13 @@ jobs:
               ]
             }')
 
-          echo "📦 Payload final pronto."
+          echo "🚀 Enviando payload ao Discord..."
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}" \
             --fail --show-error --silent || (echo "❌ Falha ao enviar para o Discord" && exit 1)
+
+          echo "✅ Embed enviado com sucesso!"
 
       # 7️⃣ Confirmação
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão ${VERSION} publicada e changelog enviado com sucesso!"
+        run: echo "✅ Versão ${VERSION} publicada e changelog completo enviado!"
