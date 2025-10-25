@@ -76,7 +76,7 @@ jobs:
           echo "✅ changelog_temp.md criado com sucesso."
           head -n 10 changelog_temp.md || true
 
-      # 6️⃣ Enviar embed com divisão automática (sem concatenação com '+')
+      # 6️⃣ Enviar embed com divisão automática (interpolação correta no jq)
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         run: |
@@ -88,10 +88,10 @@ jobs:
           SHA="${{ github.sha }}"
           DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-          # Lê changelog como string literal segura
+          # Lê changelog como string literal segura (JSON)
           CHANGELOG=$(jq -Rs . < changelog_temp.md)
 
-          # Monta payload usando apenas interpolação do jq (sem '+')
+          # Monta payload usando interpolação do jq (sem concatenação com '+')
           PAYLOAD=$(jq -n \
             --arg username "The Bard" \
             --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
@@ -108,27 +108,27 @@ jobs:
               end;
 
             def changelog_fields(s):
-              # s vem com aspas porque foi passado como string JSON; remove-as
+              # s vem como string JSON; decodifica para texto
               (s | fromjson) as $txt
-              | chunks($txt; 950)                # margem p/ cercas ```md
+              | chunks($txt; 950)                 # margem para cercas ```md
               | to_entries
               | map({
                   "name": ("🪶 Parte " + ((.key + 1)|tostring)),
                   "value": ("```md\n" + .value + "\n```"),
                   "inline": false
                 })
-              | .[:22];                          # limite de 22 partes (25 campos no total por embed)
+              | .[:22];                           # máximo de 22 partes (25 campos por embed)
 
             {
               "username": $username,
               "avatar_url": $avatar,
               "embeds": [
                 {
-                  "title": ("🧙 Nova versão " + $version + " publicada automaticamente!"),
+                  "title": ("🧙 Nova versão \($version) publicada automaticamente!"),
                   "color": 11259375,
                   "fields": (
                     [
-                      { "name": "📦 Repositório", "value": ("[\\(" + $repo + ")](https://github.com/\\(" + $repo + "))"), "inline": true },
+                      { "name": "📦 Repositório", "value": ("[\($repo)](https://github.com/\($repo))"), "inline": true },
                       { "name": "👤 Autor",       "value": $actor, "inline": true },
                       { "name": "🕐 Data",        "value": $date,  "inline": false }
                     ]
@@ -137,7 +137,7 @@ jobs:
                   ),
                   "thumbnail": { "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png" },
                   "footer":    { "text": "Lyra the Wise • Build automático do GitHub Actions" },
-                  "url": ("https://github.com/" + $repo + "/commit/" + $sha)
+                  "url": ("https://github.com/\($repo)/commit/\($sha)")
                 }
               ]
             }')
