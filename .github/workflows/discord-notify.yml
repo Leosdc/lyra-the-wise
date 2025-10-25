@@ -53,6 +53,4 @@ jobs:
             🔗 [Ver commit](${{ github.event.head_commit.url }})
 
             📜 **Últimas alterações:**
-            ```
-            ${{ env.LATEST_changelog }}
-            ```
+            ${{ env.LATEST_CHANGELOG }}
