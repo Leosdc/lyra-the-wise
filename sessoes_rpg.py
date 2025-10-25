@@ -165,11 +165,12 @@ class RollRequestView(discord.ui.View):
         self.sessoes_ativas = sessoes_ativas
         self.salvar_dados = salvar_dados
         self.channel_id = channel_id
-        self.roll_type = roll_type  # Ex: "1d20+3", "2d6"
-        self.players_needed = players_needed  # Lista de user_ids que precisam rolar
-        self.rolls_done = {}  # user_id -> resultado
+        self.roll_type = roll_type
+        self.players_needed = players_needed
+        self.rolls_done = {}
+        self.action_chosen = None  # Nova flag para rastrear ação escolhida
     
-    @discord.ui.button(label="🎲 Rolar Dados", style=discord.ButtonStyle.success, custom_id="roll_dice")
+    @discord.ui.button(label="🎲 Rolar Dados", style=discord.ButtonStyle.success, custom_id="roll_dice", row=0)
     async def roll_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Jogador rola os dados solicitados."""
         if interaction.user.id not in self.players_needed:
@@ -208,8 +209,9 @@ class RollRequestView(discord.ui.View):
             # Todos rolaram - continua a história
             sessao = self.sessoes_ativas.get(self.channel_id)
             if sessao:
-                # Desabilita botão
-                button.disabled = True
+                # Desabilita TODOS os botões
+                for item in self.children:
+                    item.disabled = True
                 await interaction.message.edit(view=self)
                 
                 # Prepara resumo das rolagens
@@ -234,6 +236,116 @@ class RollRequestView(discord.ui.View):
             await interaction.channel.send(
                 f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} rolar..."
             )
+    
+    @discord.ui.button(label="🚫 Não Fazer Nada", style=discord.ButtonStyle.secondary, custom_id="do_nothing", row=0)
+    async def do_nothing_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Jogador escolhe não realizar a ação."""
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        # Verifica se é jogador ou mestre
+        if interaction.user.id != sessao.get("mestre_id") and interaction.user.id not in self.players_needed:
+            return await interaction.response.send_message(
+                "⚠️ Esta escolha não é para você!",
+                ephemeral=True
+            )
+        
+        # Desabilita todos os botões
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+        
+        # Pega o nome do personagem
+        fichas_sel = sessao.get("fichas", {})
+        chave_ficha = fichas_sel.get(str(interaction.user.id)) or fichas_sel.get(interaction.user.id)
+        if chave_ficha:
+            nome_personagem = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
+        else:
+            nome_personagem = interaction.user.display_name
+        
+        await interaction.response.send_message(
+            embed=discord.Embed(
+                title="⏸️ Ação Cancelada",
+                description=f"**{nome_personagem}** decidiu não realizar a ação.",
+                color=discord.Color.orange()
+            )
+        )
+        
+        # Continua a história normalmente
+        from utils import chamar_groq, get_system_prompt
+        sistema = sessao.get("sistema", "dnd5e")
+        historia = sessao.get("historia", [])
+        
+        historia.append({
+            "role": "user",
+            "content": f"{nome_personagem} decidiu não realizar a ação sugerida. Narre como a situação evolui naturalmente."
+        })
+        
+        historia_recente = historia[-20:] if len(historia) > 20 else historia
+        mensagens = [
+            {"role": "system", "content": get_system_prompt(sistema)},
+        ] + historia_recente
+        
+        estilo = sessao.get("estilo_narrativo", "extenso")
+        max_tokens = 1200 if estilo == "extenso" else 500
+
+        resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
+        
+        historia.append({"role": "assistant", "content": resposta})
+        sessao["historia"] = historia
+        self.salvar_dados()
+        
+        embed = discord.Embed(
+            title="📖 A História Continua...",
+            description=resposta[:4000],
+            color=discord.Color.blue()
+        )
+        embed.set_footer(text=f"Estilo: {estilo.upper()}")
+        
+        from sessoes_rpg import ContinueStoryView
+        view = ContinueStoryView(
+            self.bot,
+            self.sessoes_ativas,
+            self.salvar_dados,
+            chamar_groq,
+            get_system_prompt
+        )
+        await interaction.channel.send(embed=embed, view=view)
+    
+    @discord.ui.button(label="✏️ Outra Ação", style=discord.ButtonStyle.primary, custom_id="other_action", row=0)
+    async def other_action_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Jogador escolhe fazer outra ação."""
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        # Verifica se é jogador da sessão
+        if interaction.user.id not in self.players_needed and interaction.user.id != sessao.get("mestre_id"):
+            return await interaction.response.send_message(
+                "⚠️ Esta opção não é para você!",
+                ephemeral=True
+            )
+        
+        # Desabilita todos os botões
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+        
+        await interaction.response.send_message(
+            embed=discord.Embed(
+                title="✏️ Descreva Sua Ação",
+                description=(
+                    "Use o comando `!acao <descrição>` para descrever o que seu personagem faz.\n\n"
+                    "💡 **Exemplos:**\n"
+                    "• `!acao examino a porta com cuidado`\n"
+                    "• `!acao ataco o goblin com minha espada`\n"
+                    "• `!acao tento persuadir o guarda`"
+                ),
+                color=discord.Color.blue()
+            ),
+            ephemeral=False
+        )
     
     async def _continue_story(self, channel, sessao):
         """Continua a história após todas as rolagens."""
@@ -423,7 +535,7 @@ class ContinueStoryView(discord.ui.View):
         self.chamar_groq = chamar_groq
         self.get_system_prompt = get_system_prompt
     
-    @discord.ui.button(label="🎬 Continuar História", style=discord.ButtonStyle.primary, custom_id="continue_story")
+    @discord.ui.button(label="🎬 Continuar História", style=discord.ButtonStyle.primary, custom_id="continue_story", row=0)
     async def continue_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Botão para o mestre continuar a narrativa."""
         sessao = self.sessoes_ativas.get(interaction.channel.id)
@@ -443,6 +555,72 @@ class ContinueStoryView(discord.ui.View):
             "Use o comando `!cenanarrada <descrição>` ou aguarde as ações dos jogadores com `!acao`.",
             ephemeral=True
         )
+    
+    @discord.ui.button(label="⚔️ Rolar Iniciativa", style=discord.ButtonStyle.success, custom_id="roll_initiative", row=0)
+    async def initiative_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Mestre rola iniciativa para todos os jogadores."""
+        sessao = self.sessoes_ativas.get(interaction.channel.id)
+        if not sessao:
+            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
+        
+        # Apenas mestre pode usar este botão
+        if interaction.user.id != sessao.get("mestre_id"):
+            return await interaction.response.send_message(
+                "⚠️ Apenas o **mestre** pode rolar iniciativa!",
+                ephemeral=True
+            )
+        
+        # Importa função de rolagem
+        import random
+        from config import fichas_personagens
+        
+        jogadores = sessao.get("jogadores", [])
+        fichas_sel = sessao.get("fichas", {})
+        
+        resultados = {}
+        
+        # Rola iniciativa para cada jogador
+        for jogador_id in jogadores:
+            membro = interaction.guild.get_member(jogador_id)
+            if not membro:
+                continue
+            
+            chave_ficha = fichas_sel.get(str(jogador_id)) or fichas_sel.get(jogador_id)
+            if chave_ficha:
+                nome = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
+            else:
+                nome = membro.display_name
+            
+            # Rola 1d20 + 1d4 (modificador genérico)
+            iniciativa = random.randint(1, 20) + random.randint(1, 4)
+            resultados[nome] = iniciativa
+        
+        # Ordena por valor (maior primeiro)
+        ranking = sorted(resultados.items(), key=lambda x: x[1], reverse=True)
+        
+        # Cria texto do resultado
+        texto = "⚔️ **Ordem de Iniciativa:**\n\n"
+        for i, (nome, valor) in enumerate(ranking, start=1):
+            emoji = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+            texto += f"{emoji} **{nome}** → {valor}\n"
+        
+        embed = discord.Embed(
+            title="⚔️ Iniciativa Rolada!",
+            description=texto,
+            color=discord.Color.red()
+        )
+        embed.set_footer(text="Os jogadores agem nesta ordem. Use !acao para descrever suas ações.")
+        
+        await interaction.response.send_message(embed=embed, ephemeral=False)
+        
+        # Adiciona ao histórico da sessão
+        historia = sessao.get("historia", [])
+        historia.append({
+            "role": "user",
+            "content": f"Ordem de iniciativa estabelecida: {', '.join([f'{nome} ({valor})' for nome, valor in ranking])}"
+        })
+        sessao["historia"] = historia
+        self.salvar_dados()
 
 
 # -----------------------------
@@ -658,9 +836,9 @@ def setup_sessoes(
             instrucao_tamanho = "2-4 parágrafos detalhados"
             instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
         else:
-            max_tokens = 500
-            instrucao_tamanho = "1-2 parágrafos curtos"
-            instrucao_estilo = "Seja objetivo e direto ao ponto. Foque no essencial."
+            max_tokens = 350  # ← REDUZIDO
+            instrucao_tamanho = "1 parágrafo breve (máximo 4 frases)"  # ← ESPECÍFICO
+            instrucao_estilo = "Seja EXTREMAMENTE direto. Máximo 4 frases. Descreva apenas: resultado imediato da ação + consequência direta + próxima situação. NADA mais."  # ← REFORÇADO
         
         # Limita histórico para não estourar tokens (últimas 20 interações)
         historia_recente = historia[-20:] if len(historia) > 20 else historia
@@ -797,9 +975,9 @@ def setup_sessoes(
             instrucao_tamanho = "2-4 parágrafos detalhados"
             instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
         else:
-            max_tokens = 500
-            instrucao_tamanho = "1-2 parágrafos curtos"
-            instrucao_estilo = "Seja objetivo e direto ao ponto. Foque no essencial."
+            max_tokens = 350  # ← REDUZIDO
+            instrucao_tamanho = "1 parágrafo breve (máximo 4 frases)"  # ← ESPECÍFICO
+            instrucao_estilo = "MÁXIMO 4 frases. Descreva apenas: cenário básico + elemento principal + momento crítico. Vá direto ao ponto sem floreios."  # ← REFORÇADO
 
         historia_recente = historia[-20:] if len(historia) > 20 else historia
         
@@ -1236,7 +1414,9 @@ def setup_sessoes(
     @bot.command(name="ajudasessao")
     async def ajudasessao(ctx: commands.Context):
         descr = (
-            "**Comandos principais**\n"
+            "**🎮 Como Criar e Gerenciar Sessões**\n\n"
+            
+            "**📋 Comandos Básicos**\n"
             "• `!iniciarsessao @jog1 @jog2` — Cria sessão privada\n"
             "• `!selecionarficha Nome` — Escolhe sua ficha\n"
             "• `!sessoes` — Lista sessões ativas\n"
@@ -1246,35 +1426,111 @@ def setup_sessoes(
             "• `!removerjogador @Jog` — Remove jogador\n"
             "• `!mudarficha Nome` — Troca de personagem\n"
             "• `!pausarsessao` — Pausa/retoma\n\n"
-            "**🎭 Durante a Aventura (Sistema Interativo!)**\n"
-            "• `!acao <descrição>` — Jogadores descrevem o que fazem\n"
-            "• `!cenanarrada <descrição>` — Mestre narra nova cena\n"
-            "• **🎲 Rolagens Automáticas:** Quando a IA solicitar rolagens, um botão aparecerá!\n"
-            "  - Clique em 'Rolar Dados' quando solicitado\n"
-            "  - O sistema aguarda TODOS rolarem antes de continuar\n"
-            "  - Os resultados são mostrados e a história prossegue automaticamente\n"
-            "• Botão 'Continuar História' — Aparece após cada ação\n\n"
-            "**Botões no canal da sessão**\n"
-            "• 🎬 Iniciar Aventura — Inicia a narrativa (mestre)\n"
-            "• 📊 Ver Fichas — Mostra status das seleções\n"
-            "• 🎲 Rolar Dados — Aparece quando a IA solicita rolagens\n"
-            "• 🎬 Continuar História — Aparece após cada ação\n"
-            "• 🚪 Encerrar Sessão — Apaga o canal (mestre)\n\n"
-            "**💡 Exemplo de Jogo com Rolagens:**\n"
-            "1. Mestre clica 'Iniciar Aventura'\n"
-            "2. Jogador usa `!acao examino a porta trancada`\n"
-            "3. IA narra: 'A porta está trancada... [SOLICITA ROLAGEM 1d20+Percepção]'\n"
-            "4. Botão 🎲 aparece para o jogador rolar\n"
-            "5. Jogador clica, rola 18+3 = 21\n"
-            "6. IA continua: 'Com esse resultado excepcional, você nota...'\n"
-            "7. História flui naturalmente!\n\n"
-            "**🎯 Dicas para Mestres:**\n"
-            "• A IA pedirá rolagens em situações apropriadas (combate, perícia, etc)\n"
-            "• Use `!cenanarrada` para introduzir desafios que exigem testes\n"
-            "• O sistema aguarda automaticamente todos os jogadores rolarem\n"
-            "• Você pode usar `!rolar` manualmente a qualquer momento também"
+            
+            "**🎭 Escolha de Estilo Narrativo**\n"
+            "Ao iniciar a aventura, o mestre escolhe como a história será contada:\n"
+            "• **📖 Narrativa Extensa** — 3-5 parágrafos, imersão profunda, ideal para roleplay\n"
+            "• **📝 Narrativa Concisa** — 1 parágrafo curto, foco em ação, ideal para combate\n\n"
+            
+            "**🎬 Durante a Aventura (Sistema Interativo!)**\n"
+            "• `!acao <descrição>` — **Jogadores** descrevem o que fazem\n"
+            "  Exemplo: `!acao examino a porta procurando armadilhas`\n"
+            "• `!cenanarrada <descrição>` — **Mestre** narra nova cena\n"
+            "  Exemplo: `!cenanarrada um dragão pousa no topo da torre`\n\n"
+            
+            "**🎲 Sistema de Rolagens Inteligente**\n"
+            "Quando a IA solicita rolagens, aparece um painel com opções:\n"
+            "• **🎲 Rolar Dados** — Rola os dados solicitados\n"
+            "• **🚫 Não Fazer Nada** — Cancela a ação\n"
+            "• **✏️ Outra Ação** — Descreve ação diferente com `!acao`\n"
+            "O sistema aguarda TODOS rolarem antes de continuar a história!\n\n"
+            
+            "**🎬 Botões de Controle da História**\n"
+            "Após cada resposta da IA, aparecem botões para o **mestre**:\n"
+            "• **🎬 Continuar História** — Pede próxima cena ao mestre\n"
+            "• **⚔️ Rolar Iniciativa** — Rola iniciativa para TODOS os jogadores\n"
+            "  - Define ordem de ação automaticamente\n"
+            "  - Aparece ordem visual (🥇🥈🥉)\n"
+            "  - Ordem é mantida no histórico da IA\n\n"
+            
+            "**🎮 Botões no Canal da Sessão**\n"
+            "• **🎬 Iniciar Aventura** — Mestre escolhe estilo e começa\n"
+            "• **📊 Ver Fichas** — Mostra status das seleções\n"
+            "• **🚪 Encerrar Sessão** — Apaga o canal (confirmação)\n\n"
+            
+            "**💡 Fluxo Completo de uma Sessão:**\n"
+            "1️⃣ Mestre cria sessão com `!iniciarsessao @jogadores`\n"
+            "2️⃣ Cada jogador usa `!selecionarficha NomePersonagem`\n"
+            "3️⃣ Mestre clica **🎬 Iniciar Aventura**\n"
+            "4️⃣ Mestre escolhe **Narrativa Extensa** ou **Concisa**\n"
+            "5️⃣ IA gera introdução épica no estilo escolhido\n"
+            "6️⃣ Jogadores usam `!acao` para descrever ações\n"
+            "7️⃣ Quando IA pede rolagens, botões aparecem:\n"
+            "   - Rolar → Aguarda todos → Continua história\n"
+            "   - Não Fazer Nada → IA narra evolução natural\n"
+            "   - Outra Ação → Permite nova descrição\n"
+            "8️⃣ Mestre usa botão **⚔️ Rolar Iniciativa** em combates\n"
+            "9️⃣ Mestre usa `!cenanarrada` para introduzir eventos\n"
+            "🔟 Ao final: `!resumosessao` + **🚪 Encerrar Sessão**\n\n"
+            
+            "**🎯 Exemplo de Jogo com Todas as Features:**\n"
+            "```\n"
+            "[Mestre clica 'Iniciar Aventura' → Escolhe 'Conciso']\n"
+            "IA: \"Vocês entram na caverna escura...\"\n"
+            "\n"
+            "[Jogador1] !acao examino as paredes\n"
+            "IA: \"Você nota marcas de garras. [SOLICITA: 1d20+Percepção]\"\n"
+            "[Botões aparecem: 🎲 Rolar | 🚫 Não Fazer | ✏️ Outra Ação]\n"
+            "\n"
+            "[Jogador1 clica 'Rolar Dados']\n"
+            "Bot: \"Jogador1 rolou: 18+3 = 21\"\n"
+            "IA: \"Você vê pegadas recentes de goblins...\"\n"
+            "\n"
+            "[Mestre] !cenanarrada goblins atacam de surpresa\n"
+            "[Mestre clica '⚔️ Rolar Iniciativa']\n"
+            "Bot: \"🥇 Elara → 19 | 🥈 Thorin → 15 | 🥉 Goblin → 12\"\n"
+            "\n"
+            "[Jogadores agem na ordem]\n"
+            "```\n\n"
+            
+            "**🎨 Diferenças entre Estilos:**\n"
+            "• **Extenso**: 3-5 parágrafos, atmosfera rica, 5 sentidos, diálogos\n"
+            "• **Conciso**: 1 parágrafo curto (4-5 frases), direto ao ponto\n\n"
+            
+            "**⚠️ Dicas Importantes:**\n"
+            "• Configure seu sistema com `!sistema <código>` antes de criar sessão\n"
+            "• Crie fichas com antecedência usando `!criarficha` ou `!ficha <nome>`\n"
+            "• Use `!verficha <nome>` para ver detalhes de fichas na sessão\n"
+            "• O estilo narrativo escolhido afeta TODOS os comandos (`!acao`, `!cenanarrada`)\n"
+            "• Iniciativa é automática - define ordem de ação para combates\n"
+            "• Botões de rolagem aparecem automaticamente quando apropriado\n"
+            "• Você pode usar `!rolar` manualmente a qualquer momento também\n"
+            "• Use `!limpar` se o histórico ficar muito longo\n\n"
+            
+            "**🔧 Comandos Avançados:**\n"
+            "• `!pausarsessao` — Pausa temporariamente (útil para pausas)\n"
+            "• `!convidarsessao @novo` — Adiciona jogador durante sessão\n"
+            "• `!mudarficha <nome>` — Troca personagem (requer aprovação se em andamento)\n"
+            "• `!resumosessao` — IA analisa últimas 50 mensagens e gera resumo\n\n"
+            
+            "**🎭 Para Mestres:**\n"
+            "• Use `!cenanarrada` para controle narrativo\n"
+            "• Botão **⚔️ Rolar Iniciativa** é exclusivo para você\n"
+            "• Você pode clicar **🚫 Não Fazer Nada** para cancelar rolagens solicitadas\n"
+            "• O estilo narrativo pode ser ajustado criando nova sessão\n"
+            "• Sessões são salvas automaticamente a cada 5 minutos\n\n"
+            
+            "**📊 Rastreamento Automático:**\n"
+            "• Histórico de 20 últimas interações mantido pela IA\n"
+            "• Rolagens são registradas e consideradas nas narrativas\n"
+            "• Ordem de iniciativa é lembrada durante combate\n"
+            "• Fichas selecionadas ficam visíveis com `!infosessao`"
         )
-        await ctx.send(embed=discord.Embed(title="📖 Ajuda — Sessões de RPG", description=descr, color=discord.Color.blurple()))
+        await ctx.send(embed=discord.Embed(
+            title="📖 Guia Completo — Sessões de RPG",
+            description=descr,
+            color=discord.Color.blurple()
+        ).set_footer(text="Use !rpghelp para ver todos os comandos do bot"))
 
     # Fim do setup
     return
