@@ -14,8 +14,8 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           message: |
-            📦 **Novo commit no repositório `${{ github.repository }}`**
+            📦 **Novo push no repositório `${{ github.repository }}`**
             👤 Autor: `${{ github.actor }}`
-            📝 Mensagem: `${{ github.event.head_commit.message }}`
+            📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
             🌿 Branch: `${{ github.ref_name }}`
-            🔗 [Ver commit](${{ github.event.head_commit.url }})
+            🔗 [Ver repositório](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }})
