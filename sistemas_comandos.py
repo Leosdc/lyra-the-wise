@@ -28,8 +28,11 @@ def register(bot: commands.Bot):
 
         sistemas_rpg[user_id] = novo_sistema
         
+        # ✅ CORREÇÃO: Força salvamento imediato
+        from config import sistemas_rpg as sistemas_dict
         from utils import salvar_dados
-        salvar_dados(sistemas_rpg=sistemas_rpg)
+        sistemas_dict[user_id] = novo_sistema
+        salvar_dados(sistemas_rpg=sistemas_dict)
         
         nome = SISTEMAS_DISPONIVEIS[novo_sistema]["nome"]
         await ctx.send(

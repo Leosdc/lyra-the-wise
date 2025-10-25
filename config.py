@@ -20,9 +20,8 @@ DATA_DIR = Path("bot_data")
 DATA_DIR.mkdir(exist_ok=True)
 
 FICHAS_FILE = DATA_DIR / "fichas_personagens.json"
-SISTEMAS_FILE = DATA_DIR / "sistemas_rpg.json"
 SESSOES_FILE = DATA_DIR / "sessoes_ativas.json"
-SISTEMAS_FILE = DATA_DIR / "sistemas_usuarios.json"
+SISTEMAS_USUARIOS_FILE = DATA_DIR / "sistemas_usuarios.json"
 
 # Estes dicionários são a ÚNICA fonte de verdade para todo o bot
 conversation_history = {}  # por canal
