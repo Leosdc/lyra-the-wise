@@ -10,14 +10,49 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+      # 1️⃣ Checkout para ler o arquivo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Extrai apenas o bloco da última versão no CHANGELOG.md
+      - name: Extract latest changelog entry
+        id: changelog
+        run: |
+          # Encontra o início da primeira versão (a mais recente)
+          start_line=$(grep -n '^## \[' CHANGELOG.md | head -n 1 | cut -d: -f1)
+
+          # Encontra o início da próxima versão (para saber onde parar)
+          next_line=$(grep -n '^## \[' CHANGELOG.md | sed -n '2p' | cut -d: -f1)
+
+          if [ -z "$next_line" ]; then
+            # Se não houver próxima versão, pega até o final do arquivo
+            end_line=$(wc -l < CHANGELOG.md)
+          else
+            end_line=$((next_line - 1))
+          fi
+
+          # Extrai apenas esse intervalo e salva em variável
+          content=$(sed -n "${start_line},${end_line}p" CHANGELOG.md)
+
+          # Exporta para ambiente
+          echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # 3️⃣ Envia notificação para o Discord
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            📦 **Novo commit no repositório `${{ github.repository }}`**
+            🧙 **Atualização detectada em `${{ github.repository }}`**
             👤 Autor: `${{ github.actor }}`
-            📝 Mensagem: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
+            📝 Commit: ${{ github.event.head_commit.message || 'Sem mensagem de commit' }}
             🌿 Branch: `${{ github.ref_name }}`
             🔗 [Ver commit](${{ github.event.head_commit.url }})
+
+            📜 **Últimas alterações:**
+            ```
+            ${{ env.LATEST_CHANGELOG }}
+            ```
