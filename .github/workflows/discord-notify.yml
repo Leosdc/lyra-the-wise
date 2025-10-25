@@ -1,13 +1,13 @@
-name: 🤖 Auto Version & Discord Notify
+name: 🤖 Auto Version & Discord Notify (Lyra Style)
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # permite execução manual também
+  workflow_dispatch:
 
 permissions:
-  contents: write  # necessário para criar tags e atualizar arquivos
+  contents: write  # necessário para criar tags e atualizar o README
 
 jobs:
   auto_version:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # 2️⃣ Detecta se o commit contém número de versão (ex: v2.4.0)
+      # 2️⃣ Detecta número de versão no commit (ex: v2.4.0)
       - name: Detectar número de versão no commit
         id: version
         run: |
@@ -33,7 +33,7 @@ jobs:
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 3️⃣ Atualiza o badge de versão no README.md
+      # 3️⃣ Atualiza badge de versão no README.md
       - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
@@ -42,7 +42,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add readme.md
-          git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança no badge."
+          git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança detectada."
           git push || true
 
       # 4️⃣ Cria e envia a tag automaticamente
@@ -65,7 +65,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           echo "📜 Último changelog preparado."
 
-      # 6️⃣ Envia mensagem formatada para o Discord
+      # 6️⃣ Envia mensagem formatada com embed estilizada (Lyra Style)
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         uses: Ilshidur/action-discord@master
@@ -73,14 +73,43 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🎯 **Nova versão `${{ env.VERSION }}` publicada automaticamente!**
-            🧙 **Repositório:** [`${{ github.repository }}`](https://github.com/${{ github.repository }})
-            👤 **Autor:** `${{ github.actor }}`
-            🕐 **Data:** `${{ github.event.head_commit.timestamp }}`
-            📝 **Changelog:**
-            ${{ env.LATEST_CHANGELOG }}
+            {
+              "username": "The Bard",
+              "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
+              "embeds": [{
+                "title": "🎯 Nova versão `${{ env.VERSION }}` publicada automaticamente!",
+                "color": 11259375,
+                "fields": [
+                  {
+                    "name": "📦 Repositório",
+                    "value": "[`${{ github.repository }}`](https://github.com/${{ github.repository }})",
+                    "inline": true
+                  },
+                  {
+                    "name": "👤 Autor",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "🕐 Data",
+                    "value": "${{ github.event.head_commit.timestamp }}",
+                    "inline": false
+                  },
+                  {
+                    "name": "🪶 Changelog",
+                    "value": "```md\n${{ env.LATEST_CHANGELOG }}\n```"
+                  }
+                ],
+                "thumbnail": {
+                  "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"
+                },
+                "footer": {
+                  "text": "Lyra the Wise • Build automático do GitHub Actions"
+                }
+              }]
+            }
 
-      # 7️⃣ Confirmação no log da Action
+      # 7️⃣ Confirmação final no log
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada, badge atualizado e notificação enviada!"
+        run: echo "✅ Versão $VERSION publicada, README atualizado e notificação enviada com sucesso!"
