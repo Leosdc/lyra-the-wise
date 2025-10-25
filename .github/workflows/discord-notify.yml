@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Full)
+name: 🤖 Auto Version & Discord Embed (Lyra Final Full)
 
 on:
   push:
@@ -92,20 +92,24 @@ jobs:
           echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      # 6️⃣ Enviar embed completo via cURL (JSON oficial)
+      # 6️⃣ Enviar embed completo via cURL (fix JSON seguro)
       - name: Enviar notificação ao Discord (Embed)
         if: env.SKIP != 'true'
         run: |
-          echo "💬 Enviando embed completo para o Discord..."
+          echo "💬 Preparando payload para o Discord..."
 
-          PAYLOAD=$(jq -n --arg repo "${{ github.repository }}" \
+          # Escapa conteúdo do changelog com segurança para JSON
+          ESCAPED_CHANGELOG=$(echo "${{ env.LATEST_CHANGELOG }}" | jq -Rs .)
+
+          PAYLOAD=$(jq -n \
+            --arg repo "${{ github.repository }}" \
             --arg actor "${{ github.actor }}" \
             --arg msg "${{ github.event.head_commit.message }}" \
             --arg branch "${{ github.ref_name }}" \
             --arg sha "${{ github.sha }}" \
             --arg version "${{ env.VERSION }}" \
-            --arg changelog "${{ env.LATEST_CHANGELOG }}" \
             --arg date "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+            --argjson changelog "$ESCAPED_CHANGELOG" \
             '{
               "username": "The Bard",
               "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
@@ -117,7 +121,7 @@ jobs:
                     { "name": "📦 Repositório", "value": "[\($repo)](https://github.com/\($repo))", "inline": true },
                     { "name": "👤 Autor", "value": $actor, "inline": true },
                     { "name": "🕐 Data", "value": $date, "inline": false },
-                    { "name": "🪶 Changelog", "value": "```md\n\($changelog)\n```", "inline": false }
+                    { "name": "🪶 Changelog", "value": ("```md\n" + $changelog + "\n```"), "inline": false }
                   ],
                   "thumbnail": {
                     "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"
@@ -130,10 +134,12 @@ jobs:
               ]
             }')
 
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "${{ secrets.DISCORD_WEBHOOK }}"
+          echo "📦 Trecho do payload JSON:"
+          echo "$PAYLOAD" | head -n 20
+
+          echo "🚀 Enviando para o Discord..."
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}" \
+            --fail --show-error --silent || (echo "❌ Falha ao enviar para o Discord" && exit 1)
 
       # 7️⃣ Confirmação
       - name: Confirmar envio
