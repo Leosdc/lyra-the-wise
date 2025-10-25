@@ -192,9 +192,9 @@ python main.py
 ## 🧩 Estrutura do Projeto
 ```
 lyra-the-wise/
-├── main.py                    # Ponto de entrada
-├── config.py                  # Configurações globais
-├── utils.py                   # Funções auxiliares
+├── main.py                   # Ponto de entrada
+├── config.py                 # Configurações globais
+├── utils.py                  # Funções auxiliares
 ├── sistemas_rpg.py           # Banco de dados de sistemas
 ├── fichas.py                 # Sistema de fichas
 ├── sessoes_rpg.py            # Sistema de sessões (com estilo narrativo)
@@ -246,7 +246,7 @@ FORMA, DECORRENTE DE, FORA DE OU EM CONEXÃO COM O SOFTWARE OU O USO OU OUTRAS
 NEGOCIAÇÕES NO SOFTWARE.
 ```
 
-Ver arquivo [https://github.com/Leosdc/lyra-the-wise/blob/main/License.txt](LICENSE) para o texto completo.
+Ver arquivo [License](https://github.com/Leosdc/lyra-the-wise/blob/main/License.txt) para o texto completo.
 
 ---
 
