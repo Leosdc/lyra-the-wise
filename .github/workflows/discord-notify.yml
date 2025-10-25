@@ -1,16 +1,17 @@
-name: Discord Notify   # nome do workflow (livre)
-on:                    # gatilhos (push, pull_request, etc)
+name: Discord Notify
+on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - master
 
-jobs:                  # início dos jobs obrigatoriamente
-  notify:              # nome do job
+jobs:
+  notify:
     runs-on: ubuntu-latest
-    steps:             # etapas que o job vai executar
+    steps:
       - name: Send Discord Notification
-        uses: Ilshidur/action-discord@v2
+        uses: Ilshidur/action-discord@master
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           message: |
