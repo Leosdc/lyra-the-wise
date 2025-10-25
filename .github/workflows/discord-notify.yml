@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Final Full)
+name: 🤖 Auto Version & Discord Embed (Lyra Final Safe)
 
 on:
   push:
@@ -41,8 +41,8 @@ jobs:
           git commit -m "Atualiza badge para ${VERSION}" || true
           git push || true
 
-      # 4️⃣ Criar/atualizar tag
-      - name: Criar tag automática (modo híbrido)
+      # 4️⃣ Criar tag automática segura (sem forçar push)
+      - name: Criar tag automática (modo seguro)
         if: env.SKIP != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,23 +50,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          FORCE_TAG=false
-
-          if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+! ]]; then
-            FORCE_TAG=true
-            VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
-            echo "⚡ Modo forçado — reetiquetando ${VERSION}"
-          fi
-
           if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
-            if [ "$FORCE_TAG" = true ]; then
-              git tag -f $VERSION
-              git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
-            else
-              echo "Tag existente — pulando criação."
-              exit 0
-            fi
+            echo "⚠️ Tag $VERSION já existe. Pulando criação."
           else
             git tag $VERSION
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
@@ -98,7 +83,6 @@ jobs:
         run: |
           echo "💬 Preparando payload para o Discord..."
 
-          # Escapa conteúdo do changelog com segurança para JSON
           ESCAPED_CHANGELOG=$(echo "${{ env.LATEST_CHANGELOG }}" | jq -Rs .)
 
           PAYLOAD=$(jq -n \
@@ -129,7 +113,7 @@ jobs:
                   "footer": {
                     "text": "Lyra the Wise • Build automático do GitHub Actions"
                   },
-                  "url": "https://github.com/\($repo)/releases/tag/\($version)"
+                  "url": "https://github.com/\($repo)/commit/\($sha)"
                 }
               ]
             }')
