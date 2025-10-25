@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Notify (Lyra Hybrid)
+name: 🤖 Auto Version & Discord Notify (Lyra Final)
 
 on:
   push:
@@ -94,7 +94,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           echo "📜 Último changelog preparado."
 
-      # 6️⃣ Envia mensagem formatada com embed estilizada (Lyra Style)
+      # 6️⃣ Envia mensagem formatada (Markdown estilizado para Discord)
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         uses: Ilshidur/action-discord@master
@@ -102,41 +102,16 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            {
-              "username": "The Bard",
-              "avatar_url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png",
-              "embeds": [{
-                "title": "🧙 Nova versão `${{ env.VERSION }}` publicada automaticamente!",
-                "color": 11259375,
-                "fields": [
-                  {
-                    "name": "📦 Repositório",
-                    "value": "[`${{ github.repository }}`](https://github.com/${{ github.repository }})",
-                    "inline": true
-                  },
-                  {
-                    "name": "👤 Autor",
-                    "value": "${{ github.actor }}",
-                    "inline": true
-                  },
-                  {
-                    "name": "🕐 Data",
-                    "value": "${{ github.event.head_commit.timestamp }}",
-                    "inline": false
-                  },
-                  {
-                    "name": "🪶 Changelog",
-                    "value": "```md\n${{ env.LATEST_CHANGELOG }}\n```"
-                  }
-                ],
-                "thumbnail": {
-                  "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"
-                },
-                "footer": {
-                  "text": "Lyra the Wise • Build automático do GitHub Actions"
-                }
-              }]
-            }
+            🧙 **Nova versão `${{ env.VERSION }}` publicada automaticamente!**
+            📦 **Repositório:** [${{ github.repository }}](https://github.com/${{ github.repository }})
+            👤 **Autor:** ${{ github.actor }}
+            🕐 **Data:** `${{ github.event.head_commit.timestamp }}`
+            🪶 **Changelog:**
+            ```md
+            ${{ env.LATEST_CHANGELOG }}
+            ```
+            🔗 [Ver no GitHub](https://github.com/${{ github.repository }}/releases/tag/${{ env.VERSION }})
+            🧩 *Lyra the Wise • Build automático do GitHub Actions*
 
       # 7️⃣ Confirmação final no log
       - name: Confirmar envio
