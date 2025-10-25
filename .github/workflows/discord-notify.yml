@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Notify (Lyra Final)
+name: 🤖 Auto Version & Discord Notify (Lyra Final v2)
 
 on:
   push:
@@ -80,19 +80,32 @@ jobs:
             echo "🏷️ Tag $VERSION criada e enviada com sucesso!"
           fi
 
-      # 5️⃣ Lê o último changelog com fallback automático
+      # 5️⃣ Extrai SOMENTE o último changelog completo
       - name: Obter changelog recente
         if: env.SKIP != 'true'
         run: |
-          LATEST_CHANGELOG=$(awk '/^## /{if (NR!=1) exit} {print}' changelog.md)
+          echo "📖 Extraindo último changelog completo..."
+          # Captura bloco entre o primeiro "## " e o próximo (ou fim do arquivo)
+          LATEST_CHANGELOG=$(awk '
+            /^## / {
+              if (found) exit; 
+              found=1; next
+            }
+            found
+          ' changelog.md)
+
+          # Remove espaços extras e linhas vazias iniciais
+          LATEST_CHANGELOG=$(echo "$LATEST_CHANGELOG" | sed '/^[[:space:]]*$/d')
+
           if [ -z "$LATEST_CHANGELOG" ]; then
             echo "⚠️ Nenhum changelog encontrado. Usando fallback."
             LATEST_CHANGELOG="Nenhum changelog disponível nesta versão."
           fi
+
           echo "LATEST_CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$LATEST_CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "📜 Último changelog preparado."
+          echo "📜 Último changelog preparado (somente o mais recente)."
 
       # 6️⃣ Envia mensagem formatada (Markdown estilizado para Discord)
       - name: Enviar notificação ao Discord
