@@ -93,12 +93,14 @@ except Exception as e:
     print(f"❌ Erro ao carregar rpg_core: {e}")
 
 try:
-    # 3. Sistema de fichas
-    import fichas
-    fichas.register(bot)
-    print("✅ fichas carregado")
+    # 3. Sistema de fichas ESTRUTURADAS (NOVO!)
+    import fichas_estruturadas
+    fichas_estruturadas.register(bot)
+    print("✅ fichas_estruturadas carregado")
 except Exception as e:
-    print(f"❌ Erro ao carregar fichas: {e}")
+    print(f"❌ Erro ao carregar fichas_estruturadas: {e}")
+    import traceback
+    traceback.print_exc()
 
 try:
     # 4. Painel de ajuda
