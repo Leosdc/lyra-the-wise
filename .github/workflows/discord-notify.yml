@@ -4,16 +4,21 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # permite rodar manualmente também
+  workflow_dispatch:  # permite execução manual também
+
+permissions:
+  contents: write  # necessário para criar tags e atualizar arquivos
 
 jobs:
   auto_version:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Clona o repositório
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # 1️⃣ Detecta se o commit contém uma versão (ex: v2.4.0)
+      # 2️⃣ Detecta se o commit contém número de versão (ex: v2.4.0)
       - name: Detectar número de versão no commit
         id: version
         run: |
@@ -28,7 +33,19 @@ jobs:
             echo "SKIP=true" >> $GITHUB_ENV
           fi
 
-      # 2️⃣ Cria e envia a tag automaticamente, se tiver versão
+      # 3️⃣ Atualiza o badge de versão no README.md
+      - name: Atualizar badge de versão no README
+        if: env.SKIP != 'true'
+        run: |
+          echo "🪄 Atualizando badge de versão no README.md..."
+          sed -i -E "s/Version-[0-9]+\.[0-9]+\.[0-9]+/Version-${VERSION}/" readme.md
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add readme.md
+          git commit -m "Atualiza badge de versão para ${VERSION}" || echo "🟡 Nenhuma mudança no badge."
+          git push || true
+
+      # 4️⃣ Cria e envia a tag automaticamente
       - name: Criar tag automática
         if: env.SKIP != 'true'
         run: |
@@ -38,7 +55,7 @@ jobs:
           git push origin $VERSION
           echo "🏷️ Tag $VERSION criada e enviada."
 
-      # 3️⃣ Extrai a última entrada do changelog
+      # 5️⃣ Lê o último changelog
       - name: Obter changelog recente
         if: env.SKIP != 'true'
         run: |
@@ -48,7 +65,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           echo "📜 Último changelog preparado."
 
-      # 4️⃣ Envia mensagem para o Discord
+      # 6️⃣ Envia mensagem formatada para o Discord
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         uses: Ilshidur/action-discord@master
@@ -63,7 +80,7 @@ jobs:
             📝 **Changelog:**
             ${{ env.LATEST_CHANGELOG }}
 
-      # 5️⃣ Mensagem de sucesso no log
+      # 7️⃣ Confirmação no log da Action
       - name: Confirmar envio
         if: env.SKIP != 'true'
-        run: echo "✅ Versão $VERSION publicada e notificada com sucesso!"
+        run: echo "✅ Versão $VERSION publicada, badge atualizado e notificação enviada!"
