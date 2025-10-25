@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Stable)
+name: 🤖 Auto Version & Discord Embed (Lyra Stable Final)
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
           git commit -m "Atualiza badge para ${VERSION}" || true
           git push || true
 
-      # 4️⃣ Criar tag automática segura
+      # 4️⃣ Criar tag automática (modo seguro)
       - name: Criar tag automática (modo seguro)
         if: env.SKIP != 'true'
         env:
@@ -74,9 +74,9 @@ jobs:
           fi
 
           echo "✅ changelog_temp.md criado com sucesso."
-          head -n 10 changelog_temp.md
+          head -n 10 changelog_temp.md || true
 
-      # 6️⃣ Enviar embed completo via cURL (divisão automática de partes)
+      # 6️⃣ Enviar embed com divisão automática (sem concatenação com '+')
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         run: |
@@ -88,24 +88,10 @@ jobs:
           SHA="${{ github.sha }}"
           DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-          # Quebra o changelog em partes de até 1000 caracteres
-          mapfile -t CHUNKS < <(fold -w 1000 changelog_temp.md)
+          # Lê changelog como string literal segura
+          CHANGELOG=$(jq -Rs . < changelog_temp.md)
 
-          # Cria os campos JSON dinamicamente
-          FIELDS_JSON=""
-          INDEX=1
-          for chunk in "${CHUNKS[@]}"; do
-            CHUNK_ESCAPED=$(jq -Rs . <<< "$chunk")
-            FIELDS_JSON+=$(jq -n --arg i "$INDEX" --arg c "$chunk" \
-              '{name: ("🪶 Parte " + $i), value: ("```md\n" + $c + "\n```"), inline: false}' | jq -c .)
-            FIELDS_JSON+=","
-            INDEX=$((INDEX+1))
-          done
-
-          # Remove vírgula final
-          FIELDS_JSON="[${FIELDS_JSON%,}]"
-
-          # Monta payload completo
+          # Monta payload usando apenas interpolação do jq (sem '+')
           PAYLOAD=$(jq -n \
             --arg username "The Bard" \
             --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
@@ -114,8 +100,26 @@ jobs:
             --arg actor "$ACTOR" \
             --arg date "$DATE" \
             --arg sha "$SHA" \
-            --argjson changelog "$FIELDS_JSON" \
-            '{
+            --arg changelog "$CHANGELOG" \
+            '
+            def chunks(s; n):
+              if (s|length) <= n then [s]
+              else [ s[0:n] ] + chunks(s[n:]; n)
+              end;
+
+            def changelog_fields(s):
+              # s vem com aspas porque foi passado como string JSON; remove-as
+              (s | fromjson) as $txt
+              | chunks($txt; 950)                # margem p/ cercas ```md
+              | to_entries
+              | map({
+                  "name": ("🪶 Parte " + ((.key + 1)|tostring)),
+                  "value": ("```md\n" + .value + "\n```"),
+                  "inline": false
+                })
+              | .[:22];                          # limite de 22 partes (25 campos no total por embed)
+
+            {
               "username": $username,
               "avatar_url": $avatar,
               "embeds": [
@@ -124,13 +128,15 @@ jobs:
                   "color": 11259375,
                   "fields": (
                     [
-                      {"name": "📦 Repositório", "value": "[" + $repo + "](https://github.com/" + $repo + ")", "inline": true},
-                      {"name": "👤 Autor", "value": $actor, "inline": true},
-                      {"name": "🕐 Data", "value": $date, "inline": false}
-                    ] + $changelog
+                      { "name": "📦 Repositório", "value": ("[\\(" + $repo + ")](https://github.com/\\(" + $repo + "))"), "inline": true },
+                      { "name": "👤 Autor",       "value": $actor, "inline": true },
+                      { "name": "🕐 Data",        "value": $date,  "inline": false }
+                    ]
+                    +
+                    (changelog_fields($changelog))
                   ),
-                  "thumbnail": {"url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png"},
-                  "footer": {"text": "Lyra the Wise • Build automático do GitHub Actions"},
+                  "thumbnail": { "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png" },
+                  "footer":    { "text": "Lyra the Wise • Build automático do GitHub Actions" },
                   "url": ("https://github.com/" + $repo + "/commit/" + $sha)
                 }
               ]
