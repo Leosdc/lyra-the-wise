@@ -324,6 +324,18 @@ lyra-the-wise/
 - [ ] Sistema de economia e comércio
 - [ ] Calendários e tracking de tempo
 
+### Salvar mais informações no `bot_data` e vincular nas `!sessoes`
+- [ ] !monstro <nome>
+- [ ] !encontro <nível> <dificuldade>
+- [ ] !armadilha <dificuldade>
+- [ ] !cena <descrição>
+- [ ] !item <tipo>
+- [ ] !tesouro <nível>
+- [ ] !puzzle <tema>
+- [ ] !vilao <tipo>
+- [ ] !nome <tipo>
+- [ ] !motivacao
+
 ---
 
 ## 🤝 **Contribuindo**
