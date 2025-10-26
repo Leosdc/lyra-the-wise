@@ -6,8 +6,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.0-purple.svg)
-
+![Version](https://img.shields.io/badge/Version-v2.5.1-purple.svg)
 
 ## 🆕 Atualização — Versão 2.5.0 (2025-10-26)
 
@@ -56,6 +55,28 @@ Seções: Básico, Atributos, Habilidades, Recursos,
         Disciplinas, Vantagens, História
 Campos: Humanidade, Fome, Potência do Sangue, Convicções, etc
 ```
+
+---
+
+## 🎙️ **Sistema de Canais de Voz Integrado** (v2.5.1)
+
+Lyra agora gerencia automaticamente canais de voz durante as sessões!
+
+### Funcionalidades:
+- ✅ **Criação Automática** - Canal de voz privado criado junto com o canal de texto
+- ✅ **Movimentação Inteligente** - Jogadores são movidos automaticamente se já estiverem em voz
+- ✅ **Desmute Automático** - Todos são desmutados ao entrar no canal da sessão
+- ⚠️ **Avisos Contextuais** - Notificação clara para quem precisa entrar manualmente
+- 🔄 **Retorno Seguro** - Ao encerrar, todos voltam para "⚜️Torre da Maga"
+- 🗑️ **Limpeza Completa** - Canais de texto e voz excluídos simultaneamente
+
+### Como Funciona:
+1. Mestre usa `!iniciarsessao @jogador1 @jogador2`
+2. Lyra cria canal de **texto** (`sessao-mestre`) e **voz** (`🎙️ sessao-mestre`)
+3. Jogadores conectados em qualquer canal de voz são **movidos automaticamente**
+4. Jogadores offline/desconectados recebem **aviso para entrar manualmente**
+5. Ao clicar **"🚪 Encerrar Sessão"**, todos retornam para a Torre da Maga
+6. Ambos os canais são deletados automaticamente
 
 ---
 

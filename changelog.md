@@ -1,5 +1,34 @@
 # 📜 Changelog
 
+## [2.5.1] - 2025-10-26
+### 🎙️ Adicionado - Sistema de Canais de Voz Integrado
+- **Criação automática de canal de voz** ao iniciar sessão com `!iniciarsessao`
+- **Movimentação automática** de jogadores para o canal de voz da sessão
+- **Desmute automático** ao entrar no canal de voz
+- **Avisos inteligentes** para jogadores que não estão em canais de voz
+- **Retorno automático** para "⚜️Torre da Maga" ao encerrar sessão
+- Canais de voz e texto são excluídos simultaneamente ao finalizar
+
+### 🎯 Melhorado - Experiência de Sessão
+- Feedback visual sobre quem foi movido para o canal de voz
+- Notificações claras para jogadores que precisam entrar manualmente
+- Mensagens de boas-vindas destacando o canal de voz criado
+- Busca flexível do canal "Torre da Maga" (aceita variações do nome)
+
+### 🔧 Arquitetura
+- Função `_criar_canal_de_sessao` agora retorna tupla `(TextChannel, VoiceChannel)`
+- Campo `voice_channel_id` adicionado à estrutura de sessões
+- Lógica de movimentação com tratamento robusto de exceções
+- Logs detalhados de movimentação de jogadores
+
+### 🎮 Fluxo Completo
+1. Mestre cria sessão → Canais texto + voz criados
+2. Jogadores em voz → Movidos automaticamente + desmutados
+3. Jogadores fora de voz → Recebem aviso para entrar manualmente
+4. Fim da sessão → Todos retornam para Torre da Maga → Canais deletados
+
+---
+
 ## [2.5.0] - 2025-10-26
 ### 🗂️ Adicionado - Estruturas de Fichas Expandidas
 - **9 sistemas com estruturas completas de fichas**:

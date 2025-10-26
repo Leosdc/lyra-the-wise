@@ -87,23 +87,35 @@ async def _criar_canal_de_sessao(
     jogadores: List[discord.Member],
     bot_member: discord.Member,
     nome_sugerido: Optional[str] = None,
-) -> discord.TextChannel:
+) -> tuple[discord.TextChannel, discord.VoiceChannel]:
+    """Cria canal de texto E voz para a sessão."""
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        bot_member: discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True, attach_files=True),
-        mestre: discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True, embed_links=True),
+        bot_member: discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True, attach_files=True, connect=True, speak=True),
+        mestre: discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, connect=True, speak=True, mute_members=True, move_members=True),
     }
     for j in jogadores:
-        overwrites[j] = discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True)
+        overwrites[j] = discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True, connect=True, speak=True)
 
     nome = nome_sugerido or f"sessao-{mestre.name.lower()}"
-    channel = await guild.create_text_channel(
+    
+    # Cria canal de texto
+    text_channel = await guild.create_text_channel(
         name=nome,
         category=categoria,
         overwrites=overwrites,
         reason="Criação de canal privado para sessão de RPG",
     )
-    return channel
+    
+    # Cria canal de voz com o mesmo nome
+    voice_channel = await guild.create_voice_channel(
+        name=f"🎙️ {nome}",
+        category=categoria,
+        overwrites=overwrites,
+        reason="Criação de canal de voz privado para sessão de RPG",
+    )
+    
+    return text_channel, voice_channel
 
 
 def _formatar_lista_fichas(fichas: List[Dict[str, Any]], SISTEMAS_DISPONIVEIS: Dict) -> str:
@@ -749,14 +761,48 @@ class SessionControlView(discord.ui.View):
         if not self._is_mestre(interaction.user.id, sessao):
             return await interaction.response.send_message("⚠️ Apenas o **mestre** pode encerrar.", ephemeral=True)
 
-        await interaction.response.send_message("⚠️ Encerrando sessão e **apagando este canal** em 5 segundos…", ephemeral=False)
-        await asyncio.sleep(5)
+        await interaction.response.send_message("⚠️ Encerrando sessão e movendo jogadores para a Torre da Maga...", ephemeral=False)
+        
+        guild = interaction.guild
+        
+        # Busca canal "⚜️Torre da maga" (ou variações)
+        torre_da_maga = None
+        for channel in guild.voice_channels:
+            if "torre" in channel.name.lower() and "maga" in channel.name.lower():
+                torre_da_maga = channel
+                break
+        
+        # Move todos os jogadores de volta
+        canal_voz_id = sessao.get("voice_channel_id")
+        if canal_voz_id:
+            canal_voz = guild.get_channel(canal_voz_id)
+            if canal_voz and isinstance(canal_voz, discord.VoiceChannel):
+                # Move todos que estão no canal de voz da sessão
+                for member in canal_voz.members:
+                    if torre_da_maga:
+                        try:
+                            await member.move_to(torre_da_maga)
+                            print(f"✅ {member.name} movido para Torre da Maga")
+                        except Exception as e:
+                            print(f"⚠️ Erro ao mover {member.name}: {e}")
+        
+        await asyncio.sleep(3)
+        
         try:
+            # Remove dos dados
             self.sessoes_ativas.pop(interaction.channel.id, None)
             self.salvar_dados()
+            
+            # Deleta canal de voz primeiro
+            if canal_voz_id:
+                canal_voz = guild.get_channel(canal_voz_id)
+                if canal_voz:
+                    await canal_voz.delete(reason="Sessão encerrada pelo mestre (botão).")
+            
+            # Deleta canal de texto
             await interaction.channel.delete(reason="Sessão encerrada pelo mestre (botão).")
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"❌ Erro ao encerrar sessão: {e}")
 
 
 # -----------------------------
@@ -1086,9 +1132,9 @@ def setup_sessoes(
         jogadores: List[discord.Member] = list(membros)
         bot_member = guild.get_member(bot.user.id)
 
-        # Categoria + canal
+        # Categoria + canais (texto E voz)
         categoria = await _garantir_categoria(guild)
-        canal = await _criar_canal_de_sessao(
+        canal_texto, canal_voz = await _criar_canal_de_sessao(
             guild=guild,
             categoria=categoria,
             mestre=mestre,
@@ -1097,11 +1143,29 @@ def setup_sessoes(
             nome_sugerido=f"sessao-{mestre.name.lower()}",
         )
 
+        # Move jogadores que estão em canais de voz e avisa quem não está
+        movidos = []
+        nao_movidos = []
+        
+        for jogador in [mestre] + jogadores:
+            if jogador.voice and jogador.voice.channel:
+                try:
+                    await jogador.move_to(canal_voz)
+                    await jogador.edit(mute=False, deafen=False)
+                    movidos.append(jogador.mention)
+                    print(f"✅ {jogador.name} movido e desmutado")
+                except Exception as e:
+                    print(f"⚠️ Não foi possível mover {jogador.name}: {e}")
+                    nao_movidos.append(jogador.mention)
+            else:
+                nao_movidos.append(jogador.mention)
+
         # Inicializa sessão
         sistema = sistemas_rpg.get(mestre.id, "dnd5e")
-        sessoes_ativas[canal.id] = {
+        sessoes_ativas[canal_texto.id] = {
             "guild_id": guild.id,
-            "channel_id": canal.id,
+            "channel_id": canal_texto.id,
+            "voice_channel_id": canal_voz.id,  # NOVO: salva ID do canal de voz
             "categoria_id": categoria.id if categoria else None,
             "mestre_id": mestre.id,
             "jogadores": [j.id for j in jogadores],
@@ -1128,7 +1192,30 @@ def setup_sessoes(
             value="Use o comando `!selecionarficha <Nome exato>` aqui neste canal.",
             inline=False,
         )
-        await canal.send(embed=embed, view=view)
+        embed.add_field(
+            name="🎙️ Canal de Voz",
+            value=f"Canal de voz criado: {canal_voz.mention}\nTodos foram movidos automaticamente!",
+            inline=False,
+        )
+
+        await canal_texto.send(embed=embed, view=view)
+        
+        # Aviso sobre canal de voz
+        if movidos:
+            await canal_texto.send(f"✅ Movidos para o canal de voz: {', '.join(movidos)}")
+        
+        if nao_movidos:
+            await canal_texto.send(
+                embed=discord.Embed(
+                    title="🎙️ Atenção!",
+                    description=(
+                        f"Os seguintes jogadores **não estão em nenhum canal de voz** e precisam entrar manualmente:\n"
+                        f"{', '.join(nao_movidos)}\n\n"
+                        f"👉 Entre no canal {canal_voz.mention} para participar!"
+                    ),
+                    color=discord.Color.orange()
+                )
+            )
 
         # Lista fichas de cada jogador
         for j in jogadores:
@@ -1137,7 +1224,7 @@ def setup_sessoes(
             if fichas:
                 lista = _formatar_lista_fichas(fichas, SISTEMAS_DISPONIVEIS)
                 total_fichas = len(fichas)
-                await canal.send(
+                await canal_texto.send(
                     embed=discord.Embed(
                         title=f"📚 Fichas de {j.display_name} ({total_fichas} encontrada{'s' if total_fichas != 1 else ''})",
                         description=lista,
@@ -1145,7 +1232,7 @@ def setup_sessoes(
                     ).set_footer(text="💡 Use !selecionarficha <nome> para escolher sua ficha")
                 )
             else:
-                await canal.send(
+                await canal_texto.send(
                     embed=discord.Embed(
                         title=f"📚 Fichas de {j.display_name}",
                         description=f"— Nenhuma ficha encontrada.\n💡 Use `!ficha <nome>` ou `!criarficha` para criar uma nova!",
@@ -1153,7 +1240,7 @@ def setup_sessoes(
                     )
                 )
 
-        await ctx.send(f"✅ Sessão criada com sucesso em {canal.mention}")
+        await ctx.send(f"✅ Sessão criada com sucesso!\n📝 Canal de texto: {canal_texto.mention}\n🎙️ Canal de voz: {canal_voz.mention}")
 
     # ------------- Comando: selecionarficha -------------
     @bot.command(name="selecionarficha")
