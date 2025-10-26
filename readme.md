@@ -5,6 +5,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
 ![Version](https://img.shields.io/badge/Version-v2.4.0-purple.svg)
 
 
