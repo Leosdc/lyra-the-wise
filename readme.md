@@ -260,7 +260,7 @@ lyra-the-wise/
 ├── main.py                   # Ponto de entrada
 ├── config.py                 # Configurações globais
 ├── utils.py                  # Funções auxiliares
-├── sistemas_rpg.py           # Banco de dados de sistemas + ESTRUTURAS_FICHAS
+├── sistemas_rpg.py           # Banco de dados de sistemas + estrutura de fichas
 ├── fichas_estruturadas.py    # Sistema de fichas estruturadas
 ├── sessoes_rpg.py            # Sistema de sessões
 ├── rpg_core.py               # Comandos principais
