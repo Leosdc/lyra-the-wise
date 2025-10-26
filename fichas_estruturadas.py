@@ -538,44 +538,129 @@ def register(bot: commands.Bot):
     
     @bot.command(name="ficha")
     async def ficha_cmd(ctx, *, nome: str = None):
-        """Cria ficha rápida com IA."""
+        """Cria ficha rápida ESTRUTURADA com IA."""
         if not nome:
             await ctx.send("❌ Use `!ficha <nome>` para criação rápida ou `!criarficha` para modo interativo estruturado.")
             return
 
         sistema = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema)
+        estrutura = get_estrutura_ficha(sistema)
+        sistema_nome = SISTEMAS_DISPONIVEIS[sistema]['nome']
 
-        await ctx.send(f"📝 Criando ficha rápida de **{nome}** em {SISTEMAS_DISPONIVEIS[sistema]['nome']}...")
+        await ctx.send(f"📝 Criando ficha estruturada de **{nome}** em {sistema_nome}...")
+
+        # Gera exemplo JSON dinâmico baseado na estrutura
+        exemplo_secoes = []
+        for secao in estrutura["secoes"]:
+            campos = estrutura["campos"][secao]
+            campos_exemplo = {campo: f"[preencher {campo}]" for campo in campos}
+            exemplo_secoes.append(f'  "{secao}": {json.dumps(campos_exemplo, ensure_ascii=False, indent=4)}')
+        
+        exemplo_json = "{\n" + ",\n".join(exemplo_secoes) + "\n}"
+
+        prompt = f"""Crie uma ficha de personagem COMPLETA e BALANCEADA para {sistema_nome}.
+
+**PERSONAGEM:** {nome}
+
+**INSTRUÇÕES OBRIGATÓRIAS:**
+1. PREENCHA 100% dos campos - NUNCA deixe vazio, com "—" ou "A definir"
+2. Crie valores apropriados para o sistema {sistema_nome}
+3. Seja criativo mas coerente com as regras do sistema
+4. História deve ter 3-4 parágrafos completos
+5. Todos os valores numéricos devem ser calculados corretamente
+
+**USE ESTA ESTRUTURA JSON EXATA:**
+
+{exemplo_json}
+
+**REGRAS:**
+- Nome do personagem: {nome}
+- TODOS os campos devem ter valores reais e completos
+- Use terminologia correta do sistema
+- Seja detalhado em descrições e história
+- Calcule valores numéricos apropriados
+
+**RETORNE APENAS O JSON - SEM MARKDOWN, SEM TEXTO EXTRA.**"""
 
         historico = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Crie uma ficha de personagem completa para {SISTEMAS_DISPONIVEIS[sistema]['nome']} chamada {nome}."}
+            {"role": "user", "content": prompt}
         ]
 
-        conteudo = await chamar_groq(historico, max_tokens=1200)
+        conteudo_bruto = await chamar_groq(historico, max_tokens=2500)
         
-        if not conteudo or "Erro" in conteudo:
-            await ctx.send(f"⚠️ Erro ao consultar a IA: {conteudo}")
-            return
-
+        # Parser JSON robusto
+        secoes_estruturadas = None
+        try:
+            conteudo_limpo = conteudo_bruto.strip()
+            
+            # Remove markdown
+            if "```" in conteudo_limpo:
+                import re
+                json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', conteudo_limpo, re.DOTALL)
+                if json_match:
+                    conteudo_limpo = json_match.group(1)
+            
+            # Extrai JSON
+            inicio = conteudo_limpo.find('{')
+            fim = conteudo_limpo.rfind('}') + 1
+            if inicio >= 0 and fim > inicio:
+                conteudo_limpo = conteudo_limpo[inicio:fim]
+            
+            # Parseia
+            secoes_estruturadas = json.loads(conteudo_limpo)
+            
+            # Valida que não está vazio
+            if not isinstance(secoes_estruturadas, dict) or not secoes_estruturadas:
+                raise ValueError("JSON vazio")
+            
+            # Valida que tem pelo menos a seção "basico"
+            if "basico" not in secoes_estruturadas:
+                raise ValueError("Falta seção 'basico'")
+            
+            print(f"✅ Ficha estruturada criada: {len(secoes_estruturadas)} seções")
+            
+        except Exception as e:
+            print(f"⚠️ Erro ao parsear JSON: {e}")
+            print(f"Conteúdo recebido: {conteudo_bruto[:500]}...")
+            
+            # Fallback genérico baseado na estrutura
+            secoes_estruturadas = {}
+            for secao in estrutura["secoes"]:
+                secoes_estruturadas[secao] = {}
+                for campo in estrutura["campos"][secao]:
+                    if "Nome" in campo:
+                        secoes_estruturadas[secao][campo] = nome
+                    elif any(x in campo for x in ["HP", "Vida", "PV", "Pontos"]):
+                        secoes_estruturadas[secao][campo] = 30
+                    elif any(x in campo for x in ["Força", "FOR", "Destreza", "DES"]):
+                        secoes_estruturadas[secao][campo] = 10
+                    else:
+                        secoes_estruturadas[secao][campo] = "—"
+            
+            await ctx.send("⚠️ IA teve dificuldades. Ficha básica criada. Use `!editarficha` para completar!")
+        
+        # Salva ficha
         chave = key_from_name(f"{ctx.author.id}_{nome}")
         fichas_personagens[chave] = {
             "nome": nome,
             "sistema": sistema,
-            "conteudo": conteudo,
             "autor": ctx.author.id,
-            "secoes": {}  # Formato legado
+            "criada_em": "estruturada_rapida",
+            "secoes": secoes_estruturadas,
+            "conteudo": conteudo_bruto
         }
         
         salvar_fichas_agora()
+        print(f"✅ Ficha '{nome}' salva para sistema {sistema}")
         
+        # Mostra ficha com navegação
+        view = FichaNavigationView(fichas_personagens[chave], sistema)
         await ctx.send(
-            embed=discord.Embed(
-                title=f"✅ Ficha criada: {nome}",
-                description=conteudo[:4000],
-                color=discord.Color.green(),
-            ).set_footer(text="💡 Use !criarficha para fichas estruturadas com navegação por páginas")
+            content=f"✅ **Ficha Criada: {nome}**\n💡 Use `!criarficha` para modo interativo detalhado.",
+            embed=view.get_embed(),
+            view=view
         )
 
     @bot.command(name="minhasfichas")

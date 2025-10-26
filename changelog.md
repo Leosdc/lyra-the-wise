@@ -1,5 +1,43 @@
 # 📜 Changelog
 
+## [2.5.0] - 2025-10-26
+### 🗂️ Adicionado - Estruturas de Fichas Expandidas
+- **9 sistemas com estruturas completas de fichas**:
+  - D&D 5e, Pathfinder 2e, Call of Cthulhu 7e
+  - Vampire: The Masquerade V5, Shadowrun 5e/6e
+  - FATE Core, Dungeon World, Blades in the Dark, Numenera
+- Cada sistema possui **campos específicos e autênticos**
+- Estruturas baseadas em fichas oficiais dos sistemas
+- Sistema genérico como fallback para sistemas não mapeados
+
+### 🎯 Melhorado - Comando `!ficha`
+- Agora cria fichas **estruturadas por padrão** (não mais formato legado)
+- Prompt dinâmico adaptado à estrutura de cada sistema
+- Geração automática de exemplo JSON baseado nos campos do sistema
+- Parser robusto com fallback inteligente por sistema
+- Compatível com todos os 50+ sistemas suportados
+
+### 🧠 IA Mais Inteligente
+- Prompts específicos por sistema para melhor preenchimento
+- Validação automática de campos obrigatórios
+- Cálculos corretos de valores derivados (HP, CA, iniciativa, etc)
+- História e background mais ricos e coerentes
+
+### 🔧 Arquitetura
+- Nova função `get_estrutura_ficha()` em `sistemas_rpg.py`
+- Dicionário `ESTRUTURAS_FICHAS` centralizando todas as estruturas
+- Sistema escalável - fácil adicionar novos sistemas no futuro
+- Separação clara entre dados (sistemas_rpg.py) e lógica (fichas_estruturadas.py)
+
+### 📋 Próximos Sistemas
+Estruturas em desenvolvimento para:
+- Warhammer Fantasy, GURPS, Savage Worlds
+- Apocalypse World, Monster of the Week
+- Star Wars (FFG e d20), Star Trek Adventures
+- E mais 30+ sistemas restantes
+
+---
+
 ## [2.4.0] - 2025-10-25
 ### 📋 Adicionado - Sistema de Fichas Estruturadas
 - Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
@@ -24,7 +62,6 @@
 - Permite converter fichas entre sistemas mantendo equilíbrio e contexto narrativo
 - Detecta automaticamente formato (texto ou estruturado)
 - Converte atributos e recursos para o novo sistema mantendo proporções
-- Exemplo:
 
 ### 💾 Melhorado - Persistência e Encoding
 - Salvamento forçado com **UTF-8 seguro**
@@ -52,7 +89,7 @@
 - IA continua a narrativa automaticamente com base na decisão tomada
 
 ### ⚔️ Adicionado - Botão de Iniciativa
-- Botão **“⚔️ Rolar Iniciativa”** dentro de “Continuar História”
+- Botão **"⚔️ Rolar Iniciativa"** dentro de "Continuar História"
 - Exclusivo para o mestre
 - Define automaticamente a ordem de ação dos jogadores (🥇🥈🥉)
 - Resultado registrado no histórico da IA

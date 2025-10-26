@@ -6,55 +6,56 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.4.0-purple.svg)
+![Version](https://img.shields.io/badge/Version-v2.5.0-purple.svg)
 
 
-## 🆕 Atualização — Versão 2.4.0 (2025-10-25)
+## 🆕 Atualização — Versão 2.5.0 (2025-10-26)
 
-### 📋 Sistema de Fichas Estruturadas
-- Fichas agora são **totalmente estruturadas e organizadas em páginas navegáveis**
-- Cada sistema (D&D 5e, Pathfinder 2e, Cthulhu, Shadowrun, Vampire V5, etc.) possui **campos e recursos próprios**
-- Inclusão de atributos específicos:
-  - D&D: HP, MP, Dados de Vida, Espaços de Magia
-  - Cthulhu: Sanidade Máxima/Atual, Magia, Movimento
-  - Shadowrun: Essência, Magia, Ressonância
-  - Vampire: Humanidade, Fome, Pontos de Sangue
-- Visualização interativa com botões:
-  - `◀️ Anterior`, `▶️ Próxima`, `❌ Fechar`
-- Compatível com fichas antigas (legado) e novo formato 📋 estruturado
+### 🗂️ Estruturas de Fichas Expandidas
+- **9 sistemas com estruturas completas de fichas**:
+  - D&D 5e, Pathfinder 2e, Call of Cthulhu 7e
+  - Vampire: The Masquerade V5, Shadowrun 5e/6e
+  - FATE Core, Dungeon World, Blades in the Dark, Numenera
+- Cada sistema possui **campos específicos e autênticos** baseados nas fichas oficiais
+- Estruturas totalmente integradas ao sistema de criação com IA
+- Sistema genérico como fallback para sistemas não mapeados (ainda suporta todos os 50+ sistemas)
 
-### 🧠 IA Aprimorada - Fichas Mais Completas
-- `!criarficha` agora faz **8 perguntas detalhadas**
-- Prompt reescrito para **forçar preenchimento de todos os campos**
-- IA expande e enriquece as respostas do jogador
-- Tokens aumentados de 2000 → **2500**
-- Parser JSON robusto com fallback inteligente (nunca retorna vazio)
+### 🎯 Comando `!ficha` Totalmente Reformulado
+- Agora cria fichas **estruturadas por padrão** (não mais formato legado)
+- Prompt dinâmico adaptado à estrutura de cada sistema
+- Geração automática de exemplo JSON baseado nos campos definidos
+- Parser robusto com fallback inteligente por sistema
+- **Experiência idêntica para qualquer sistema** - escalável e consistente
 
-### 🧩 Novo - Comando `!converterficha`
-- Permite converter fichas entre sistemas mantendo equilíbrio e contexto narrativo
-- Detecta automaticamente formato (texto ou estruturado)
-- Converte atributos e recursos para o novo sistema mantendo proporções
-- Exemplo:
-  ```bash
-  !converterficha cthulhu Theresia Van Astrea
-  ```
+### 🧠 IA Mais Inteligente
+- Prompts específicos por sistema para preenchimento correto
+- Validação automática de campos obrigatórios
+- Cálculos corretos de valores derivados (HP, CA, iniciativa, Sanidade, etc)
+- História e background mais ricos e coerentes com o sistema
 
-### 💾 Melhorado - Persistência e Encoding
-- Salvamento forçado com **UTF-8 seguro**
-- Correção automática de campos com encoding corrompido (ex: "raÃ§a" → "raça")
-- Recuperação automática de fichas quebradas
-- Logs detalhados no console para debugging
+### 🔧 Arquitetura Escalável
+- Nova função `get_estrutura_ficha()` em `sistemas_rpg.py`
+- Dicionário `ESTRUTURAS_FICHAS` centralizando todas as estruturas
+- **Fácil adicionar novos sistemas** - basta adicionar entrada no dicionário
+- Separação clara entre dados (sistemas_rpg.py) e lógica (fichas_estruturadas.py)
 
-### ⚙️ Compatibilidade Total
-- Todos os comandos existentes continuam funcionais:
-  - `!criarficha`, `!verficha`, `!editarficha`, `!minhasfichas`, `!exportarficha`, `!converterficha`
-- Fichas antigas (legado) continuam sendo lidas e listadas normalmente
-- Indicador visual 📋 (estruturada) ou 📄 (legado)
+### 📋 Exemplo de Estruturas
+```python
+# D&D 5e
+Seções: Básico, Atributos, Recursos, Combate, Perícias, 
+        Equipamento, Magia, História
+Campos: 40+ campos específicos de D&D
 
-### 🧠 Experiência do Usuário
-- Feedback de criação mostrando **percentual de completude**
-- Dicas contextuais sugerindo `!editarficha` se <70%
-- Exibição mais limpa e legível, página por página
+# Call of Cthulhu
+Seções: Básico, Características, Recursos, Combate, 
+        Perícias, Equipamento, História
+Campos: FOR, CON, TAM, DES, INT, POD, EDU, SOR, Sanidade, etc
+
+# Vampire V5
+Seções: Básico, Atributos, Habilidades, Recursos, 
+        Disciplinas, Vantagens, História
+Campos: Humanidade, Fome, Potência do Sangue, Convicções, etc
+```
 
 ---
 
@@ -62,6 +63,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 - 🤖 **IA Integrada (Lyra, the Wise)** — Gera fichas, NPCs, monstros e narrativas com **Groq (Llama 3.3 70B)**
 - 🎮 **50+ Sistemas** — D&D, Pathfinder, Call of Cthulhu, Shadowrun, Vampire e mais
+- 🗂️ **9 Sistemas com Fichas Completas** — Estruturas autênticas baseadas em fichas oficiais
 - 🔐 **Sessões Privadas** — Canais isolados com gerenciamento de fichas e botões interativos
 - 📖 **Sistema de Estilo Narrativo** — Escolha entre **Narrativa Extensa** ou **Concisa**
 - 🎭 **Narrativa Contínua** — Sistema `!acao` e `!cenanarrada` com IA contextual
@@ -73,7 +75,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ---
 
-## 🎨 **NOVO: Sistema de Estilo Narrativo**
+## 🎨 **Sistema de Estilo Narrativo**
 
 Ao iniciar uma aventura, o mestre pode escolher como Lyra contará a história:
 
@@ -91,14 +93,30 @@ Ao iniciar uma aventura, o mestre pode escolher como Lyra contará a história:
 - **Ideal para:** Combate, ritmo acelerado, sessões rápidas
 - **Tokens:** 500-600 por resposta
 
-**Como funciona:**
-1. Mestre cria sessão com `!iniciarsessao`
-2. Jogadores selecionam fichas
-3. Mestre clica em **"🎬 Iniciar Aventura"**
-4. **NOVO:** Aparece escolha de estilo (Extensa ou Concisa)
-5. Lyra inicia a história no estilo escolhido
-6. **Todos** os comandos (`!acao`, `!cenanarrada`) seguem o mesmo estilo
-7. Estilo é salvo na sessão e mostrado nos footers
+---
+
+## 📋 **Sistemas com Estruturas Completas**
+
+### 🎲 Sistemas Totalmente Mapeados (9 sistemas)
+1. **D&D 5ª Edição** - 40+ campos específicos, 18 perícias, sistema de magia completo
+2. **Pathfinder 2ª Edição** - Ancestralidade, Heritage, sistema de 3 ações
+3. **Call of Cthulhu 7ª Edição** - 9 características, sistema de sanidade
+4. **Vampire: The Masquerade V5** - Disciplinas, Humanidade, Fome
+5. **Shadowrun 5e/6e** - Cyberware, Magia, Ressonância, Matriz
+6. **FATE Core** - Aspectos, Façanhas, Pontos de Destino
+7. **Dungeon World** - Movimentos, Vínculos, sistema PbtA
+8. **Blades in the Dark** - Ações, Estresse, Trauma, Crew
+9. **Numenera** - Pools (Might/Speed/Intellect), Cyphers, Esforço
+
+### 🔮 Sistemas Suportados com Estrutura Genérica (41+ sistemas)
+Todos os outros sistemas do bot possuem estrutura genérica funcional e serão expandidos no futuro:
+- D&D 3.5, Pathfinder 1e, 13th Age
+- Chronicles of Darkness, Werewolf, Mage
+- Cyberpunk 2020/RED, Eclipse Phase, Star Trek, Star Wars
+- Warhammer Fantasy (1e/4e), GURPS, FATE Accelerated, Savage Worlds
+- Apocalypse World, Monster of the Week, 7th Sea, Shadow of the Demon Lord
+- Mutants & Masterminds, Champions, Marvel FASERIP
+- E mais 20+ sistemas
 
 ---
 
@@ -122,13 +140,13 @@ Ao iniciar uma aventura, o mestre pode escolher como Lyra contará a história:
 
 ### 👤 Fichas & Personagens
 ```
-!ficha <nome>
-!criarficha
-!verficha <nome>
-!editarficha <nome>
-!converterficha <sistema> <nome>
-!minhasfichas [sistema]
-!exportarficha <nome>
+!ficha <nome> - Criação rápida estruturada
+!criarficha - Modo interativo com 8 perguntas
+!verficha <nome> - Ver com navegação por páginas
+!editarficha <nome> - Editor interativo
+!converterficha <sistema> <nome> - Converte entre sistemas
+!minhasfichas [sistema] - Lista suas fichas
+!exportarficha <nome> - Exporta como JSON
 ```
 
 ### 🎮 Sessões de RPG
@@ -209,7 +227,7 @@ python main.py
 
 1. **Preparação:**
    - Mestre: `!sistema dnd5e` (configura sistema)
-   - Jogadores: `!criarficha` (criam personagens)
+   - Jogadores: `!criarficha` ou `!ficha <nome>` (criam personagens)
 
 2. **Criação da Sessão:**
    - Mestre: `!iniciarsessao @Jogador1 @Jogador2`
@@ -221,7 +239,7 @@ python main.py
 
 4. **Início da Aventura:**
    - Mestre clica no botão **"🎬 Iniciar Aventura"**
-   - **NOVO:** Escolhe estilo (Extensa ou Concisa)
+   - Escolhe estilo (Extensa ou Concisa)
    - Lyra gera introdução épica personalizada
 
 5. **Durante o Jogo:**
@@ -242,9 +260,9 @@ lyra-the-wise/
 ├── main.py                   # Ponto de entrada
 ├── config.py                 # Configurações globais
 ├── utils.py                  # Funções auxiliares
-├── sistemas_rpg.py           # Banco de dados de sistemas
-├── fichas_estruturadas.py    # Novo sistema de fichas estruturadas
-├── sessoes_rpg.py            # Sistema de sessões (com estilo narrativo)
+├── sistemas_rpg.py           # Banco de dados de sistemas + ESTRUTURAS_FICHAS
+├── fichas_estruturadas.py    # Sistema de fichas estruturadas
+├── sessoes_rpg.py            # Sistema de sessões
 ├── rpg_core.py               # Comandos principais
 ├── geracao_conteudo.py       # Geração de NPCs, monstros, etc
 ├── monstros_database.py      # Banco de monstros
@@ -256,12 +274,34 @@ lyra-the-wise/
 │   ├── fichas_personagens.json
 │   ├── sistemas_usuarios.json
 │   └── sessoes_ativas.json
-├── .env                      # Variáveis de ambiente (não versionado)
+├── .env                      # Variáveis de ambiente
 ├── requirements.txt          # Dependências Python
 ├── LICENSE                   # Licença MIT
 ├── README.md                 # Este arquivo
 └── changelog.md              # Histórico de mudanças
 ```
+
+---
+
+## 🔮 **Roadmap Futuro**
+
+### Próximas Estruturas de Fichas
+- [ ] Warhammer Fantasy 1e/4e
+- [ ] GURPS 4ª Edição
+- [ ] Savage Worlds
+- [ ] Apocalypse World
+- [ ] Monster of the Week
+- [ ] Star Wars (FFG e d20)
+- [ ] Star Trek Adventures
+- [ ] E mais 30+ sistemas
+
+### Novas Features
+- [ ] Sistema de progressão automática (level up)
+- [ ] Gerador de aventuras completas
+- [ ] Mapas e tokens visuais
+- [ ] Integração com Roll20/Foundry VTT
+- [ ] Sistema de economia e comércio
+- [ ] Calendários e tracking de tempo
 
 ---
 
@@ -281,6 +321,12 @@ Contribuições são bem-vindas! Para contribuir:
 - Atualize a documentação conforme necessário
 - Seja descritivo nos commits
 
+**Especialmente bem-vindos:**
+- Novas estruturas de fichas para sistemas não mapeados
+- Melhorias nos prompts de IA
+- Traduções da documentação
+- Correções de bugs
+
 ---
 
 ## 👨‍💻 Autor
@@ -297,6 +343,7 @@ Contribuições são bem-vindas! Para contribuir:
 - **Groq** — pela API de IA incrível
 - **Discord.py** — pela biblioteca robusta
 - **Comunidade de RPG** — pela inspiração e feedback
+- **Contribuidores** — por ajudarem a expandir as estruturas de fichas
 
 ---
 
@@ -305,7 +352,8 @@ Contribuições são bem-vindas! Para contribuir:
 Se este bot te ajudou ou você simplesmente quer apoiar o desenvolvimento:
 
 ⭐ **Dê uma estrela no GitHub!**  
-☕ **[Compre um café para mim](https://ko-fi.com/leosdc)**
+☕ **[Compre um café para mim](https://ko-fi.com/leosdc)**  
+💬 **Entre no nosso Discord**: [Taverna](https://discord.gg/SdWnWJ6w)
 
 ---
 
