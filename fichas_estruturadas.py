@@ -258,35 +258,35 @@ def register(bot: commands.Bot):
         
         try:
             # Nome
-            msg = await bot.wait_for('message', check=check, timeout=60.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             nome = msg.content
             
             # Raça/Ancestralidade
             await ctx.send(f"**2/8** - Qual a **raça/ancestralidade** de {nome}?")
-            msg = await bot.wait_for('message', check=check, timeout=60.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             raca = msg.content
             
             # Classe/Arquétipo
             await ctx.send(f"**3/8** - Qual a **classe/profissão** de {nome}?")
-            msg = await bot.wait_for('message', check=check, timeout=60.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             classe = msg.content
             
             # Nível/Idade
             await ctx.send(f"**4/8** - Qual o **nível ou idade** de {nome}? (Ex: Nível 5, ou 28 anos)")
-            msg = await bot.wait_for('message', check=check, timeout=60.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             nivel = msg.content
             
             # Conceito/Personalidade
             await ctx.send(f"**5/8** - Descreva a **personalidade** de {nome} (3-5 traços):")
-            msg = await bot.wait_for('message', check=check, timeout=90.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             conceito = msg.content
@@ -300,14 +300,14 @@ def register(bot: commands.Bot):
             
             # Background/História
             await ctx.send(f"**7/8** - Qual o **background ou origem** de {nome}?")
-            msg = await bot.wait_for('message', check=check, timeout=120.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             historia = msg.content
             
             # Objetivos/Motivações
             await ctx.send(f"**8/8** - Quais os **objetivos ou motivações** de {nome}?")
-            msg = await bot.wait_for('message', check=check, timeout=90.0)
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
                 return await ctx.send("❌ Criação de ficha cancelada.")
             objetivos = msg.content
