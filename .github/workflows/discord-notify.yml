@@ -124,7 +124,7 @@ jobs:
               "avatar_url": $avatar,
               "embeds": [
                 {
-                  "title": ("🧙 Nova versão \($version) publicada automaticamente!"),
+                  "title": ("🧙 Nova versão \($version) publicada!"),
                   "color": 11259375,
                   "fields": (
                     [

@@ -66,7 +66,7 @@ def register(bot: commands.Bot):
         embed2.add_field(
             name="⚔️ Combate & Encontros",
             value="""\
-!monstro <nome> - Busca stats de monstros
+!monstro <nome> - Cria um monstro
 !encontro <nível> <dificuldade> - Gera encontro balanceado
 !armadilha <dificuldade> - Cria armadilha
 !cena <descrição> - Descreve cena dramaticamente""",
@@ -182,7 +182,7 @@ Exemplos populares:
         # ---------------- Navegação ----------------
         class HelpView(View):
             def __init__(self):
-                super().__init__(timeout=180)
+                super().__init__(timeout=None)
                 self.page = 0
 
             async def update(self, interaction):
