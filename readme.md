@@ -306,16 +306,6 @@ lyra-the-wise/
 
 ## 🔮 **Roadmap Futuro**
 
-### Próximas Estruturas de Fichas
-- [ ] Warhammer Fantasy 1e/4e
-- [ ] GURPS 4ª Edição
-- [ ] Savage Worlds
-- [ ] Apocalypse World
-- [ ] Monster of the Week
-- [ ] Star Wars (FFG e d20)
-- [ ] Star Trek Adventures
-- [ ] E mais 30+ sistemas
-
 ### 🎯 **Próximas Estruturas de Fichas**
 - [ ] Warhammer Fantasy 1e/4e
 - [ ] GURPS 4ª Edição
