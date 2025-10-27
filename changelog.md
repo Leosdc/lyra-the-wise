@@ -1,5 +1,18 @@
 # 📜 Changelog
 
+## [2.5.2] - 2025-10-26
+### 🛡️ Melhorado - Comandos de ajuda enviados por DM
+- **help_painel.py - !rpghelp** → DM
+- **documentacao.py - !documentacao** → DM
+- **utilidades.py - !ajuda** → DM
+- **utilidades.py - !suporte** → DM
+- **utilidades.py - !sobre → DM**
+- **sistemas_comandos.py - !sistemas** → DM
+- **sistemas_comandos.py - !buscarsistema** → DM
+- **sistemas_comandos.py - !infosistema** → DM
+
+---
+
 ## [2.5.1] - 2025-10-26
 ### 🎙️ Adicionado - Sistema de Canais de Voz Integrado
 - **Criação automática de canal de voz** ao iniciar sessão com `!iniciarsessao`

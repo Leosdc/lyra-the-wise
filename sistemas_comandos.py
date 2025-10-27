@@ -46,9 +46,23 @@ def register(bot: commands.Bot):
         linhas = [f"**{info['nome']}** (`{codigo}`)" for codigo, info in SISTEMAS_DISPONIVEIS.items()]
         texto = "📚 **Sistemas Suportados:**\n" + "\n".join(linhas)
 
-        partes = enviar_em_partes(texto)  # <- CORRETO
-        for parte in partes:
-            await ctx.send(parte)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        try:
+            partes = enviar_em_partes(texto)
+            for parte in partes:
+                await ctx.author.send(parte)
+            
+            await ctx.send(f"📨 {ctx.author.mention}, lista enviada no privado!", delete_after=10)
+        
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                delete_after=15
+            )
 
     @bot.command(name="buscarsistema")
     async def buscarsistema(ctx, *, termo: str = None):
@@ -63,13 +77,28 @@ def register(bot: commands.Bot):
             if termo.lower() in info["nome"].lower()
         ]
 
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
         if resultados:
             texto = "🔍 **Resultados da busca:**\n" + "\n".join(resultados)
-            partes = enviar_em_partes(texto)
-            for parte in partes:
-                await ctx.send(parte)
+            
+            try:
+                partes = enviar_em_partes(texto)
+                for parte in partes:
+                    await ctx.author.send(parte)
+                
+                await ctx.send(f"📨 {ctx.author.mention}, resultados enviados no privado!", delete_after=10)
+            
+            except discord.Forbidden:
+                await ctx.send(
+                    f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                    delete_after=15
+                )
         else:
-            await ctx.send("❌ Nenhum sistema encontrado com esse nome.")
+            await ctx.send("❌ Nenhum sistema encontrado com esse nome.", delete_after=10)
 
     @bot.command(name="infosistema")
     async def infosistema(ctx, codigo: str = None):
@@ -97,4 +126,16 @@ def register(bot: commands.Bot):
         embed.add_field(name="📊 Atributos", value=", ".join(info.get("atributos", [])), inline=False)
         embed.add_field(name="🧙 Classes", value=", ".join(info.get("classes", []))[:1020], inline=False)
         embed.set_footer(text="Use !sistema <código> para mudar o sistema deste canal.")
-        await ctx.send(embed=embed)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        try:
+            await ctx.author.send(embed=embed)
+            await ctx.send(f"📨 {ctx.author.mention}, informações enviadas no privado!", delete_after=10)
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                delete_after=15
+            )

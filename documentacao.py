@@ -401,9 +401,26 @@ def register(bot: commands.Bot):
     async def documentacao(ctx):
         """Exibe a documentação completa do bot."""
         texto = DOCUMENTACAO_COMPLETA
-        if len(texto) <= 2000:
-            await ctx.send(texto)
-        else:
-            partes = [texto[i:i+2000] for i in range(0, len(texto), 2000)]
-            for parte in partes:
-                await ctx.send(parte)
+        # Deleta o comando do usuário
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        # Envia por DM
+        try:
+            if len(texto) <= 2000:
+                await ctx.author.send(texto)
+            else:
+                partes = [texto[i:i+2000] for i in range(0, len(texto), 2000)]
+                for parte in partes:
+                    await ctx.author.send(parte)
+            
+            await ctx.send(f"📨 {ctx.author.mention}, documentação enviada no privado!", delete_after=10)
+        
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM! "
+                f"Habilite mensagens diretas nas configurações.",
+                delete_after=15
+            )

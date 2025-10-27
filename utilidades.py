@@ -72,11 +72,23 @@ def register(bot: commands.Bot):
             "• `!ajudasessao` — Guia completo de sessões\n\n"
             "💡 **Dica:** Use `!rpghelp` para ver todos os comandos organizados por categoria!"
         )
-        await ctx.send(embed=discord.Embed(
-            title="🆘 Ajuda Rápida",
-            description=msg,
-            color=discord.Color.green()
-        ))
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        try:
+            await ctx.author.send(embed=discord.Embed(
+                title="🆘 Ajuda Rápida",
+                description=msg,
+                color=discord.Color.green()
+            ))
+            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                delete_after=15
+            )
 
     @bot.command(name="suporte")
     async def suporte(ctx):
@@ -95,7 +107,19 @@ def register(bot: commands.Bot):
             color=discord.Color.blue()
         )
         embed.set_footer(text="Obrigado por usar o RPG Master Bot! 🎲")
-        await ctx.send(embed=embed)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        try:
+            await ctx.author.send(embed=embed)
+            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                delete_after=15
+            )
 
     @bot.command(name="sobre")
     async def sobre(ctx):
@@ -129,6 +153,18 @@ def register(bot: commands.Bot):
             inline=False
         )
         embed.set_footer(text="Desenvolvido por Leosdc_ • Versão 2.0")
-        await ctx.send(embed=embed)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        try:
+            await ctx.author.send(embed=embed)
+            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM!",
+                delete_after=15
+            )
 
     print("✅ utilidades carregado com sucesso!")

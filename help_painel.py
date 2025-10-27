@@ -202,4 +202,19 @@ Exemplos populares:
             async def close(self, interaction, _):
                 await interaction.message.delete()
 
-        await ctx.send(embed=pages[0], view=HelpView())
+        # Deleta o comando do usuário
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        # Envia por DM
+        try:
+            await ctx.author.send(embed=pages[0], view=HelpView())
+            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM! "
+                f"Habilite mensagens diretas nas configurações de privacidade.",
+                delete_after=15
+            )
