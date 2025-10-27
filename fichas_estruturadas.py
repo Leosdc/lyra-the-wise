@@ -246,74 +246,110 @@ def register(bot: commands.Bot):
         system_prompt = get_system_prompt(sistema)
         estrutura = get_estrutura_ficha(sistema)
         
-        await ctx.send(
-            f"📝 **Criação de Ficha Estruturada** - Sistema: {SISTEMAS_DISPONIVEIS[sistema]['nome']}\n\n"
-            f"Vou fazer perguntas para criar sua ficha de forma organizada.\n"
-            f"Digite `cancelar` a qualquer momento para parar.\n\n"
-            f"**1/8** - Qual o **nome** do seu personagem?"
-        )
+        # Deleta comando do usuário
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        # Envia tudo por DM
+        try:
+            # Mensagem inicial com preview das perguntas
+            await ctx.author.send(
+                f"📝 **Criação de Ficha Estruturada**\n"
+                f"Sistema: {SISTEMAS_DISPONIVEIS[sistema]['nome']}\n\n"
+                f"**Farei estas 8 perguntas para você:**\n"
+                f"1️⃣ Nome do personagem\n"
+                f"2️⃣ Raça/Ancestralidade\n"
+                f"3️⃣ Classe/Profissão\n"
+                f"4️⃣ Nível ou Idade\n"
+                f"5️⃣ Personalidade (3-5 traços)\n"
+                f"6️⃣ Aparência física\n"
+                f"7️⃣ Background/Origem\n"
+                f"8️⃣ Objetivos/Motivações\n\n"
+                f"💡 **Dica importante:** Para evitar timeout durante a criação, "
+                f"prepare suas respostas mais longas (história, aparência, objetivos) "
+                f"em outro lugar e cole quando chegar a pergunta!\n\n"
+                f"Digite `cancelar` a qualquer momento para parar.\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+                f"**1/8** - Qual o **nome** do seu personagem?"
+            )
+            
+            await ctx.send(
+                f"✅ {ctx.author.mention}, processo de criação iniciado no privado! "
+                f"Confira sua DM.",
+                delete_after=10
+            )
+        
+        except discord.Forbidden:
+            await ctx.send(
+                f"❌ {ctx.author.mention}, não consigo te enviar DM! "
+                f"Habilite mensagens diretas nas configurações.",
+                delete_after=15
+            )
+            return
         
         def check(m):
-            return m.author == ctx.author and m.channel == ctx.channel
+            return m.author == ctx.author and isinstance(m.channel, discord.DMChannel)
         
         try:
             # Nome
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             nome = msg.content
             
             # Raça/Ancestralidade
-            await ctx.send(f"**2/8** - Qual a **raça/ancestralidade** de {nome}?")
+            await ctx.author.send(f"**2/8** - Qual a **raça/ancestralidade** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             raca = msg.content
             
             # Classe/Arquétipo
-            await ctx.send(f"**3/8** - Qual a **classe/profissão** de {nome}?")
+            await ctx.author.send(f"**3/8** - Qual a **classe/profissão** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             classe = msg.content
             
             # Nível/Idade
-            await ctx.send(f"**4/8** - Qual o **nível ou idade** de {nome}? (Ex: Nível 5, ou 28 anos)")
+            await ctx.author.send(f"**4/8** - Qual o **nível ou idade** de {nome}? (Ex: Nível 5, ou 28 anos)")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             nivel = msg.content
             
             # Conceito/Personalidade
-            await ctx.send(f"**5/8** - Descreva a **personalidade** de {nome} (3-5 traços):")
+            await ctx.author.send(f"**5/8** - Descreva a **personalidade** de {nome} (3-5 traços):")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             conceito = msg.content
             
             # Aparência
-            await ctx.send(f"**6/8** - Descreva a **aparência física** de {nome}:")
-            msg = await bot.wait_for('message', check=check, timeout=90.0)
+            await ctx.author.send(f"**6/8** - Descreva a **aparência física** de {nome}:")
+            msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             aparencia = msg.content
             
             # Background/História
-            await ctx.send(f"**7/8** - Qual o **background ou origem** de {nome}?")
+            await ctx.author.send(f"**7/8** - Qual o **background ou origem** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             historia = msg.content
             
             # Objetivos/Motivações
-            await ctx.send(f"**8/8** - Quais os **objetivos ou motivações** de {nome}?")
+            await ctx.author.send(f"**8/8** - Quais os **objetivos ou motivações** de {nome}?")
             msg = await bot.wait_for('message', check=check, timeout=None)
             if msg.content.lower() == 'cancelar':
-                return await ctx.send("❌ Criação de ficha cancelada.")
+                return await ctx.author.send("❌ Criação de ficha cancelada.")
             objetivos = msg.content
             
             # Gera ficha estruturada com IA
-            await ctx.send(f"✨ Gerando ficha estruturada de **{nome}** com IA...")
+            await ctx.author.send(f"✨ Gerando ficha estruturada de **{nome}** com IA...")
             
             # Monta prompt específico para formato estruturado
             prompt = f"""Crie uma ficha de personagem COMPLETA, DETALHADA e BALANCEADA para {SISTEMAS_DISPONIVEIS[sistema]['nome']}.
@@ -406,7 +442,7 @@ def register(bot: commands.Bot):
                 {"role": "user", "content": prompt}
             ]
             
-            conteudo_bruto = await chamar_groq(historico, max_tokens=2500)  # ← MUDE 2000 para 2500
+            conteudo_bruto = await chamar_groq(historico, max_tokens=2500)
             
             # Tenta parsear JSON estruturado
             secoes_estruturadas = None
@@ -447,7 +483,7 @@ def register(bot: commands.Bot):
                     "magia": {},
                     "historia": {"Personalidade": conceito, "Aparência": aparencia, "História": historia, "Objetivos": objetivos}
                 }
-                await ctx.send("⚠️ IA teve dificuldades. Criada ficha básica. Use `!editarficha` para completar!")
+                await ctx.author.send("⚠️ IA teve dificuldades. Criada ficha básica. Use `!editarficha` para completar!")
             
             # Salva ficha
             chave = key_from_name(f"{ctx.author.id}_{nome}")
@@ -457,7 +493,7 @@ def register(bot: commands.Bot):
                 "autor": ctx.author.id,
                 "criada_em": "estruturada",
                 "secoes": secoes_estruturadas,
-                "conteudo": conteudo_bruto  # Backup do formato bruto
+                "conteudo": conteudo_bruto
             }
             
             if salvar_fichas_agora():
@@ -465,16 +501,14 @@ def register(bot: commands.Bot):
             
             # Mostra ficha com navegação
             if secoes_estruturadas and any(secoes_estruturadas.values()):
-                # Ficha estruturada válida
                 view = FichaNavigationView(fichas_personagens[chave], sistema)
-                await ctx.send(
+                await ctx.author.send(
                     content="✅ **Ficha Criada com Sucesso!**",
                     embed=view.get_embed(),
                     view=view
                 )
             else:
-                # Fallback: mostra texto bruto e sugere usar !ficha
-                await ctx.send(
+                await ctx.author.send(
                     embed=discord.Embed(
                         title=f"⚠️ Ficha Criada (Formato Simplificado)",
                         description=(
@@ -491,7 +525,12 @@ def register(bot: commands.Bot):
                 )
             
         except asyncio.TimeoutError:
-            await ctx.send("⏰ Tempo esgotado! Use `!criarficha` novamente.")
+            await ctx.author.send(
+                "⏰ Tempo esgotado!\n\n"
+                "💡 **Dica:** Prepare suas respostas longas (história, aparência) "
+                "em um editor de texto antes e cole quando chegar a pergunta.\n\n"
+                "Use `!criarficha` novamente quando estiver pronto!"
+            )
 
     # ========== VER FICHA COM NAVEGAÇÃO ==========
     @bot.command(name="verficha")
