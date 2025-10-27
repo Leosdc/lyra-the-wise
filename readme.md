@@ -316,13 +316,121 @@ lyra-the-wise/
 - [ ] Star Trek Adventures
 - [ ] E mais 30+ sistemas
 
-### Novas Features
+### 🎯 **Próximas Estruturas de Fichas**
+- [ ] Warhammer Fantasy 1e/4e
+- [ ] GURPS 4ª Edição
+- [ ] Savage Worlds
+- [ ] Apocalypse World, Monster of the Week
+- [ ] Star Wars (FFG e d20), Star Trek Adventures
+- [ ] E mais 30+ sistemas restantes
+
+### 🆕 **Novas Features - Gameplay**
 - [ ] Sistema de progressão automática (level up)
-- [ ] Gerador de aventuras completas
-- [ ] Mapas e tokens visuais
-- [ ] Integração com Roll20/Foundry VTT
-- [ ] Sistema de economia e comércio
-- [ ] Calendários e tracking de tempo
+  - XP tracking automático
+  - Sugestões de escolhas por classe
+  - Atualização de fichas via IA
+
+- [ ] Sistema de Economia e Comércio
+  - Loja procedural (itens por nível)
+  - Preços dinâmicos por região
+  - Sistema de crafting básico
+
+- [ ] Sistema de Tempo e Calendário
+  - Tracking de passagem do tempo
+  - Calendários de sistemas diferentes
+  - Eventos sazonais e datas importantes
+
+- [ ] Sistema de Macros Personalizados
+  - Comandos customizados por usuário
+  - Templates de ações recorrentes
+  - Atalhos para combos complexos
+
+### 🎲 **Geração Procedural de Conteúdo**
+- [ ] Gerador de Aventuras Completas
+  - Plot com 3 atos estruturados
+  - Encontros balanceados
+  - Recompensas apropriadas
+  - NPCs recorrentes
+
+- [ ] Gerador de Masmorras
+  - Layout procedural (salas conectadas)
+  - Armadilhas e puzzles contextuais
+  - Tesouros distribuídos
+  - Boss final apropriado
+
+- [ ] Gerador de Locais
+  - Tavernas com NPCs únicos
+  - Cidades com distritos
+  - Vilas e assentamentos
+  - Clima e atmosfera
+
+- [ ] Sistema de Tabelas Aleatórias
+  - Loot tables por CR/nível
+  - Encontros randômicos
+  - Eventos climáticos
+  - Complicações narrativas
+
+### 🎨 **Interface Visual Avançada**
+- [ ] Mapas e Tokens Interativos
+  - Upload de mapas customizados
+  - Tokens de personagens
+  - Fog of War básico
+
+- [ ] Tracker de Iniciativa Visual
+  - Ordem visual clara (🥇🥈🥉)
+  - HP e condições visíveis
+  - Contadores de turno/rodada
+
+- [ ] Dashboard de Estatísticas
+  - Progressão da campanha
+  - Estatísticas de combate
+  - Gráficos de XP e loot
+  - Histórico de sessões
+
+### 🔗 **Integrações Externas**
+- [ ] VTTs (Virtual Tabletops)
+  - Roll20 (sync de fichas)
+  - Foundry VTT (export de dados)
+  - Owlbear Rodeo (tokens)
+
+- [ ] Gerenciadores de Fichas
+  - D&D Beyond (import/export)
+  - Pathbuilder 2e (sync)
+  - Orcbrew (fichas antigas)
+
+- [ ] Ferramentas de IA
+  - Midjourney/DALL-E (retratos de NPCs)
+  - Stable Diffusion (mapas visuais)
+  - Outras APIs de geração
+
+### 📊 **Expansão de Banco de Dados**
+- [ ] Expandir Banco de Monstros
+  - 100+ monstros por sistema principal
+  - Variantes e templates
+  - Monstros customizados salvos
+
+- [ ] Biblioteca de NPCs
+  - NPCs recorrentes salvos
+  - Relacionamentos entre NPCs
+  - Histórico de interações
+
+- [ ] Arquivo de Itens Mágicos
+  - Catálogo por sistema
+  - Itens customizados
+  - Histórico de loot das sessões
+
+### 💾 **Persistência Avançada**
+- [ ] Sistema de Salvamento Expandido
+  - Salvar encontros gerados
+  - Salvar NPCs criados
+  - Salvar puzzles/armadilhas
+  - Salvar locais visitados
+  - Vincular tudo às sessões ativas
+
+- [ ] Exportação Completa
+  - Export de campanhas inteiras
+  - Formato JSON/XML universal
+  - Import de dados externos
 
 ### Salvar mais informações no `bot_data` e vincular nas `!sessoes`
 - [ ] !monstro <nome>
@@ -335,6 +443,24 @@ lyra-the-wise/
 - [ ] !vilao <tipo>
 - [ ] !nome <tipo>
 - [ ] !motivacao
+
+---
+
+### 🎯 Priorização coletada por feedbacks
+- [ ] Curto Prazo (1-2 meses)
+      - [ ] Expandir banco de monstros (impacto imediato)
+      - [ ] Sistema de tabelas aleatórias (fácil implementar)
+      - [ ] Gerador de aventuras completas (alto valor)
+
+- [ ] Médio Prazo (3-6 meses)
+      - [ ] Tracker de iniciativa visual (melhora UX)
+      - [ ] Sistema de progressão automática (QoL importante)
+      - [ ] Persistência de conteúdo gerado (salvar monstros/NPCs/itens)
+
+- [ ] Longo Prazo (6-12 meses)
+      - [ ] Interface visual avançada (complexo)
+      - [ ] Integrações com VTTs (requer APIs externas)
+      - [ ] Sistema completo de geração procedural (masmorras, locais, etc)
 
 ---
 
