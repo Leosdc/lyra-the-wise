@@ -300,7 +300,7 @@ class RollRequestView(discord.ui.View):
         ] + historia_recente
         
         estilo = sessao.get("estilo_narrativo", "extenso")
-        max_tokens = 1200 if estilo == "extenso" else 500
+        max_tokens = 1200 if estilo == "extenso" else 600
 
         resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
@@ -882,7 +882,7 @@ def setup_sessoes(
             instrucao_tamanho = "2-4 parágrafos detalhados"
             instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
         else:
-            max_tokens = 350  # ← REDUZIDO
+            max_tokens = 600  # ← REDUZIDO
             instrucao_tamanho = "1 parágrafo breve (máximo 4 frases)"  # ← ESPECÍFICO
             instrucao_estilo = "Seja EXTREMAMENTE direto. Máximo 4 frases. Descreva apenas: resultado imediato da ação + consequência direta + próxima situação. NADA mais."  # ← REFORÇADO
         
@@ -1021,7 +1021,7 @@ def setup_sessoes(
             instrucao_tamanho = "2-4 parágrafos detalhados"
             instrucao_estilo = "Seja cinematográfico, use os 5 sentidos e crie atmosfera profunda."
         else:
-            max_tokens = 350  # ← REDUZIDO
+            max_tokens = 600  # ← REDUZIDO
             instrucao_tamanho = "1 parágrafo breve (máximo 4 frases)"  # ← ESPECÍFICO
             instrucao_estilo = "MÁXIMO 4 frases. Descreva apenas: cenário básico + elemento principal + momento crítico. Vá direto ao ponto sem floreios."  # ← REFORÇADO
 

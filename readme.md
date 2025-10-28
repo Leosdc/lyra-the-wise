@@ -6,7 +6,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.2-purple.svg)
+![Version](https://img.shields.io/badge/Version-v2.5.3-purple.svg)
 
 ## 🆕 Atualização — Versão 2.5.0 (2025-10-26)
 
@@ -112,7 +112,7 @@ Ao iniciar uma aventura, o mestre pode escolher como Lyra contará a história:
 - **Foco em ação e progressão**
 - Direto ao ponto, sem perder qualidade
 - **Ideal para:** Combate, ritmo acelerado, sessões rápidas
-- **Tokens:** 500-600 por resposta
+- **Tokens:** 600-800 por resposta
 
 ---
 

@@ -1,5 +1,11 @@
 # 📜 Changelog
 
+## [2.5.3] - 2025-10-28
+### ✍️ Corrigido - Estilo Narrativo Conciso
+- Aumento de tokens para 600
+- Ainda limitado a **1 parágrafo curto (máx. 4–5 frases)**
+- Linguagem objetiva e direta, ideal para combate e ritmo rápido
+
 ## [2.5.2] - 2025-10-26
 ### 🛡️ Melhorado - Comandos de ajuda enviados por DM
 - **help_painel.py - !rpghelp** → DM
