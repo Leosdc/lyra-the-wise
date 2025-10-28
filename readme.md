@@ -422,7 +422,7 @@ lyra-the-wise/
   - Formato JSON/XML universal
   - Import de dados externos
 
-### 💾 **Salvar mais informações no `bot_data` e vincular nas `!sessoes`**
+### 💾 **Melhoria de Funções e Database Aprimorado para `!sessoes`**
 - [ ] !monstro <nome>
 - [ ] !encontro <nível> <dificuldade>
 - [ ] !armadilha <dificuldade>
