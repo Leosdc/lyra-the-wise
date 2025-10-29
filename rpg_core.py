@@ -260,5 +260,3 @@ Sistema: {sistema_atual.upper()}. SEJA DIRETO E COMPLETE TODAS AS SEÇÕES."""
             await ctx.send(f"📋 **Planejamento de Sessão: {tema}** (parte 1/{len(partes)})\n\n{partes[0]}")
             for i, parte in enumerate(partes[1:], start=2):
                 await ctx.send(f"📋 *(continuação {i}/{len(partes)})*\n\n{parte}")
-
-    print("✅ Módulo 'rpg_core' carregado com sucesso!")

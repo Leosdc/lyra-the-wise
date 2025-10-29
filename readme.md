@@ -1,12 +1,12 @@
-# 🎲 Lyra the Wise - Sistema de Sessões de RPG
+# 🎲 Lyra, the Wise
 
-> **Sistema completo de sessões privadas de RPG com IA, rolagens interativas e narrativa adaptativa**
+Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**, **IA integrada (Lyra, the Wise)** e **sessões privadas com narrativa contínua**.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.4-purple.svg)
+![Version](https://img.shields.io/badge/Version-v2.5.5-purple.svg)
 
 ---
 
@@ -20,6 +20,7 @@
 - 🎙️ **Voz Automática** - Canais de voz criados e gerenciados automaticamente
 - 📊 **Gestão Completa** - Fichas, iniciativa, histórico e muito mais
 - 🔒 **Sessões Privadas** - Canais exclusivos para cada grupo
+- 👹 **Geração de conteúdo** - Gera monstros, NPCs, itens, puzzles e muito mais
 
 ---
 
@@ -36,9 +37,9 @@
 
 ### 🎲 Dados & Iniciativa
 ```
-!rolar 1d20
-!rolar 2d6+3
-!iniciativa
+!rolar 1d20 ou !r 1d20 - Rola dados
+!rolar 2d6+3 - Rola com modificador
+!rolar 4d6k3 - Mantém 3 maiores
 ```
 
 ### 👤 Fichas & Personagens
@@ -282,7 +283,7 @@ R: Sim, mantém 20 últimas interações no contexto.
 
 ---
 
-## 🤝 Contribuindo
+## 🤝 Contribuições
 
 ### Como Contribuir
 
@@ -316,15 +317,7 @@ R: Sim, mantém 20 últimas interações no contexto.
 - **Discord.py** - Framework incrível
 - **Groq** - IA rápida e poderosa
 - **Comunidade RPG** - Feedback e ideias
-- **Contribuidores** - Todos que ajudaram
-
----
-
-## 📞 Suporte
-
-- 📧 Email: [Gmail](leonardo.dc.work@gmail.com)
-- 💬 Discord: [Taverna](https://discord.gg/SdWnWJ6w)
-- 🐛 Issues: [GitHub Issues](https://github.com/Leosdc/lyra-the-wise/issues)
+- **Contribuidores** - Todos que ajudaram até aqui
 
 ---
 
@@ -448,6 +441,13 @@ R: Sim, mantém 20 últimas interações no contexto.
 
 ---
 
-**Feito com ❤️ pela comunidade RPG**
+## 📞 Suporte
+
+- 💬 Discord: [Taverna](https://discord.gg/SdWnWJ6w)
+- 🐛 Issues: [GitHub Issues](https://github.com/Leosdc/lyra-the-wise/issues)
+
+---
+
+**Feito com ❤️ para a comunidade de RPG**
 
 *Transformando Discord em mesas de RPG épicas desde 2025*

@@ -11,7 +11,6 @@ groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 DATA_DIR = os.path.join(os.getcwd(), "bot_data")
 os.makedirs(DATA_DIR, exist_ok=True)
 FICHAS_PATH = os.path.join(DATA_DIR, "fichas_personagens.json")
-SISTEMAS_PATH = os.path.join(DATA_DIR, "sistemas_usuarios.json")
 SESSOES_PATH = os.path.join(DATA_DIR, "sessoes_ativas.json")
 
 # ==================== IDENTIDADE DA LYRA ====================
@@ -58,16 +57,12 @@ def salvar_json(caminho, dados):
 
 def carregar_dados(fichas_personagens, sistemas_rpg, sessoes_ativas):
     fichas_personagens.update(carregar_json(FICHAS_PATH, {}))
-    sistemas_rpg.update(carregar_json(SISTEMAS_PATH, {}))
     sessoes_ativas.update(carregar_json(SESSOES_PATH, {}))
-    print("💾 Dados carregados!")
 
 def salvar_dados(fichas_personagens=None, sistemas_rpg=None, sessoes_ativas=None):
     try:
         if fichas_personagens is not None:
             salvar_json(FICHAS_PATH, fichas_personagens)
-        if sistemas_rpg is not None:
-            salvar_json(SISTEMAS_PATH, sistemas_rpg)
         if sessoes_ativas is not None:
             salvar_json(SESSOES_PATH, sessoes_ativas)
         print("💾 Dados salvos!")

@@ -93,8 +93,6 @@ def get_estrutura_ficha(sistema):
     """Retorna a estrutura de ficha apropriada para o sistema."""
     return ESTRUTURA_FICHAS.get(sistema, ESTRUTURA_GENERICA)
 
-# ========== FUNÇÕES DE PERSISTÊNCIA ==========
-
 def salvar_fichas_agora():
     """SALVA FICHAS IMEDIATAMENTE no arquivo JSON com encoding correto."""
     try:
@@ -131,8 +129,6 @@ def encontrar_ficha(user_id, nome):
                 return k, v
     
     return None, None
-
-# ========== VIEW DE NAVEGAÇÃO DE FICHAS ==========
 
 class FichaNavigationView(View):
     """View para navegar entre páginas da ficha."""
@@ -227,8 +223,6 @@ class FichaNavigationView(View):
         """Fecha a visualização."""
         await interaction.message.delete()
 
-# ========== REGISTRO DE COMANDOS ==========
-
 def register(bot: commands.Bot):
     # Remove comandos duplicados
     for cmd in ["ficha", "criarficha", "verficha", "editarficha", "deletarficha",
@@ -238,7 +232,6 @@ def register(bot: commands.Bot):
         except Exception:
             pass
 
-    # ========== CRIAR FICHA ESTRUTURADA ==========
     @bot.command(name="criarficha")
     async def criar_ficha_estruturada(ctx):
         """Cria uma ficha estruturada através de perguntas interativas."""
@@ -532,7 +525,6 @@ def register(bot: commands.Bot):
                 "Use `!criarficha` novamente quando estiver pronto!"
             )
 
-    # ========== VER FICHA COM NAVEGAÇÃO ==========
     @bot.command(name="verficha")
     async def ver_ficha(ctx, *, nome: str = None):
         """Visualiza uma ficha com navegação por páginas."""
@@ -572,8 +564,6 @@ def register(bot: commands.Bot):
             sistema = ficha.get("sistema", "dnd5e")
             view = FichaNavigationView(ficha, sistema)
             await ctx.send(embed=view.get_embed(), view=view)
-
-    # ========== OUTROS COMANDOS (mantidos da versão anterior) ==========
     
     @bot.command(name="ficha")
     async def ficha_cmd(ctx, *, nome: str = None):
@@ -1064,5 +1054,3 @@ Preencha TODOS os campos apropriados para {SISTEMAS_DISPONIVEIS[novo_sistema]['n
             
         except asyncio.TimeoutError:
             await ctx.send("⏰ Tempo esgotado! Use `!editarficha <nome>` novamente.")
-
-    print("✅ fichas_estruturadas carregado com sucesso!")

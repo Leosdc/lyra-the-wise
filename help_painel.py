@@ -37,8 +37,7 @@ def register(bot: commands.Bot):
             value="""\
 !rolar 1d20 ou !r 1d20 - Rola dados
 !rolar 2d6+3 - Rola com modificador
-!rolar 4d6k3 - Mantém 3 maiores
-!iniciativa - Rola iniciativa para o grupo""",
+!rolar 4d6k3 - Mantém 3 maiores""",
             inline=False,
         )
         embed1.add_field(

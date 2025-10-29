@@ -107,5 +107,3 @@ def setup_sessoes(
             description=descr,
             color=discord.Color.blurple()
         ).set_footer(text="Use !rpghelp para ver todos os comandos do bot"))
-    
-    print("✅ Sistema de sessões carregado (MODULARIZADO)")

@@ -54,7 +54,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"👹 {'Gerando' if nome else 'Criando'} monstro{' ' + nome if nome else ' aleatório'}...")
-        resposta = await chamar_groq(mensagens, max_tokens=1500)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1500)
         
         embed = discord.Embed(
             title=f"👹 {nome if nome else 'Monstro Gerado'}",
@@ -100,7 +100,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🎭 Gerando NPC...")
-        resposta = await chamar_groq(mensagens, max_tokens=1200)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1200)
         
         embed = discord.Embed(
             title="🎭 NPC Gerado",
@@ -133,7 +133,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"⚔️ Gerando encontro nível {nivel} ({dificuldade})...")
-        resposta = await chamar_groq(mensagens, max_tokens=1800)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1800)
         
         embed = discord.Embed(
             title=f"⚔️ Encontro - Nível {nivel} ({dificuldade.capitalize()})",
@@ -163,7 +163,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"🪤 Gerando armadilha ({dificuldade})...")
-        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1000)
         
         embed = discord.Embed(
             title=f"🪤 Armadilha ({dificuldade.capitalize()})",
@@ -189,7 +189,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("✨ Gerando item mágico...")
-        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1000)
         
         embed = discord.Embed(
             title="✨ Item Mágico",
@@ -215,7 +215,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send(f"💰 Gerando tesouro para nível {nivel}...")
-        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1000)
         
         embed = discord.Embed(
             title=f"💰 Tesouro - Nível {nivel}",
@@ -241,7 +241,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🧩 Gerando puzzle...")
-        resposta = await chamar_groq(mensagens, max_tokens=1200)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1200)
         
         embed = discord.Embed(
             title="🧩 Enigma",
@@ -267,7 +267,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("😈 Gerando vilão...")
-        resposta = await chamar_groq(mensagens, max_tokens=1800)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1800)
         
         embed = discord.Embed(
             title="😈 Vilão",
@@ -294,7 +294,7 @@ def register(bot: commands.Bot):
         ]
         
         await ctx.send("🎬 Criando cena...")
-        resposta = await chamar_groq(mensagens, max_tokens=1000)  # AUMENTADO
+        resposta = await chamar_groq(mensagens, max_tokens=1000)
         
         embed = discord.Embed(
             title="🎬 Cena",
@@ -359,5 +359,3 @@ def register(bot: commands.Bot):
             color=discord.Color.random()
         )
         await ctx.send(embed=embed)
-
-    print("✅ geracao_conteudo carregado com sucesso!")

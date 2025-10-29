@@ -102,7 +102,7 @@ def register(bot: commands.Bot):
                 "• Use `!documentacao` para ver a documentação completa\n"
                 "• Entre em contato com o desenvolvedor\n\n"
                 "**Desenvolvedor:** Leosdc\n"
-                "**GitHub:** https://github.com/Leosdc/rpg-master-bot"
+                "**GitHub:** https://github.com/Leosdc/lyra-the-wise"
             ),
             color=discord.Color.blue()
         )
@@ -166,5 +166,3 @@ def register(bot: commands.Bot):
                 f"❌ {ctx.author.mention}, não consigo te enviar DM!",
                 delete_after=15
             )
-
-    print("✅ utilidades carregado com sucesso!")

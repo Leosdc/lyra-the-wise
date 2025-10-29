@@ -1,5 +1,15 @@
 # 📜 Changelog
 
+## [2.5.5] - 2025-10-29
+### 🎉 Correções
+- **Sistema conciso realmente funcionando nas `!sessoes`**
+- **Removido botão "Outra ação" das `!sessoes`. Agora, o jogador pode selecionar entre `Rolar dados`, `Não fazer nada` ou usar o comando `!acao`.**
+### ✨ Melhorias na mestragem de Lyra
+- **Ação é esperada por todos envolvidos naquele momento da história.**
+- **Seja `Rolar dados`, `Não fazer nada` ou usar o comando `!acao`, se for necessário que todos façam algo, Lyra aguardará antes de continuar a história.**
+
+---
+
 ## [2.5.4] - 2025-10-28
 ### 🎉 Grandes Mudanças
 - **Modularização Total**: `sessoes_rpg.py` (1600+ linhas) dividido em 5 módulos organizados

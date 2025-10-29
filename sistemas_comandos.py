@@ -28,16 +28,11 @@ def register(bot: commands.Bot):
 
         sistemas_rpg[user_id] = novo_sistema
         
-        # ✅ CORREÇÃO: Força salvamento imediato
-        from config import sistemas_rpg as sistemas_dict
-        from utils import salvar_dados
-        sistemas_dict[user_id] = novo_sistema
-        salvar_dados(sistemas_rpg=sistemas_dict)
-        
         nome = SISTEMAS_DISPONIVEIS[novo_sistema]["nome"]
         await ctx.send(
             f"✅ Seu sistema foi alterado para **{nome}** (`{novo_sistema}`).\n"
             f"🎲 Todos os comandos de IA agora usarão este sistema."
+            f"⚠️ **Nota:** Esta configuração será perdida ao reiniciar o bot."
         )
 
     @bot.command(name="sistemas")

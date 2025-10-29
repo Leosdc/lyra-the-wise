@@ -55,19 +55,68 @@ def register_acao_commands(
             # Marca que este jogador agiu
             sessao["turnos_agidos"].append(ctx.author.id)
             salvar_dados()
+
+        # SISTEMA DE CONTROLE DE AÇÕES - Inicializa se não existir
+        if "acoes_pendentes" not in sessao:
+            sessao["acoes_pendentes"] = {}
         
-        # Adiciona ao histórico
+        # Se há rolagem/ação ativa definida pela IA, registra que este jogador agiu
+        if "players_needed_action" in sessao and sessao["players_needed_action"]:
+            if ctx.author.id in sessao["players_needed_action"]:
+                sessao["acoes_pendentes"][ctx.author.id] = descricao
+                salvar_dados()
+                
+                # Verifica se todos já agiram
+                total_esperados = len(sessao["players_needed_action"])
+                # Conta quem já respondeu (rolls + skipped + acoes)
+                # Observação: listas podem ser preenchidas pela View de rolagem
+                rolls_done = len(sessao.get("rolls_done_ids", []))
+                skipped = len(sessao.get("players_skipped_ids", []))
+                acoes = len(sessao["acoes_pendentes"])
+                
+                total_respostas = rolls_done + skipped + acoes
+                
+                if total_respostas < total_esperados:
+                    # Ainda faltam pessoas — mostra a ação do jogador e aguarda
+                    await ctx.send(embed=discord.Embed(
+                        title=f"🎭 {nome_personagem} age!",
+                        description=descricao,
+                        color=discord.Color.blue()
+                    ).set_footer(text=f"Jogador: {ctx.author.display_name}"))
+                    
+                    faltam = total_esperados - total_respostas
+                    await ctx.send(
+                        f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} responder (rolar, não fazer nada ou !acao)..."
+                    )
+                    return  # ❗ NÃO gera resposta ainda e NÃO adiciona ao histórico
+                else:
+                    # TODOS responderam! Limpa flags e continua o fluxo normal
+                    sessao.pop("players_needed_action", None)
+                    sessao.pop("rolls_done_ids", None)
+                    sessao.pop("players_skipped_ids", None)
+                    sessao["acoes_pendentes"] = {}
+                    salvar_dados()
+                    
+                    await ctx.send(
+                        embed=discord.Embed(
+                            title="✅ Todos Responderam!",
+                            description="Gerando consequências...",
+                            color=discord.Color.green()
+                        )
+                    )
+
+        # Adiciona ao histórico (apenas quando já podemos prosseguir)
         historia = sessao.get("historia", [])
         historia.append({"role": "user", "content": f"Ação de {nome_personagem}: {descricao}"})
         
-        # Envia mensagem visual
+        # Envia mensagem visual da ação
         await ctx.send(embed=discord.Embed(
             title=f"🎭 {nome_personagem} age!",
             description=descricao,
             color=discord.Color.blue()
         ).set_footer(text=f"Jogador: {ctx.author.display_name}"))
         
-        # VERIFICA SE TODOS JÁ AGIRAM NESTE TURNO
+        # VERIFICA SE TODOS JÁ AGIRAM NESTE TURNO (iniciativa)
         if iniciativa_ativa:
             jogadores_total = len(sessao.get("jogadores", []))
             jogadores_agidos = len(sessao["turnos_agidos"])
@@ -124,8 +173,8 @@ def register_acao_commands(
             max_tokens = 1200
             instrucao = "Narre as consequências em 2-4 parágrafos detalhados."
         else:
-            max_tokens = 600
-            instrucao = "Narre em 1 parágrafo breve (máx 4 frases). SEJA DIRETO."
+            max_tokens = 400
+            instrucao = "MÁXIMO 4 FRASES CURTAS. Uma frase por evento principal. SEJA EXTREMAMENTE DIRETO."
         
         historia_recente = historia[-20:] if len(historia) > 20 else historia
         
@@ -175,7 +224,14 @@ def register_acao_commands(
             
             roll_embed = discord.Embed(
                 title="🎲 Rolagem Necessária!",
-                description=f"**Tipo:** `{roll_type}`\n**Jogadores:** {', '.join(jogadores_nomes)}\n\nClique no botão abaixo!",
+                description=(
+                    f"**Tipo:** `{roll_type}`\n"
+                    f"**Jogadores:** {', '.join(jogadores_nomes)}\n\n"
+                    f"**Opções:**\n"
+                    f"🎲 Rolar os dados solicitados\n"
+                    f"🚫 Não fazer nada (ignorar ação)\n"
+                    f"✏️ Usar `!acao <descrição>` para fazer outra coisa"
+                ),
                 color=discord.Color.blue()
             )
             
@@ -222,8 +278,8 @@ def register_acao_commands(
             max_tokens = 1200
             instrucao = "Expanda em 2-4 parágrafos cinematográficos."
         else:
-            max_tokens = 600
-            instrucao = "MÁXIMO 4 frases. Cenário + elemento principal + momento crítico."
+            max_tokens = 400
+            instrucao = "MÁXIMO 3 FRASES. Cenário em 1 frase + gancho em 1 frase. NADA MAIS."
 
         historia_recente = historia[-20:]
         

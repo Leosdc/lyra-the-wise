@@ -48,6 +48,15 @@ class RollRequestView(discord.ui.View):
         
         self.rolls_done[interaction.user.id] = total
         
+        
+        # Registra no estado global da sessão para sincronizar com !acao
+        sessao = self.sessoes_ativas.get(self.channel_id)
+        if sessao:
+            if "rolls_done_ids" not in sessao:
+                sessao["rolls_done_ids"] = []
+            sessao["rolls_done_ids"].append(interaction.user.id)
+            sessao["players_needed_action"] = self.players_needed
+            self.salvar_dados()
         await interaction.response.send_message(
             f"🎲 **{interaction.user.display_name}** rolou:\n{texto}",
             ephemeral=False
@@ -77,7 +86,8 @@ class RollRequestView(discord.ui.View):
         else:
             faltam = len(self.players_needed) - len(self.rolls_done)
             await interaction.channel.send(
-                f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} rolar..."
+                f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} rolar...\n"
+                f"💡 *Ou use `!acao <descrição>` para fazer outra coisa*"
             )
 
     @discord.ui.button(label="🚫 Não Fazer Nada", style=discord.ButtonStyle.secondary, custom_id="do_nothing", row=0)
@@ -105,6 +115,13 @@ class RollRequestView(discord.ui.View):
         
         self.players_skipped.append(interaction.user.id)
         
+        
+        # Registra no estado global da sessão
+        if "players_skipped_ids" not in sessao:
+            sessao["players_skipped_ids"] = []
+        sessao["players_skipped_ids"].append(interaction.user.id)
+        sessao["players_needed_action"] = self.players_needed
+        self.salvar_dados()
         fichas_sel = sessao.get("fichas", {})
         chave_ficha = fichas_sel.get(str(interaction.user.id)) or fichas_sel.get(interaction.user.id)
         if chave_ficha:
@@ -146,137 +163,13 @@ class RollRequestView(discord.ui.View):
                     color=discord.Color.gold()
                 )
             )
-            
+
             await self._continue_story_with_choices(interaction.channel, sessao)
         else:
-            faltam = len(self.players_needed) - total_respostas
-            await interaction.channel.send(
-                f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} responder..."
-            )
-        
-        from utils import chamar_groq, get_system_prompt
-        sistema = sessao.get("sistema", "dnd5e")
-        historia = sessao.get("historia", [])
-        
-        historia.append({
-            "role": "user",
-            "content": f"{nome_personagem} decidiu não realizar a ação sugerida. Narre como a situação evolui naturalmente."
-        })
-        
-        historia_recente = historia[-20:] if len(historia) > 20 else historia
-        mensagens = [
-            {"role": "system", "content": get_system_prompt(sistema)},
-        ] + historia_recente
-        
-        estilo = sessao.get("estilo_narrativo", "extenso")
-        max_tokens = 1200 if estilo == "extenso" else 600
-
-        resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
-        
-        historia.append({"role": "assistant", "content": resposta})
-        sessao["historia"] = historia
-        self.salvar_dados()
-        
-        embed = discord.Embed(
-            title="📖 A História Continua...",
-            description=resposta[:4000],
-            color=discord.Color.blue()
-        )
-        embed.set_footer(text=f"Estilo: {estilo.upper()}")
-        
-        view = ContinueStoryView(
-            self.bot,
-            self.sessoes_ativas,
-            self.salvar_dados,
-            chamar_groq,
-            get_system_prompt
-        )
-        await interaction.channel.send(embed=embed, view=view)
-
-    @discord.ui.button(label="✏️ Outra Ação", style=discord.ButtonStyle.primary, custom_id="other_action", row=0)
-    async def other_action_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        """Jogador escolhe fazer outra ação."""
-        sessao = self.sessoes_ativas.get(self.channel_id)
-        if not sessao:
-            return await interaction.response.send_message("❌ Sessão não encontrada.", ephemeral=True)
-        
-        if interaction.user.id not in self.players_needed:
-            return await interaction.response.send_message(
-                "⚠️ Esta opção não é para você!",
-                ephemeral=True
-            )
-        
-        # Marca que este jogador escolheu outra ação
-        if not hasattr(self, 'players_other_action'):
-            self.players_other_action = []
-        
-        if interaction.user.id in self.players_other_action:
-            return await interaction.response.send_message(
-                "✅ Você já escolheu fazer outra ação. Use `!acao <descrição>`",
-                ephemeral=True
-            )
-        
-        self.players_other_action.append(interaction.user.id)
-        
-        fichas_sel = sessao.get("fichas", {})
-        chave_ficha = fichas_sel.get(str(interaction.user.id)) or fichas_sel.get(interaction.user.id)
-        if chave_ficha:
-            nome_personagem = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
-        else:
-            nome_personagem = interaction.user.display_name
-        
-        await interaction.response.send_message(
-            embed=discord.Embed(
-                title="✏️ Descreva Sua Ação",
-                description=(
-                    f"**{nome_personagem}**, use o comando `!acao <descrição>` para descrever o que seu personagem faz.\n\n"
-                    "💡 **Exemplos:**\n"
-                    "• `!acao examino a porta com cuidado`\n"
-                    "• `!acao ataco o goblin com minha espada`\n"
-                    "• `!acao tento persuadir o guarda`"
-                ),
-                color=discord.Color.blue()
-            ),
-            ephemeral=False
-        )
-        
-        # Verifica se todos responderam (rolaram OU pularam OU escolheram outra ação)
-        total_respostas = len(self.rolls_done) + len(getattr(self, 'players_skipped', [])) + len(self.players_other_action)
-        if total_respostas >= len(self.players_needed):
-            # Todos responderam - desabilita botões
-            for item in self.children:
-                item.disabled = True
-            await interaction.message.edit(view=self)
-            
-            # Prepara resumo
-            resumo_parts = []
-            for uid in self.players_needed:
-                membro = interaction.guild.get_member(uid)
-                nome = membro.display_name if membro else f"Jogador {uid}"
-                
-                if uid in self.rolls_done:
-                    resumo_parts.append(f"• **{nome}**: Rolou {self.rolls_done[uid]}")
-                elif uid in getattr(self, 'players_skipped', []):
-                    resumo_parts.append(f"• **{nome}**: Não fez nada")
-                elif uid in self.players_other_action:
-                    resumo_parts.append(f"• **{nome}**: Escolheu outra ação")
-            
-            await interaction.channel.send(
-                embed=discord.Embed(
-                    title="📊 Todos Responderam!",
-                    description="\n".join(resumo_parts) + "\n\n⏳ *Aguardando ações alternativas com `!acao`...*",
-                    color=discord.Color.blue()
+                faltam = len(self.players_needed) - total_respostas
+                await interaction.channel.send(
+                    f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} responder..."
                 )
-            )
-            
-            # Se houver rolagens, continua a história
-            if self.rolls_done:
-                await self._continue_story_with_choices(interaction.channel, sessao)
-        else:
-            faltam = len(self.players_needed) - total_respostas
-            await interaction.channel.send(
-                f"⏳ Aguardando {faltam} jogador{'es' if faltam > 1 else ''} responder..."
-            )
 
     async def _continue_story(self, channel, sessao):
         """Continua a história após todas as rolagens."""
@@ -284,15 +177,21 @@ class RollRequestView(discord.ui.View):
         
         sistema = sessao.get("sistema", "dnd5e")
         historia = sessao.get("historia", [])
+        estilo = sessao.get("estilo_narrativo", "extenso")  
         
         resumo_rolls = "\n".join([
             f"Jogador {uid} rolou: {resultado}"
             for uid, resultado in self.rolls_done.items()
         ])
         
+        if estilo == "extenso":
+            instrucao = "Narre as consequências de forma cinematográfica. 2-3 parágrafos completos."
+        else:
+            instrucao = "MÁXIMO 4 FRASES CURTAS E DIRETAS. Foque apenas no resultado essencial das rolagens."
+
         historia.append({
             "role": "user",
-            "content": f"Resultados das rolagens ({self.roll_type}):\n{resumo_rolls}\n\nNarre as consequências destas rolagens de forma cinematográfica. Considere os valores obtidos e descreva o resultado de forma envolvente. 2-3 parágrafos."
+            "content": f"Resultados das rolagens ({self.roll_type}):\n{resumo_rolls}\n\n{instrucao}"
         })
         
         historia_recente = historia[-20:] if len(historia) > 20 else historia
@@ -301,8 +200,7 @@ class RollRequestView(discord.ui.View):
             {"role": "system", "content": get_system_prompt(sistema)},
         ] + historia_recente
         
-        estilo = sessao.get("estilo_narrativo", "extenso")
-        max_tokens = 1200 if estilo == "extenso" else 500
+        max_tokens = 1200 if estilo == "extenso" else 400
 
         resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
@@ -324,33 +222,55 @@ class RollRequestView(discord.ui.View):
             get_system_prompt
         )
         await channel.send(embed=embed, view=view)
-    
+
     async def _continue_story_with_choices(self, channel, sessao):
-        """Continua a história considerando TODAS as escolhas dos jogadores."""
+        """Continua a história considerando TODAS as escolhas dos jogadores (rolls, skip, ações alternativas)."""
         from utils import chamar_groq, get_system_prompt
         
         sistema = sessao.get("sistema", "dnd5e")
         historia = sessao.get("historia", [])
+        estilo = sessao.get("estilo_narrativo", "extenso")  
         
-        # Monta resumo de TODAS as escolhas
+        # Monta resumo DETALHADO de TODAS as escolhas
         resumo_parts = []
+        fichas_sel = sessao.get("fichas", {})
         
         for uid in self.players_needed:
             membro = channel.guild.get_member(uid)
             nome = membro.display_name if membro else f"Jogador {uid}"
             
+            # Busca nome do personagem
+            chave_ficha = fichas_sel.get(str(uid)) or fichas_sel.get(uid)
+            if chave_ficha:
+                nome_personagem = chave_ficha.split('_', 1)[-1].replace('_', ' ').title()
+            else:
+                nome_personagem = nome
+            
             if uid in self.rolls_done:
-                resumo_parts.append(f"- {nome} rolou {self.roll_type}: {self.rolls_done[uid]}")
+                resumo_parts.append(f"- {nome_personagem} rolou {self.roll_type} e obteve: {self.rolls_done[uid]}")
             elif uid in getattr(self, 'players_skipped', []):
-                resumo_parts.append(f"- {nome} decidiu não realizar a ação")
-            elif uid in getattr(self, 'players_other_action', []):
-                resumo_parts.append(f"- {nome} escolheu fazer outra ação (aguardando descrição)")
+                resumo_parts.append(f"- {nome_personagem} decidiu NÃO realizar a ação proposta e permaneceu imóvel/inativo")
+            elif uid in sessao.get("acoes_pendentes", {}):
+                acao_alternativa = sessao["acoes_pendentes"][uid]
+                resumo_parts.append(f"- {nome_personagem} ignorou a ação sugerida e fez outra coisa: {acao_alternativa}")
         
         resumo_completo = "\n".join(resumo_parts)
         
+        if estilo == "extenso":
+            instrucao_narrativa = "Seja específico sobre o impacto de cada escolha. 2-3 parágrafos cinematográficos."
+        else:
+            instrucao_narrativa = "MÁXIMO 5 FRASES CURTAS. Seja direto: o que aconteceu com quem agiu e com quem não agiu."
+
         historia.append({
             "role": "user",
-            "content": f"Escolhas dos jogadores:\n{resumo_completo}\n\nNarre as consequências destas escolhas de forma cinematográfica. Considere quem agiu e quem não agiu. 2-3 parágrafos."
+            "content": (
+                f"Escolhas dos jogadores sobre a situação anterior:\n{resumo_completo}\n\n"
+                f"INSTRUÇÃO CRÍTICA: Narre as consequências considerando:\n"
+                f"1. Quem AGIU e obteve resultados (considere os valores das rolagens)\n"
+                f"2. Quem NÃO FEZ NADA e as consequências dessa INAÇÃO (ex: perdeu oportunidade, foi pego de surpresa, etc)\n"
+                f"3. Quem fez AÇÕES ALTERNATIVAS diferentes do sugerido\n\n"
+                f"{instrucao_narrativa}"
+            )
         })
         
         historia_recente = historia[-20:] if len(historia) > 20 else historia
@@ -359,13 +279,15 @@ class RollRequestView(discord.ui.View):
             {"role": "system", "content": get_system_prompt(sistema)},
         ] + historia_recente
         
-        estilo = sessao.get("estilo_narrativo", "extenso")
-        max_tokens = 1200 if estilo == "extenso" else 500
+        max_tokens = 1200 if estilo == "extenso" else 400
 
         resposta = await chamar_groq(mensagens, max_tokens=max_tokens)
         
         historia.append({"role": "assistant", "content": resposta})
         sessao["historia"] = historia
+        
+        # Limpa ações pendentes
+        sessao["acoes_pendentes"] = {}
         self.salvar_dados()
         
         embed = discord.Embed(
@@ -382,7 +304,6 @@ class RollRequestView(discord.ui.View):
             get_system_prompt
         )
         await channel.send(embed=embed, view=view)
-
 
 class NarrativeStyleView(discord.ui.View):
     """View para o mestre escolher o estilo narrativo da Lyra."""
@@ -724,14 +645,14 @@ class SessionControlView(discord.ui.View):
         
         guild = interaction.guild
         
-        # RESTAURADO: Busca Torre da Maga
+        # Busca Torre da Maga
         torre_da_maga = None
         for channel in guild.voice_channels:
             if "torre" in channel.name.lower() and "maga" in channel.name.lower():
                 torre_da_maga = channel
                 break
         
-        # RESTAURADO: Move jogadores de volta
+        # Move jogadores de volta
         canal_voz_id = sessao.get("voice_channel_id")
         if canal_voz_id:
             canal_voz = guild.get_channel(canal_voz_id)
@@ -752,7 +673,7 @@ class SessionControlView(discord.ui.View):
             self.sessoes_ativas.pop(interaction.channel.id, None)
             self.salvar_dados()
             
-            # RESTAURADO: Deleta canal de voz primeiro
+            # Deleta canal de voz primeiro
             if canal_voz_id:
                 canal_voz = guild.get_channel(canal_voz_id)
                 if canal_voz:
