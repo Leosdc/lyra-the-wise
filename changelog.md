@@ -1,7 +1,6 @@
 # 📜 Changelog
 
 ## [2.5.4] - 2025-10-28
-
 ### 🎉 Grandes Mudanças
 - **Modularização Total**: `sessoes_rpg.py` (1600+ linhas) dividido em 5 módulos organizados
 - **Estrutura Nova**:
