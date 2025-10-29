@@ -79,7 +79,7 @@ jobs:
           echo "✅ changelog_temp.md criado:"
           head -n 15 changelog_temp.md || true
 
-      # 6️⃣ Enviar changelog ao Discord (somente última versão)
+      # 6️⃣ Enviar changelog ao Discord (em múltiplos embeds se necessário)
       - name: Enviar changelog mais recente ao Discord
         if: env.SKIP != 'true'
         run: |
@@ -96,12 +96,17 @@ jobs:
           CHANGELOG_TEXT=$(jq -r . <<< "$CHANGELOG")
           echo "📏 Tamanho do changelog extraído: $(echo "$CHANGELOG_TEXT" | wc -c) bytes"
 
-          # Divide o changelog em blocos seguros
-          echo "$CHANGELOG_TEXT" | fold -w 750 > changelog_parts.txt
+          # Divide o changelog em blocos de 950 caracteres
+          echo "$CHANGELOG_TEXT" | fold -w 950 > changelog_parts.txt
 
           i=0
           while IFS= read -r chunk; do
             i=$((i+1))
+            if [ $i -eq 1 ]; then
+              TITLE="🧙 Lyra toca sua harpa e anuncia: nova versão $VERSION publicada! (Parte $i)"
+            else
+              TITLE="🧙 Nova versão $VERSION publicada! (Parte $i)"
+            fi
 
             PAYLOAD=$(jq -n \
               --arg username "The Bard" \
@@ -112,14 +117,14 @@ jobs:
               --arg date "$DATE" \
               --arg sha "$SHA" \
               --arg part "$chunk" \
-              --arg partnum "$i" \
+              --arg title "$TITLE" \
               '
               {
                 "username": $username,
                 "avatar_url": $avatar,
                 "embeds": [
                   {
-                    "title": ("🧙 Nova versão \($version) publicada! (Parte " + $partnum + ")"),
+                    "title": $title,
                     "color": 11259375,
                     "fields": [
                       { "name": "📦 Repositório", "value": ("[\($repo)](https://github.com/\($repo))"), "inline": true },
@@ -135,18 +140,22 @@ jobs:
               }')
 
             echo "📦 Enviando parte $i..."
-            echo "$PAYLOAD" | jq . || echo "⚠️ Falha ao formatar payload."
-
             RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
               -X POST -H "Content-Type: application/json" \
               -d "$PAYLOAD" "$WEBHOOK")
 
             echo "📨 HTTP: $RESPONSE"
-            cat response.txt || echo "(sem resposta)"
+            if [ "$RESPONSE" -ne 204 ]; then
+              echo "❌ Erro ao enviar parte $i:"
+              cat response.txt
+            else
+              echo "✅ Parte $i enviada com sucesso!"
+            fi
+
             sleep 2
           done
 
-          echo "✅ Última versão enviada com sucesso!"
+          echo "✅ Todas as partes do changelog foram publicadas no Discord!"
 
       # 7️⃣ Confirmação final
       - name: Confirmar publicação
