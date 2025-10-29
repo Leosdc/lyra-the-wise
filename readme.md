@@ -448,24 +448,6 @@ R: Sim, mantém 20 últimas interações no contexto.
 
 ---
 
-### 🎯 Priorização coletada por feedbacks
-- [ ] Curto Prazo (1-2 meses)
-  - Expandir banco de monstros (impacto imediato)
-  - Sistema de tabelas aleatórias (fácil implementar)
-  - Gerador de aventuras completas (alto valor)
-
-- [ ] Médio Prazo (3-6 meses)
-  - Tracker de iniciativa visual (melhora UX)
-  - Sistema de progressão automática (QoL importante)
-  - Persistência de conteúdo gerado (salvar monstros/NPCs/itens)
-
-- [ ] Longo Prazo (6-12 meses)
-  - Interface visual avançada (complexo)
-  - Integrações com VTTs (requer APIs externas)
-  - Sistema completo de geração procedural (masmorras, locais, etc)
-
----
-
 **Feito com ❤️ pela comunidade RPG**
 
 *Transformando Discord em mesas de RPG épicas desde 2025*
