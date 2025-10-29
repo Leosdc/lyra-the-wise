@@ -10,21 +10,6 @@
 
 ---
 
-## 📖 Índice
-
-- [Visão Geral](#-visão-geral)
-- [Features Principais](#-features-principais)
-- [Instalação](#-instalação)
-- [Guia Rápido](#-guia-rápido)
-- [Sistema de Rolagens](#-sistema-de-rolagens)
-- [Estilos Narrativos](#-estilos-narrativos)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Exemplos de Uso](#-exemplos-de-uso)
-- [FAQ](#-faq)
-- [Contribuindo](#-contribuindo)
-
----
-
 ## 🌟 Visão Geral
 
 **Lyra the Wise** é um bot de Discord que transforma seu servidor em uma mesa de RPG completa, com:
@@ -38,71 +23,63 @@
 
 ---
 
-## ✨ Features Principais
+## 📋 **Comandos Principais**
 
-### 🎲 Sistema de Rolagens Interativo
-
-Quando a IA solicita rolagens, aparecem **3 botões**:
-
+### ⚙️ Configuração
 ```
-┌─────────────────────────────────────────┐
-│  🎲 Rolar Dados  │  🚫 Não Fazer Nada  |
-└─────────────────────────────────────────┘
-```
-
-- **🎲 Rolar Dados**: Executa o teste solicitado
-- **🚫 Não Fazer Nada**: Cancela ação, IA continua narrativa naturalmente
-- **✏️ Outra Ação**: Permite descrever ação alternativa com `!acao`
-
-O sistema **aguarda TODOS** os jogadores rolarem antes de continuar!
-
-### 🎭 Estilos Narrativos
-
-Escolha como Lyra conta a história:
-
-#### 📖 Narrativa Extensa
-```
-✓ 3-5 parágrafos detalhados
-✓ Descrições ricas dos 5 sentidos
-✓ Atmosfera cinematográfica
-✓ Profundidade emocional
-✓ Ideal para: Roleplay, exploração, investigação
+!sistema - Ver seu sistema atual
+!sistema <código> - Mudar sistema pessoal
+!sistemas - Lista todos os sistemas
+!buscarsistema <nome> - Buscar sistemas
+!infosistema <código> - Detalhes do sistema
 ```
 
-#### 📝 Narrativa Concisa
+### 🎲 Dados & Iniciativa
 ```
-✓ 1-2 parágrafos curtos (4-5 frases)
-✓ Foco em ação e essencial
-✓ Narrativa ágil e dinâmica
-✓ Respostas mais rápidas
-✓ Ideal para: Combate, dungeons, sessões rápidas
+!rolar 1d20
+!rolar 2d6+3
+!iniciativa
 ```
 
-### 🎙️ Canais de Voz Automáticos
-
-- ✅ **Criação Automática**: Canal de voz junto com texto
-- ✅ **Move Jogadores**: Transfere todos automaticamente
-- ✅ **Desmuta**: Remove mute/deafen de todos
-- ✅ **Encerramento**: Move para "Torre da Maga" e apaga canais
-
-### ⚔️ Sistema de Iniciativa
-
-Botão exclusivo do **mestre** para rolar iniciativa de todos:
-
+### 👤 Fichas & Personagens
 ```
-⚔️ Ordem de Iniciativa:
-🥇 Elara → 22
-🥈 Thorin → 18
-🥉 Goblin Líder → 15
-4. Kael → 12
+!ficha <nome> - Criação rápida estruturada
+!criarficha - Modo interativo com 8 perguntas
+!verficha <nome> - Ver com navegação por páginas
+!editarficha <nome> - Editor interativo
+!converterficha <sistema> <nome> - Converte entre sistemas
+!minhasfichas [sistema] - Lista suas fichas
+!exportarficha <nome> - Exporta como JSON
 ```
 
-### 📊 Gestão Completa
+### 🎮 Sessões de RPG
+```
+!iniciarsessao @jog1 @jog2
+!selecionarficha <nome>
+!sessoes
+!infosessao
+!cenanarrada <descrição>
+!acao <descrição>
+```
 
-- **Fichas**: Sistema integrado com validação
-- **Histórico**: 20 últimas interações salvas
-- **Status**: Acompanhamento em tempo real
-- **Resumos**: IA gera resumo narrativo da sessão
+### ✨ Geração de Conteúdo
+```
+!npc <descrição>
+!vilao <tipo>
+!item <tipo>
+!tesouro <nível>
+!puzzle <tema>
+!monstro <nome>
+!cena <descrição>
+```
+
+### 📖 História & Campanha
+```
+!mestre <pergunta>
+!plot <tema>
+!sessao <tema>
+!regra <dúvida>
+```
 
 ---
 
@@ -201,8 +178,6 @@ Quando todos selecionarem:
 🎲 Rolagem Necessária!
 Tipo: 1d20+Percepção
 Jogadores: @Elara, @Thorin
-
-[Botões aparecem: 🎲 Rolar | 🚫 Não Fazer ]
 ```
 
 ### 5️⃣ Combate
@@ -225,249 +200,6 @@ Jogadores agem na ordem com `!acao`
 - ✅ Jogadores movidos para Torre da Maga
 - ✅ Canais de voz e texto apagados
 - ✅ Dados salvos
-
----
-
-## 🎲 Sistema de Rolagens
-
-### Como Funciona
-
-1. **IA Detecta Necessidade**
-   - Jogador usa `!acao ataco o goblin`
-   - IA analisa e detecta necessidade de rolagem
-   - Solicita com tag especial: `[ROLL: 1d20+3, Elara]`
-
-2. **Sistema Exibe Botões**
-   ```
-   🎲 Rolagem Necessária!
-   Tipo: 1d20+3
-   Jogadores: @Elara
-   
-   [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
-   ```
-
-3. **Jogadores Escolhem**
-   - **Rolar**: Executa teste
-   - **Não Fazer**: IA narra sem teste
-   - **Outra Ação**: Usa `!acao` novamente
-
-4. **Sistema Aguarda Todos**
-   ```
-   ✅ Elara rolou: 1d20+3 = 18
-   ⏳ Aguardando 1 jogador rolar...
-   ```
-
-5. **Resumo e Continuação**
-   ```
-   📊 Todas as Rolagens Concluídas!
-   • Elara: 18
-   • Thorin: 12
-   
-   ✨ A história continua...
-   ```
-
-6. **IA Narra Resultado**
-   - Considera todos os valores
-   - Narra consequências
-   - Continua história
-
-### Tipos de Rolagem Suportados
-
-```
-1d20        # D20 básico
-1d20+5      # Com modificador
-2d6         # Múltiplos dados
-1d100       # Percentil
-3d6+2       # Combinações
-```
-
-### Alvos de Rolagem
-
-```
-[ROLL: 1d20, todos]           # Todos jogadores
-[ROLL: 1d20, Elara]           # Personagem específico
-[ROLL: 1d20, Elara, Thorin]   # Múltiplos personagens
-```
-
----
-
-## 🎭 Estilos Narrativos
-
-#### 📖 Narrativa Extensa
-
-```
-A porta de carvalho range suavemente sob seus dedos enquanto 
-você a empurra. O cheiro de mofo e velas apagadas invade suas 
-narinas, misturado com algo metálico - sangue, talvez. Suas 
-botas afundam no tapete empoeirado, cada passo levantando 
-pequenas nuvens que dançam na luz fraca da sua tocha.
-
-As sombras se contorcem nas paredes de pedra, projetadas por 
-relevos que retratam batalhas esquecidas. Você pode quase ouvir 
-os gritos dos guerreiros, sentir o peso das espadas que nunca 
-mais serão empunhadas. No centro da sala, uma mesa circular 
-aguarda, coberta por um mapa amarelado cujas bordas se desfazem 
-ao toque.
-
-Ao se aproximar, você nota marcas recentes na poeira - pegadas. 
-Alguém esteve aqui, e não faz muito tempo...
-```
-
-#### 📝 Narrativa Concisa
-
-```
-Você empurra a porta. O cômodo está escuro, cheira a mofo e 
-sangue velho. No centro, uma mesa com mapa antigo. Pegadas 
-recentes na poeira - alguém passou aqui há pouco.
-```
-
-### Quando Usar Cada Uma?
-
-**Use Extensa quando:**
-- ✅ Sessão focada em roleplay
-- ✅ Explorando locais importantes
-- ✅ Desenvolvendo NPCs
-- ✅ Investigação e mistério
-- ✅ Momentos dramáticos
-
-**Use Concisa quando:**
-- ✅ Combate intenso
-- ✅ Dungeon crawling
-- ✅ Sessões curtas (2-3h)
-- ✅ Grupo grande (5+ jogadores)
-- ✅ Foco em mecânicas
-
----
-
-## 💡 Exemplos de Uso
-
-### Exemplo Completo: Sessão de D&D 5e
-
-```bash
-# 1. MESTRE CRIA SESSÃO
-!iniciarsessao @Alice @Bob @Carol
-
-# ✅ Canais criados
-# ✅ Todos movidos para voz
-# ✅ Fichas listadas
-
-# 2. JOGADORES SELECIONAM FICHAS
-[Alice] !selecionarficha Elara Corações de Cristal
-[Bob] !selecionarficha Thorin Martelo de Ferro
-[Carol] !selecionarficha Kael Sombra Noturna
-
-# 🎉 Todos os jogadores selecionaram suas fichas!
-
-# 3. MESTRE INICIA AVENTURA
-[Mestre clica: 🎬 Iniciar Aventura]
-[Escolhe: 📖 Narrativa Extensa]
-
-# IA GERA INTRODUÇÃO:
-"""
-A taverna do Dragão Vermelho está lotada esta noite. O cheiro 
-de cerveja maltada mistura-se com fumaça de tabaco enquanto 
-aventureiros de todos os cantos do reino trocam histórias de 
-suas façanhas...
-"""
-
-# 4. JOGADORES AGEM
-[Alice] !acao me aproximo do taverneiro e pergunto sobre rumores
-
-# IA RESPONDE:
-"""
-O taverneiro, um anão de barba grisalha, limpa um copo enquanto 
-te analisa com olhos experientes. "Rumores?" ele resmunga. 
-"Tenho algo melhor que rumores, jovem. Tenho um trabalho."
-
-Ele se inclina, baixando a voz. "Há uma caravana que precisa 
-de escolta até Forte Névoa. Pagam bem, mas o caminho... 
-digamos que não é dos mais seguros."
-
-[ROLL: 1d20+Percepção, Elara]
-"""
-
-# BOTÕES APARECEM:
-# [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
-
-[Alice clica: 🎲 Rolar Dados]
-
-# SISTEMA ROLA:
-"""
-🎲 Elara rolou: 1d20+3 = 18
-
-📊 Todas as Rolagens Concluídas!
-• Elara: 18
-"""
-
-# IA CONTINUA:
-"""
-Com sua percepção aguçada, você nota que o taverneiro está 
-nervoso. Suas mãos tremem ligeiramente e seus olhos desviam 
-para a janela a cada poucos segundos, como se esperasse algo...
-"""
-
-# 5. COMBATE ACONTECE
-[Mestre] !cenanarrada goblins invadem a taverna
-
-# IA EXPANDE:
-"""
-O vidro da janela se estilhaça em mil pedaços! Três goblins 
-saltam para dentro, brandindo adagas enferrujadas e gritando 
-em sua língua gutural. O taverneiro grita e mergulha atrás 
-do balcão...
-"""
-
-[Mestre clica: ⚔️ Rolar Iniciativa]
-
-# SISTEMA ROLA:
-"""
-⚔️ Iniciativa Rolada!
-🥇 Elara → 22
-🥈 Thorin → 18
-🥉 Kael → 15
-4. Goblin 1 → 12
-5. Goblin 2 → 8
-6. Goblin 3 → 5
-"""
-
-# JOGADORES AGEM NA ORDEM
-[Alice] !acao disparo uma flecha no goblin mais próximo
-[Bob] !acao avanço com meu martelo de guerra
-[Carol] !acao lanço Raio de Gelo
-
-# ... combate continua ...
-
-# 6. FINAL DA SESSÃO
-[Mestre clica: 🚪 Encerrar Sessão]
-
-# ✅ Jogadores movidos para Torre da Maga
-# ✅ Canais apagados
-# ✅ Sessão salva
-```
-
-### Exemplo: Sessão Concisa (Dungeon Crawl)
-
-```bash
-# MESTRE ESCOLHE NARRATIVA CONCISA
-
-[Mestre] !cenanarrada vocês entram na sala
-
-# IA (CONCISA):
-"""
-Sala circular, 20 pés de diâmetro. Três portas - norte, 
-leste, oeste. Cheiro de mofo. Pegadas recentes na poeira.
-"""
-
-[Alice] !acao examino as pegadas
-
-# IA (CONCISA):
-"""
-Pegadas de humanoides, tamanho médio, 4-6 indivíduos. 
-Levam à porta norte. Recentes - últimas horas.
-"""
-
-# RÁPIDO E DIRETO!
-```
 
 ---
 
@@ -529,7 +261,7 @@ R: Sim, use `!pausarsessao` novamente para retomar.
 ### Problemas Comuns
 
 **P: "Erro ao processar rolagem"**  
-R: A IA está usando formato inválido. Isso foi corrigido na v2.5.4. Atualize
+R: A IA está usando formato inválido. Isso foi corrigido na v2.5.4.
 
 **P: Botões não aparecem**  
 R: Verifique se o bot tem permissão de "Usar Botões" no canal.
