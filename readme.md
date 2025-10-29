@@ -446,18 +446,6 @@ R: Sim, mantém 20 últimas interações no contexto.
   - Formato JSON/XML universal
   - Import de dados externos
 
-### 💾 **Melhoria de Funções e Database Aprimorado para `!sessoes`**
-- [ ] !monstro <nome>
-- [ ] !encontro <nível> <dificuldade>
-- [ ] !armadilha <dificuldade>
-- [ ] !cena <descrição>
-- [ ] !item <tipo>
-- [ ] !tesouro <nível>
-- [ ] !puzzle <tema>
-- [ ] !vilao <tipo>
-- [ ] !nome <tipo>
-- [ ] !motivacao
-
 ---
 
 ### 🎯 Priorização coletada por feedbacks
