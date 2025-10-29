@@ -44,12 +44,6 @@
 
 Quando a IA solicita rolagens, há **3 opções**:
 
-```
-┌──────────────────────────────────┐
-│  🎲 Rolar Dados  │  🚫 Não Fazer Nada  |
-└──────────────────────────────────┘
-```
-
 - **🎲 Rolar Dados**: Executa o teste solicitado
 - **🚫 Não Fazer Nada**: Cancela ação, IA continua narrativa naturalmente
 - **✏️ Outra Ação**: Permite descrever ação alternativa com `!acao`
