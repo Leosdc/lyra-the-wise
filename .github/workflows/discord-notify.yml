@@ -1,4 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Stable Final)
+name: 🤖 Auto Version & Discord Embed (Lyra Debug Mode)
 
 on:
   push:
@@ -79,11 +79,11 @@ jobs:
           echo "✅ changelog_temp.md criado:"
           head -n 15 changelog_temp.md || true
 
-      # 6️⃣ Enviar changelog ao Discord (em múltiplos embeds se necessário)
-      - name: Enviar changelog mais recente ao Discord
+      # 6️⃣ Enviar changelog mais recente ao Discord (modo DEBUG)
+      - name: Enviar changelog mais recente ao Discord (modo debug)
         if: env.SKIP != 'true'
         run: |
-          echo "💬 Preparando envio do changelog da última versão..."
+          echo "💬 Preparando envio do changelog da última versão (modo debug)..."
 
           VERSION="${{ env.VERSION }}"
           REPO="${{ github.repository }}"
@@ -92,20 +92,38 @@ jobs:
           DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
           WEBHOOK="${{ secrets.DISCORD_WEBHOOK }}"
 
-          CHANGELOG=$(jq -Rs . < changelog_temp.md)
-          CHANGELOG_TEXT=$(jq -r . <<< "$CHANGELOG")
-          echo "📏 Tamanho do changelog extraído: $(echo "$CHANGELOG_TEXT" | wc -c) bytes"
+          echo "📜 Carregando changelog real..."
+          CHANGELOG_TEXT=$(cat changelog_temp.md)
+          echo "📏 Tamanho original: $(echo "$CHANGELOG_TEXT" | wc -c) bytes"
 
-          # Divide o changelog em blocos de 950 caracteres
-          echo "$CHANGELOG_TEXT" | fold -w 950 > changelog_parts.txt
+          # Divide o texto em partes de ~900 caracteres reais
+          echo "$CHANGELOG_TEXT" | awk '
+            BEGIN { part=1; count=0 }
+            {
+              len=length($0)+1
+              if (count+len>900) { part++; count=0 }
+              file=sprintf("changelog_part_%03d.txt", part)
+              print $0 >> file
+              count+=len
+            }'
 
-          i=0
-          while IFS= read -r chunk; do
-            i=$((i+1))
-            if [ $i -eq 1 ]; then
-              TITLE="🧙 Lyra toca sua harpa e anuncia: nova versão $VERSION publicada! (Parte $i)"
+          total_parts=$(ls changelog_part_*.txt | wc -l)
+          echo "📚 Total de partes a enviar: $total_parts"
+
+          part_count=0
+          for FILE in changelog_part_*.txt; do
+            part_count=$((part_count+1))
+            CHUNK=$(cat "$FILE")
+            SIZE=$(echo "$CHUNK" | wc -c)
+
+            echo -e "\033[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+            echo -e "📦 Parte $part_count / $total_parts — Tamanho: ${SIZE} bytes"
+            echo -e "\033[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+
+            if [ $part_count -eq 1 ]; then
+              INTRO="🎶 *Lyra toca sua harpa e anuncia a nova versão...* ✨"
             else
-              TITLE="🧙 Nova versão $VERSION publicada! (Parte $i)"
+              INTRO=""
             fi
 
             PAYLOAD=$(jq -n \
@@ -116,21 +134,25 @@ jobs:
               --arg actor "$ACTOR" \
               --arg date "$DATE" \
               --arg sha "$SHA" \
-              --arg part "$chunk" \
-              --arg title "$TITLE" \
+              --arg part "$CHUNK" \
+              --arg partnum "$part_count" \
+              --arg total "$total_parts" \
+              --arg intro "$INTRO" \
               '
               {
                 "username": $username,
                 "avatar_url": $avatar,
+                "content": $intro,
                 "embeds": [
                   {
-                    "title": $title,
+                    "title": ("🧙 Nova versão \($version) publicada! (Parte " + $partnum + " de " + $total + ")"),
                     "color": 11259375,
                     "fields": [
                       { "name": "📦 Repositório", "value": ("[\($repo)](https://github.com/\($repo))"), "inline": true },
                       { "name": "👤 Autor", "value": $actor, "inline": true },
                       { "name": "🕐 Data", "value": $date, "inline": false },
-                      { "name": "🪶 Changelog", "value": ("```md\n" + $part + "\n```"), "inline": false }
+                      { "name": "🪶 Changelog", "value": ("```md\n" + $part + "\n```"), "inline": false },
+                      { "name": "🧩 Debug Info", "value": ("Parte: " + $partnum + " / " + $total + " | Tamanho: " + ($part|length|tostring) + " chars"), "inline": false }
                     ],
                     "thumbnail": { "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png" },
                     "footer": { "text": "Lyra the Wise • Build automático do GitHub Actions" },
@@ -139,23 +161,27 @@ jobs:
                 ]
               }')
 
-            echo "📦 Enviando parte $i..."
-            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
+            echo "🔍 Pré-visualização do payload (primeiras 25 linhas):"
+            echo "$PAYLOAD" | head -n 25
+
+            echo "🚀 Enviando para Discord..."
+            RESPONSE=$(curl -v -s -o response.txt -w "%{http_code}" \
               -X POST -H "Content-Type: application/json" \
               -d "$PAYLOAD" "$WEBHOOK")
 
-            echo "📨 HTTP: $RESPONSE"
-            if [ "$RESPONSE" -ne 204 ]; then
-              echo "❌ Erro ao enviar parte $i:"
-              cat response.txt
-            else
-              echo "✅ Parte $i enviada com sucesso!"
-            fi
+            echo "📨 Código HTTP retornado: $RESPONSE"
+            echo "📜 Resposta do Discord:"
+            cat response.txt || echo "(sem resposta)"
 
+            if [ "$RESPONSE" -eq 204 ]; then
+              echo -e "\033[32m✅ Parte $part_count enviada com sucesso!\033[0m"
+            else
+              echo -e "\033[31m❌ Erro ao enviar parte $part_count (HTTP $RESPONSE)\033[0m"
+            fi
             sleep 2
           done
 
-          echo "✅ Todas as partes do changelog foram publicadas no Discord!"
+          echo -e "\033[32m✅ Todas as partes do changelog foram processadas!\033[0m"
 
       # 7️⃣ Confirmação final
       - name: Confirmar publicação
