@@ -42,7 +42,7 @@
 
 ### 🎲 Sistema de Rolagens Interativo
 
-Quando a IA solicita rolagens, aparecem **3 botões**:
+Quando a IA solicita rolagens, há **3 botões**:
 
 ```
 ┌──────────────────────────────────┐
