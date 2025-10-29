@@ -16,7 +16,6 @@
 - [Features Principais](#-features-principais)
 - [Instalação](#-instalação)
 - [Guia Rápido](#-guia-rápido)
-- [Comandos](#-comandos)
 - [Sistema de Rolagens](#-sistema-de-rolagens)
 - [Estilos Narrativos](#-estilos-narrativos)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
@@ -605,7 +604,7 @@ R: Sim, mantém 20 últimas interações no contexto.
 
 ## 📞 Suporte
 
-- 📧 Email: [leonardo.dc.work@gmail.com]
+- 📧 Email: [Gmail](leonardo.dc.work@gmail.com)
 - 💬 Discord: [Taverna](https://discord.gg/SdWnWJ6w)
 - 🐛 Issues: [GitHub Issues](https://github.com/Leosdc/lyra-the-wise/issues)
 
