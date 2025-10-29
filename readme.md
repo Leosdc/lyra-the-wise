@@ -1,277 +1,474 @@
-# 🎲 Lyra, the Wise
+# 🎲 Lyra the Wise - Sistema de Sessões de RPG
 
-Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**, **IA integrada (Lyra, the Wise)** e **sessões privadas com narrativa contínua**.
+> **Sistema completo de sessões privadas de RPG com IA, rolagens interativas e narrativa adaptativa**
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.3-purple.svg)
-
-## 🆕 Atualização — Versão 2.5.0 (2025-10-26)
-
-### 🗂️ Estruturas de Fichas Expandidas
-- **9 sistemas com estruturas completas de fichas**:
-  - D&D 5e, Pathfinder 2e, Call of Cthulhu 7e
-  - Vampire: The Masquerade V5, Shadowrun 5e/6e
-  - FATE Core, Dungeon World, Blades in the Dark, Numenera
-- Cada sistema possui **campos específicos e autênticos** baseados nas fichas oficiais
-- Estruturas totalmente integradas ao sistema de criação com IA
-- Sistema genérico como fallback para sistemas não mapeados (ainda suporta todos os 50+ sistemas)
-
-### 🎯 Comando `!ficha` Totalmente Reformulado
-- Agora cria fichas **estruturadas por padrão** (não mais formato legado)
-- Prompt dinâmico adaptado à estrutura de cada sistema
-- Geração automática de exemplo JSON baseado nos campos definidos
-- Parser robusto com fallback inteligente por sistema
-- **Experiência idêntica para qualquer sistema** - escalável e consistente
-
-### 🧠 IA Mais Inteligente
-- Prompts específicos por sistema para preenchimento correto
-- Validação automática de campos obrigatórios
-- Cálculos corretos de valores derivados (HP, CA, iniciativa, Sanidade, etc)
-- História e background mais ricos e coerentes com o sistema
-
-### 🔧 Arquitetura Escalável
-- Nova função `get_estrutura_ficha()` em `sistemas_rpg.py`
-- Dicionário `ESTRUTURAS_FICHAS` centralizando todas as estruturas
-- **Fácil adicionar novos sistemas** - basta adicionar entrada no dicionário
-- Separação clara entre dados (sistemas_rpg.py) e lógica (fichas_estruturadas.py)
-
-### 📋 Exemplo de Estruturas
-```python
-# D&D 5e
-Seções: Básico, Atributos, Recursos, Combate, Perícias, 
-        Equipamento, Magia, História
-Campos: 40+ campos específicos de D&D
-
-# Call of Cthulhu
-Seções: Básico, Características, Recursos, Combate, 
-        Perícias, Equipamento, História
-Campos: FOR, CON, TAM, DES, INT, POD, EDU, SOR, Sanidade, etc
-
-# Vampire V5
-Seções: Básico, Atributos, Habilidades, Recursos, 
-        Disciplinas, Vantagens, História
-Campos: Humanidade, Fome, Potência do Sangue, Convicções, etc
-```
+![Version](https://img.shields.io/badge/Version-v2.5.4-purple.svg)
 
 ---
 
-## 🎙️ **Sistema de Canais de Voz Integrado** (v2.5.1)
+## 📖 Índice
 
-Lyra agora gerencia automaticamente canais de voz durante as sessões!
-
-### Funcionalidades:
-- ✅ **Criação Automática** - Canal de voz privado criado junto com o canal de texto
-- ✅ **Movimentação Inteligente** - Jogadores são movidos automaticamente se já estiverem em voz
-- ✅ **Desmute Automático** - Todos são desmutados ao entrar no canal da sessão
-- ⚠️ **Avisos Contextuais** - Notificação clara para quem precisa entrar manualmente
-- 🔄 **Retorno Seguro** - Ao encerrar, todos voltam para "⚜️Torre da Maga"
-- 🗑️ **Limpeza Completa** - Canais de texto e voz excluídos simultaneamente
-
-### Como Funciona:
-1. Mestre usa `!iniciarsessao @jogador1 @jogador2`
-2. Lyra cria canal de **texto** (`sessao-mestre`) e **voz** (`🎙️ sessao-mestre`)
-3. Jogadores conectados em qualquer canal de voz são **movidos automaticamente**
-4. Jogadores offline/desconectados recebem **aviso para entrar manualmente**
-5. Ao clicar **"🚪 Encerrar Sessão"**, todos retornam para a Torre da Maga
-6. Ambos os canais são deletados automaticamente
+- [Visão Geral](#-visão-geral)
+- [Features Principais](#-features-principais)
+- [Instalação](#-instalação)
+- [Guia Rápido](#-guia-rápido)
+- [Comandos](#-comandos)
+- [Sistema de Rolagens](#-sistema-de-rolagens)
+- [Estilos Narrativos](#-estilos-narrativos)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Exemplos de Uso](#-exemplos-de-uso)
+- [FAQ](#-faq)
+- [Contribuindo](#-contribuindo)
 
 ---
 
-## ✨ Recursos Principais
+## 🌟 Visão Geral
 
-- 🤖 **IA Integrada (Lyra, the Wise)** — Gera fichas, NPCs, monstros e narrativas com **Groq (Llama 3.3 70B)**
-- 🎮 **50+ Sistemas** — D&D, Pathfinder, Call of Cthulhu, Shadowrun, Vampire e mais
-- 🗂️ **9 Sistemas com Fichas Completas** — Estruturas autênticas baseadas em fichas oficiais
-- 🔐 **Sessões Privadas** — Canais isolados com gerenciamento de fichas e botões interativos
-- 📖 **Sistema de Estilo Narrativo** — Escolha entre **Narrativa Extensa** ou **Concisa**
-- 🎭 **Narrativa Contínua** — Sistema `!acao` e `!cenanarrada` com IA contextual
-- 🎯 **Sistema por Usuário** — Cada jogador define o próprio sistema
-- 👹 **Banco de Monstros** — Dados prontos de múltiplos sistemas
-- 🎲 **Sistema de Dados** — Suporte a rolagens complexas (4d6k3, vantagem, etc)
-- 💾 **Persistência** — Auto-save e backup automáticos
-- 🔄 **Conversão de Fichas** — Migre fichas entre sistemas diferentes
+**Lyra the Wise** é um bot de Discord que transforma seu servidor em uma mesa de RPG completa, com:
+
+- 🤖 **IA Narrativa** - Groq AI gera histórias dinâmicas e contextuais
+- 🎲 **Rolagens Interativas** - Sistema de botões para rolagens colaborativas
+- 🎭 **Narrativa Adaptativa** - Escolha entre estilo extenso ou conciso
+- 🎙️ **Voz Automática** - Canais de voz criados e gerenciados automaticamente
+- 📊 **Gestão Completa** - Fichas, iniciativa, histórico e muito mais
+- 🔒 **Sessões Privadas** - Canais exclusivos para cada grupo
 
 ---
 
-## 🎨 **Sistema de Estilo Narrativo**
+## ✨ Features Principais
 
-Ao iniciar uma aventura, o mestre pode escolher como Lyra contará a história:
+### 🎲 Sistema de Rolagens Interativo
 
-### 📖 **Narrativa Extensa**
-- **3-5 parágrafos detalhados**
-- **Descrições ricas e imersivas**
-- Uso dos 5 sentidos e atmosfera profunda
-- **Ideal para:** Roleplay, exploração, drama narrativo
-- **Tokens:** 1200-1500 por resposta
+Quando a IA solicita rolagens, aparecem **3 botões**:
 
-### 📝 **Narrativa Concisa**
-- **1-2 parágrafos objetivos**
-- **Foco em ação e progressão**
-- Direto ao ponto, sem perder qualidade
-- **Ideal para:** Combate, ritmo acelerado, sessões rápidas
-- **Tokens:** 600-800 por resposta
+```
+┌─────────────────────────────────────────┐
+│  🎲 Rolar Dados  │  🚫 Não Fazer Nada  |
+└─────────────────────────────────────────┘
+```
+
+- **🎲 Rolar Dados**: Executa o teste solicitado
+- **🚫 Não Fazer Nada**: Cancela ação, IA continua narrativa naturalmente
+- **✏️ Outra Ação**: Permite descrever ação alternativa com `!acao`
+
+O sistema **aguarda TODOS** os jogadores rolarem antes de continuar!
+
+### 🎭 Estilos Narrativos
+
+Escolha como Lyra conta a história:
+
+#### 📖 Narrativa Extensa
+```
+✓ 3-5 parágrafos detalhados
+✓ Descrições ricas dos 5 sentidos
+✓ Atmosfera cinematográfica
+✓ Profundidade emocional
+✓ Ideal para: Roleplay, exploração, investigação
+```
+
+#### 📝 Narrativa Concisa
+```
+✓ 1-2 parágrafos curtos (4-5 frases)
+✓ Foco em ação e essencial
+✓ Narrativa ágil e dinâmica
+✓ Respostas mais rápidas
+✓ Ideal para: Combate, dungeons, sessões rápidas
+```
+
+### 🎙️ Canais de Voz Automáticos
+
+- ✅ **Criação Automática**: Canal de voz junto com texto
+- ✅ **Move Jogadores**: Transfere todos automaticamente
+- ✅ **Desmuta**: Remove mute/deafen de todos
+- ✅ **Encerramento**: Move para "Torre da Maga" e apaga canais
+
+### ⚔️ Sistema de Iniciativa
+
+Botão exclusivo do **mestre** para rolar iniciativa de todos:
+
+```
+⚔️ Ordem de Iniciativa:
+🥇 Elara → 22
+🥈 Thorin → 18
+🥉 Goblin Líder → 15
+4. Kael → 12
+```
+
+### 📊 Gestão Completa
+
+- **Fichas**: Sistema integrado com validação
+- **Histórico**: 20 últimas interações salvas
+- **Status**: Acompanhamento em tempo real
+- **Resumos**: IA gera resumo narrativo da sessão
 
 ---
 
-## 📋 **Sistemas com Estruturas Completas**
-
-### 🎲 Sistemas Totalmente Mapeados (9 sistemas)
-1. **D&D 5ª Edição** - 40+ campos específicos, 18 perícias, sistema de magia completo
-2. **Pathfinder 2ª Edição** - Ancestralidade, Heritage, sistema de 3 ações
-3. **Call of Cthulhu 7ª Edição** - 9 características, sistema de sanidade
-4. **Vampire: The Masquerade V5** - Disciplinas, Humanidade, Fome
-5. **Shadowrun 5e/6e** - Cyberware, Magia, Ressonância, Matriz
-6. **FATE Core** - Aspectos, Façanhas, Pontos de Destino
-7. **Dungeon World** - Movimentos, Vínculos, sistema PbtA
-8. **Blades in the Dark** - Ações, Estresse, Trauma, Crew
-9. **Numenera** - Pools (Might/Speed/Intellect), Cyphers, Esforço
-
-### 🔮 Sistemas Suportados com Estrutura Genérica (41+ sistemas)
-Todos os outros sistemas do bot possuem estrutura genérica funcional e serão expandidos no futuro:
-- D&D 3.5, Pathfinder 1e, 13th Age
-- Chronicles of Darkness, Werewolf, Mage
-- Cyberpunk 2020/RED, Eclipse Phase, Star Trek, Star Wars
-- Warhammer Fantasy (1e/4e), GURPS, FATE Accelerated, Savage Worlds
-- Apocalypse World, Monster of the Week, 7th Sea, Shadow of the Demon Lord
-- Mutants & Masterminds, Champions, Marvel FASERIP
-- E mais 20+ sistemas
-
----
-
-## 📋 **Comandos Principais**
-
-### ⚙️ Configuração
-```
-!sistema - Ver seu sistema atual
-!sistema <código> - Mudar sistema pessoal
-!sistemas - Lista todos os sistemas
-!buscarsistema <nome> - Buscar sistemas
-!infosistema <código> - Detalhes do sistema
-```
-
-### 🎲 Dados & Iniciativa
-```
-!rolar 1d20
-!rolar 2d6+3
-!iniciativa
-```
-
-### 👤 Fichas & Personagens
-```
-!ficha <nome> - Criação rápida estruturada
-!criarficha - Modo interativo com 8 perguntas
-!verficha <nome> - Ver com navegação por páginas
-!editarficha <nome> - Editor interativo
-!converterficha <sistema> <nome> - Converte entre sistemas
-!minhasfichas [sistema] - Lista suas fichas
-!exportarficha <nome> - Exporta como JSON
-```
-
-### 🎮 Sessões de RPG
-```
-!iniciarsessao @jog1 @jog2
-!selecionarficha <nome>
-!sessoes
-!infosessao
-!cenanarrada <descrição>
-!acao <descrição>
-```
-
-### ✨ Geração de Conteúdo
-```
-!npc <descrição>
-!vilao <tipo>
-!item <tipo>
-!tesouro <nível>
-!puzzle <tema>
-!monstro <nome>
-!cena <descrição>
-```
-
-### 📖 História & Campanha
-```
-!mestre <pergunta>
-!plot <tema>
-!sessao <tema>
-!regra <dúvida>
-```
-
----
-
-## 🚀 **Instalação e Configuração**
+## 🚀 Instalação
 
 ### Pré-requisitos
-- Python 3.10+
-- Conta Discord Developer (bot token)
-- Chave API do Groq
 
-### Passo a Passo
+```bash
+Python 3.11+
+discord.py 2.3+
+Groq API Key
+```
 
-1. **Clone o repositório:**
+### Setup
+
+1. **Clone o repositório**
 ```bash
 git clone https://github.com/Leosdc/lyra-the-wise.git
 cd lyra-the-wise
 ```
 
-2. **Instale as dependências:**
+2. **Instale dependências**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Configure as variáveis de ambiente:**
-
-Crie um arquivo `.env` na raiz do projeto:
-```env
-DISCORD_BOT_TOKEN=seu_token_discord_aqui
-GROQ_API_KEY=sua_chave_groq_aqui
+3. **Configure variáveis de ambiente**
+```bash
+DISCORD_TOKEN=seu_token_aqui
+GROQ_API_KEY=sua_chave_aqui
 ```
 
-4. **Execute o bot:**
+4. **Execute o bot**
 ```bash
 python main.py
 ```
 
-5. **Convide o bot para seu servidor:**
-- Acesse o Discord Developer Portal
-- Copie o link de convite com permissões de:
-  - Gerenciar Canais
-  - Ler/Enviar Mensagens
-  - Adicionar Reações
-  - Usar Comandos
+---
+
+## 🎮 Guia Rápido
+
+### 1️⃣ Criando uma Sessão
+
+```bash
+!iniciarsessao @Jogador1 @Jogador2 @Jogador3
+```
+
+**O que acontece:**
+- ✅ Canal de texto privado criado
+- ✅ Canal de voz privado criado
+- ✅ Todos movidos automaticamente
+- ✅ Botões de controle aparecem
+- ✅ Fichas de cada jogador listadas
+
+### 2️⃣ Selecionando Fichas
+
+```bash
+!selecionarficha Elara Corações de Cristal
+```
+
+**Sistema notifica:**
+```
+✅ Ficha Elara Corações de Cristal selecionada!
+⏳ Aguardando 2 jogadores selecionarem ficha...
+```
+
+Quando todos selecionarem:
+```
+🎉 Todos os jogadores selecionaram suas fichas! O mestre pode iniciar a aventura.
+```
+
+### 3️⃣ Iniciando a Aventura
+
+**Mestre clica:** `🎬 Iniciar Aventura`
+
+**Escolhe estilo:**
+- 📖 Narrativa Extensa
+- 📝 Narrativa Concisa
+
+**IA gera introdução épica!**
+
+### 4️⃣ Durante a Sessão
+
+**Jogadores descrevem ações:**
+```bash
+!acao examino a porta procurando armadilhas
+```
+
+**Mestre narra cenas:**
+```bash
+!cenanarrada um dragão pousa no topo da torre
+```
+
+**IA detecta quando precisa rolagens:**
+```
+🎲 Rolagem Necessária!
+Tipo: 1d20+Percepção
+Jogadores: @Elara, @Thorin
+
+[Botões aparecem: 🎲 Rolar | 🚫 Não Fazer ]
+```
+
+### 5️⃣ Combate
+
+**Mestre clica:** `⚔️ Rolar Iniciativa`
+
+```
+⚔️ Iniciativa Rolada!
+🥇 Elara → 22
+🥈 Thorin → 18
+🥉 Goblin → 12
+```
+
+Jogadores agem na ordem com `!acao`
+
+### 6️⃣ Encerrando
+
+**Mestre clica:** `🚪 Encerrar Sessão`
+
+- ✅ Jogadores movidos para Torre da Maga
+- ✅ Canais de voz e texto apagados
+- ✅ Dados salvos
 
 ---
 
-## 🎯 **Fluxo Completo de uma Sessão**
+## 🎲 Sistema de Rolagens
 
-1. **Preparação:**
-   - Mestre: `!sistema dnd5e` (configura sistema)
-   - Jogadores: `!criarficha` ou `!ficha <nome>` (criam personagens)
+### Como Funciona
 
-2. **Criação da Sessão:**
-   - Mestre: `!iniciarsessao @Jogador1 @Jogador2`
-   - Bot cria canal privado automaticamente
+1. **IA Detecta Necessidade**
+   - Jogador usa `!acao ataco o goblin`
+   - IA analisa e detecta necessidade de rolagem
+   - Solicita com tag especial: `[ROLL: 1d20+3, Elara]`
 
-3. **Seleção de Fichas:**
-   - Cada jogador: `!selecionarficha NomePersonagem`
-   - Bot lista fichas disponíveis automaticamente
+2. **Sistema Exibe Botões**
+   ```
+   🎲 Rolagem Necessária!
+   Tipo: 1d20+3
+   Jogadores: @Elara
+   
+   [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
+   ```
 
-4. **Início da Aventura:**
-   - Mestre clica no botão **"🎬 Iniciar Aventura"**
-   - Escolhe estilo (Extensa ou Concisa)
-   - Lyra gera introdução épica personalizada
+3. **Jogadores Escolhem**
+   - **Rolar**: Executa teste
+   - **Não Fazer**: IA narra sem teste
+   - **Outra Ação**: Usa `!acao` novamente
 
-5. **Durante o Jogo:**
-   - Jogadores: `!acao escalo a parede`
-   - Mestre: `!cenanarrada dragão pousa na torre`
-   - Bot gera narrativa no estilo escolhido
-   - Sistema de rolagens interativas (quando solicitado)
+4. **Sistema Aguarda Todos**
+   ```
+   ✅ Elara rolou: 1d20+3 = 18
+   ⏳ Aguardando 1 jogador rolar...
+   ```
 
-6. **Encerramento:**
-   - Mestre: `!resumosessao` (gera resumo com IA)
-   - Mestre clica **"🚪 Encerrar Sessão"**
+5. **Resumo e Continuação**
+   ```
+   📊 Todas as Rolagens Concluídas!
+   • Elara: 18
+   • Thorin: 12
+   
+   ✨ A história continua...
+   ```
+
+6. **IA Narra Resultado**
+   - Considera todos os valores
+   - Narra consequências
+   - Continua história
+
+### Tipos de Rolagem Suportados
+
+```
+1d20        # D20 básico
+1d20+5      # Com modificador
+2d6         # Múltiplos dados
+1d100       # Percentil
+3d6+2       # Combinações
+```
+
+### Alvos de Rolagem
+
+```
+[ROLL: 1d20, todos]           # Todos jogadores
+[ROLL: 1d20, Elara]           # Personagem específico
+[ROLL: 1d20, Elara, Thorin]   # Múltiplos personagens
+```
+
+---
+
+## 🎭 Estilos Narrativos
+
+#### 📖 Narrativa Extensa
+
+```
+A porta de carvalho range suavemente sob seus dedos enquanto 
+você a empurra. O cheiro de mofo e velas apagadas invade suas 
+narinas, misturado com algo metálico - sangue, talvez. Suas 
+botas afundam no tapete empoeirado, cada passo levantando 
+pequenas nuvens que dançam na luz fraca da sua tocha.
+
+As sombras se contorcem nas paredes de pedra, projetadas por 
+relevos que retratam batalhas esquecidas. Você pode quase ouvir 
+os gritos dos guerreiros, sentir o peso das espadas que nunca 
+mais serão empunhadas. No centro da sala, uma mesa circular 
+aguarda, coberta por um mapa amarelado cujas bordas se desfazem 
+ao toque.
+
+Ao se aproximar, você nota marcas recentes na poeira - pegadas. 
+Alguém esteve aqui, e não faz muito tempo...
+```
+
+#### 📝 Narrativa Concisa
+
+```
+Você empurra a porta. O cômodo está escuro, cheira a mofo e 
+sangue velho. No centro, uma mesa com mapa antigo. Pegadas 
+recentes na poeira - alguém passou aqui há pouco.
+```
+
+### Quando Usar Cada Uma?
+
+**Use Extensa quando:**
+- ✅ Sessão focada em roleplay
+- ✅ Explorando locais importantes
+- ✅ Desenvolvendo NPCs
+- ✅ Investigação e mistério
+- ✅ Momentos dramáticos
+
+**Use Concisa quando:**
+- ✅ Combate intenso
+- ✅ Dungeon crawling
+- ✅ Sessões curtas (2-3h)
+- ✅ Grupo grande (5+ jogadores)
+- ✅ Foco em mecânicas
+
+---
+
+## 💡 Exemplos de Uso
+
+### Exemplo Completo: Sessão de D&D 5e
+
+```bash
+# 1. MESTRE CRIA SESSÃO
+!iniciarsessao @Alice @Bob @Carol
+
+# ✅ Canais criados
+# ✅ Todos movidos para voz
+# ✅ Fichas listadas
+
+# 2. JOGADORES SELECIONAM FICHAS
+[Alice] !selecionarficha Elara Corações de Cristal
+[Bob] !selecionarficha Thorin Martelo de Ferro
+[Carol] !selecionarficha Kael Sombra Noturna
+
+# 🎉 Todos os jogadores selecionaram suas fichas!
+
+# 3. MESTRE INICIA AVENTURA
+[Mestre clica: 🎬 Iniciar Aventura]
+[Escolhe: 📖 Narrativa Extensa]
+
+# IA GERA INTRODUÇÃO:
+"""
+A taverna do Dragão Vermelho está lotada esta noite. O cheiro 
+de cerveja maltada mistura-se com fumaça de tabaco enquanto 
+aventureiros de todos os cantos do reino trocam histórias de 
+suas façanhas...
+"""
+
+# 4. JOGADORES AGEM
+[Alice] !acao me aproximo do taverneiro e pergunto sobre rumores
+
+# IA RESPONDE:
+"""
+O taverneiro, um anão de barba grisalha, limpa um copo enquanto 
+te analisa com olhos experientes. "Rumores?" ele resmunga. 
+"Tenho algo melhor que rumores, jovem. Tenho um trabalho."
+
+Ele se inclina, baixando a voz. "Há uma caravana que precisa 
+de escolta até Forte Névoa. Pagam bem, mas o caminho... 
+digamos que não é dos mais seguros."
+
+[ROLL: 1d20+Percepção, Elara]
+"""
+
+# BOTÕES APARECEM:
+# [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
+
+[Alice clica: 🎲 Rolar Dados]
+
+# SISTEMA ROLA:
+"""
+🎲 Elara rolou: 1d20+3 = 18
+
+📊 Todas as Rolagens Concluídas!
+• Elara: 18
+"""
+
+# IA CONTINUA:
+"""
+Com sua percepção aguçada, você nota que o taverneiro está 
+nervoso. Suas mãos tremem ligeiramente e seus olhos desviam 
+para a janela a cada poucos segundos, como se esperasse algo...
+"""
+
+# 5. COMBATE ACONTECE
+[Mestre] !cenanarrada goblins invadem a taverna
+
+# IA EXPANDE:
+"""
+O vidro da janela se estilhaça em mil pedaços! Três goblins 
+saltam para dentro, brandindo adagas enferrujadas e gritando 
+em sua língua gutural. O taverneiro grita e mergulha atrás 
+do balcão...
+"""
+
+[Mestre clica: ⚔️ Rolar Iniciativa]
+
+# SISTEMA ROLA:
+"""
+⚔️ Iniciativa Rolada!
+🥇 Elara → 22
+🥈 Thorin → 18
+🥉 Kael → 15
+4. Goblin 1 → 12
+5. Goblin 2 → 8
+6. Goblin 3 → 5
+"""
+
+# JOGADORES AGEM NA ORDEM
+[Alice] !acao disparo uma flecha no goblin mais próximo
+[Bob] !acao avanço com meu martelo de guerra
+[Carol] !acao lanço Raio de Gelo
+
+# ... combate continua ...
+
+# 6. FINAL DA SESSÃO
+[Mestre clica: 🚪 Encerrar Sessão]
+
+# ✅ Jogadores movidos para Torre da Maga
+# ✅ Canais apagados
+# ✅ Sessão salva
+```
+
+### Exemplo: Sessão Concisa (Dungeon Crawl)
+
+```bash
+# MESTRE ESCOLHE NARRATIVA CONCISA
+
+[Mestre] !cenanarrada vocês entram na sala
+
+# IA (CONCISA):
+"""
+Sala circular, 20 pés de diâmetro. Três portas - norte, 
+leste, oeste. Cheiro de mofo. Pegadas recentes na poeira.
+"""
+
+[Alice] !acao examino as pegadas
+
+# IA (CONCISA):
+"""
+Pegadas de humanoides, tamanho médio, 4-6 indivíduos. 
+Levam à porta norte. Recentes - últimas horas.
+"""
+
+# RÁPIDO E DIRETO!
+```
 
 ---
 
@@ -295,12 +492,122 @@ lyra-the-wise/
 │   ├── fichas_personagens.json
 │   ├── sistemas_usuarios.json
 │   └── sessoes_ativas.json
+├── commands/
+│   ├── sessoes_acao.py
+│   └── sessoes_commands.py
+│   └── __init__.py
+├── core/
+│   ├── sessao_helpers.py
+│   └── __init__.py
+├── views/
+│   ├── sessao_views.py
+│   └── __init__.py
 ├── .env                      # Variáveis de ambiente
 ├── requirements.txt          # Dependências Python
 ├── LICENSE                   # Licença MIT
 ├── README.md                 # Este arquivo
 └── changelog.md              # Histórico de mudanças
 ```
+
+---
+
+## ❓ FAQ
+
+### Perguntas Gerais
+
+**P: Quantos jogadores por sessão?**  
+R: Recomendado 3-6 jogadores. Tecnicamente suporta até 20, mas fica lento.
+
+**P: Posso ter múltiplas sessões simultâneas?**  
+R: Sim! Cada sessão é independente com seus próprios canais.
+
+**P: As sessões são salvas?**  
+R: Sim, automaticamente a cada 5 minutos e ao encerrar.
+
+**P: Posso retomar uma sessão pausada?**  
+R: Sim, use `!pausarsessao` novamente para retomar.
+
+### Problemas Comuns
+
+**P: "Erro ao processar rolagem"**  
+R: A IA está usando formato inválido. Isso foi corrigido na v2.5.4. Atualize
+
+**P: Botões não aparecem**  
+R: Verifique se o bot tem permissão de "Usar Botões" no canal.
+
+**P: "Sessão não encontrada"**  
+R: Use o comando dentro do canal da sessão, não no canal geral.
+
+**P: Fichas não aparecem ao selecionar**  
+R: Verifique se a ficha tem nome, sistema E conteúdo preenchidos.
+
+### Sistemas de RPG
+
+**P: Quais sistemas são suportados?**  
+R: D&D 5e, Call of Cthulhu, Vampire, Shadowrun, FATE, PBtA, Ordem Paranormal, Tormenta20, 3D&T, Old Dragon e mais.
+
+**P: Como mudar o sistema da sessão?**  
+R: O sistema é definido pelo mestre com `!sistema <código>` ANTES de criar a sessão.
+
+**P: Posso criar meu próprio sistema?**  
+R: Sim! Edite `sistemas_rpg.py` e adicione as regras.
+
+### IA e Narrativa
+
+**P: A IA pode quebrar o jogo?**  
+R: Ela segue as regras do sistema configurado. Mestres podem corrigir com `!cenanarrada`.
+
+**P: Posso mudar o estilo durante a sessão?**  
+R: Não diretamente. Você precisa criar nova sessão. Use `!pausarsessao` e recrie.
+
+**P: A IA lembra de eventos anteriores?**  
+R: Sim, mantém 20 últimas interações no contexto.
+
+---
+
+## 🤝 Contribuindo
+
+### Como Contribuir
+
+1. **Fork o projeto**
+2. **Crie uma branch** (`git checkout -b feature/MinhaFeature`)
+3. **Commit suas mudanças** (`git commit -m 'Add MinhaFeature'`)
+4. **Push para a branch** (`git push origin feature/MinhaFeature`)
+5. **Abra um Pull Request**
+
+### Diretrizes
+
+- ✅ Mantenha a modularização
+- ✅ Adicione docstrings
+- ✅ Teste todas as features
+- ✅ Atualize CHANGELOG.md
+- ✅ Siga PEP 8
+
+### Áreas para Contribuir
+
+- 🐛 Reportar bugs
+- 💡 Sugerir features
+- 📖 Melhorar documentação
+- 🌍 Traduzir para outros idiomas
+- 🎨 Melhorar UI/UX
+- 🧪 Adicionar testes
+
+---
+
+## 🙏 Agradecimentos
+
+- **Discord.py** - Framework incrível
+- **Groq** - IA rápida e poderosa
+- **Comunidade RPG** - Feedback e ideias
+- **Contribuidores** - Todos que ajudaram
+
+---
+
+## 📞 Suporte
+
+- 📧 Email: [leonardo.dc.work@gmail.com]
+- 💬 Discord: [Taverna](https://discord.gg/SdWnWJ6w)
+- 🐛 Issues: [GitHub Issues](https://github.com/Leosdc/lyra-the-wise/issues)
 
 ---
 
@@ -454,56 +761,6 @@ lyra-the-wise/
 
 ---
 
-## 🤝 **Contribuindo**
+**Feito com ❤️ pela comunidade RPG**
 
-Contribuições são bem-vindas! Para contribuir:
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/NovaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona NovaFeature'`)
-4. Push para a branch (`git push origin feature/NovaFeature`)
-5. Abra um Pull Request
-
-**Diretrizes:**
-- Siga o estilo de código existente
-- Adicione testes quando aplicável
-- Atualize a documentação conforme necessário
-- Seja descritivo nos commits
-
-**Especialmente bem-vindos:**
-- Novas estruturas de fichas para sistemas não mapeados
-- Melhorias nos prompts de IA
-- Traduções da documentação
-- Correções de bugs
-
----
-
-## 👨‍💻 Autor
-
-**Leonardo (Leosdc_)**  
-- Discord: `Leosdc_`  
-- Canal do Discord: [Taverna](https://discord.gg/SdWnWJ6w)
-- GitHub: [@Leosdc](https://github.com/Leosdc)
-
----
-
-## 🙏 **Agradecimentos**
-
-- **Groq** — pela API de IA incrível
-- **Discord.py** — pela biblioteca robusta
-- **Comunidade de RPG** — pela inspiração e feedback
-- **Contribuidores** — por ajudarem a expandir as estruturas de fichas
-
----
-
-## ☕ **Apoie o Projeto**
-
-Se este bot te ajudou ou você simplesmente quer apoiar o desenvolvimento:
-
-⭐ **Dê uma estrela no GitHub!**  
-☕ **[Compre um café para mim](https://ko-fi.com/leosdc)**  
-💬 **Entre no nosso Discord**: [Taverna](https://discord.gg/SdWnWJ6w)
-
----
-
-**Feito com ❤️ para a comunidade de RPG de mesa** 🎲
+*Transformando Discord em mesas de RPG épicas desde 2025*
