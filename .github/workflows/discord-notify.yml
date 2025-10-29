@@ -1,84 +1,154 @@
-      # 6️⃣ Enviar embed com log detalhado e debug do payload
-      - name: Enviar notificação ao Discord
+name: 🤖 Auto Version & Discord Embed (Lyra Stable Final)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  auto_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      # 2️⃣ Detectar número de versão no commit
+      - name: Detectar número de versão no commit
+        id: version
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "🧙 Versão detectada: $VERSION"
+          else
+            echo "SKIP=true" >> $GITHUB_ENV
+            echo "⚠️ Nenhum número de versão encontrado no commit."
+          fi
+
+      # 3️⃣ Atualizar badge de versão no README
+      - name: Atualizar badge de versão no README
         if: env.SKIP != 'true'
         run: |
-          echo "💬 Preparando payload para o Discord..."
+          sed -i -E "s/Version-[0-9]+\.[0-9]+\.[0-9]+/Version-${VERSION}/" readme.md
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add readme.md
+          git commit -m "🔖 Atualiza badge para ${VERSION}" || true
+          git push || true
+
+      # 4️⃣ Criar tag automática (modo seguro)
+      - name: Criar tag automática (modo seguro)
+        if: env.SKIP != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
+            echo "⚠️ Tag $VERSION já existe. Pulando criação."
+          else
+            git tag $VERSION
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
+          fi
+
+      # 5️⃣ Extrair changelog da última versão
+      - name: Extrair changelog mais recente
+        if: env.SKIP != 'true'
+        run: |
+          echo "🔍 Extraindo changelog da versão mais recente..."
+          awk '
+            /^## \[/ {
+              if (found) exit;
+              found=1; next;
+            }
+            found
+          ' changelog.md > changelog_temp.md
+
+          if [ ! -s changelog_temp.md ]; then
+            echo "⚠️ Nenhum changelog encontrado."
+            echo "Nenhum changelog encontrado." > changelog_temp.md
+          fi
+
+          echo "✅ changelog_temp.md criado:"
+          head -n 15 changelog_temp.md || true
+
+      # 6️⃣ Enviar changelog ao Discord (somente última versão)
+      - name: Enviar changelog mais recente ao Discord
+        if: env.SKIP != 'true'
+        run: |
+          echo "💬 Preparando envio do changelog da última versão..."
 
           VERSION="${{ env.VERSION }}"
           REPO="${{ github.repository }}"
           ACTOR="${{ github.actor }}"
           SHA="${{ github.sha }}"
           DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          WEBHOOK="${{ secrets.DISCORD_WEBHOOK }}"
 
-          # Lê changelog como string literal segura (JSON)
           CHANGELOG=$(jq -Rs . < changelog_temp.md)
+          CHANGELOG_TEXT=$(jq -r . <<< "$CHANGELOG")
+          echo "📏 Tamanho do changelog extraído: $(echo "$CHANGELOG_TEXT" | wc -c) bytes"
 
-          # Monta payload usando jq (com funções auxiliares)
-          PAYLOAD=$(jq -n \
-            --arg username "The Bard" \
-            --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
-            --arg version "$VERSION" \
-            --arg repo "$REPO" \
-            --arg actor "$ACTOR" \
-            --arg date "$DATE" \
-            --arg sha "$SHA" \
-            --arg changelog "$CHANGELOG" \
-            '
-            def chunks(s; n):
-              if (s|length) <= n then [s]
-              else [ s[0:n] ] + chunks(s[n:]; n)
-              end;
+          # Divide o changelog em blocos seguros
+          echo "$CHANGELOG_TEXT" | fold -w 750 > changelog_parts.txt
 
-            def changelog_fields(s):
-              (s | fromjson) as $txt
-              | chunks($txt; 950)
-              | to_entries
-              | map({
-                  "name": ("🪶 Parte " + ((.key + 1)|tostring)),
-                  "value": ("```md\n" + .value + "\n```"),
-                  "inline": false
-                })
-              | .[:22];
+          i=0
+          while IFS= read -r chunk; do
+            i=$((i+1))
 
-            {
-              "username": $username,
-              "avatar_url": $avatar,
-              "embeds": [
-                {
-                  "title": ("🧙 Nova versão \($version) publicada!"),
-                  "color": 11259375,
-                  "fields": (
-                    [
+            PAYLOAD=$(jq -n \
+              --arg username "The Bard" \
+              --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
+              --arg version "$VERSION" \
+              --arg repo "$REPO" \
+              --arg actor "$ACTOR" \
+              --arg date "$DATE" \
+              --arg sha "$SHA" \
+              --arg part "$chunk" \
+              --arg partnum "$i" \
+              '
+              {
+                "username": $username,
+                "avatar_url": $avatar,
+                "embeds": [
+                  {
+                    "title": ("🧙 Nova versão \($version) publicada! (Parte " + $partnum + ")"),
+                    "color": 11259375,
+                    "fields": [
                       { "name": "📦 Repositório", "value": ("[\($repo)](https://github.com/\($repo))"), "inline": true },
-                      { "name": "👤 Autor",       "value": $actor, "inline": true },
-                      { "name": "🕐 Data",        "value": $date,  "inline": false }
-                    ]
-                    +
-                    (changelog_fields($changelog))
-                  ),
-                  "thumbnail": { "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png" },
-                  "footer":    { "text": "Lyra the Wise • Build automático do GitHub Actions" },
-                  "url": ("https://github.com/\($repo)/commit/\($sha)")
-                }
-              ]
-            }')
+                      { "name": "👤 Autor", "value": $actor, "inline": true },
+                      { "name": "🕐 Data", "value": $date, "inline": false },
+                      { "name": "🪶 Changelog", "value": ("```md\n" + $part + "\n```"), "inline": false }
+                    ],
+                    "thumbnail": { "url": "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_icon.png" },
+                    "footer": { "text": "Lyra the Wise • Build automático do GitHub Actions" },
+                    "url": ("https://github.com/\($repo)/commit/\($sha)")
+                  }
+                ]
+              }')
 
-          echo "📦 Payload gerado (pré-envio):"
-          echo "$PAYLOAD" | jq . || echo "⚠️ Falha ao formatar payload com jq."
+            echo "📦 Enviando parte $i..."
+            echo "$PAYLOAD" | jq . || echo "⚠️ Falha ao formatar payload."
 
-          echo "🚀 Enviando payload ao Discord (modo debug)..."
-          RESPONSE=$(curl -v -s -o response.txt -w "%{http_code}" \
-            -X POST -H "Content-Type: application/json" \
-            -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}")
+            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
+              -X POST -H "Content-Type: application/json" \
+              -d "$PAYLOAD" "$WEBHOOK")
 
-          echo "📨 Código HTTP retornado: $RESPONSE"
-          echo "📜 Resposta completa do Discord:"
-          cat response.txt || echo "⚠️ Nenhuma resposta capturada."
+            echo "📨 HTTP: $RESPONSE"
+            cat response.txt || echo "(sem resposta)"
+            sleep 2
+          done
 
-          if [ "$RESPONSE" -eq 204 ]; then
-            echo "✅ Embed enviado com sucesso (HTTP 204 - Sem conteúdo)."
-          elif [ "$RESPONSE" -eq 200 ]; then
-            echo "✅ Mensagem enviada com sucesso (HTTP 200)."
-          else
-            echo "❌ Falha ao enviar embed (HTTP $RESPONSE)."
-          fi
+          echo "✅ Última versão enviada com sucesso!"
+
+      # 7️⃣ Confirmação final
+      - name: Confirmar publicação
+        if: env.SKIP != 'true'
+        run: echo "🎉 Versão ${VERSION} publicada e changelog enviado ao Discord com sucesso!"
