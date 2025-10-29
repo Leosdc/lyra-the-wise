@@ -13,7 +13,7 @@
 ### ✨ Novas Features
 
 #### Sistema de Rolagens Interativo
-- **Botões de Rolagem**: Quando IA solicita dados, aparecem 3 botões:
+- **Botões de Rolagem**: Quando IA solicita dados, aparecem 3 opções:
   - 🎲 Rolar Dados - Executa rolagem solicitada
   - 🚫 Não Fazer Nada - Cancela ação e continua narrativa
   - ✏️ Outra Ação - Permite descrever ação alternativa
