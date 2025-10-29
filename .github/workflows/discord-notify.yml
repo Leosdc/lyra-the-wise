@@ -1,82 +1,4 @@
-name: 🤖 Auto Version & Discord Embed (Lyra Stable Final)
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-jobs:
-  auto_version:
-    runs-on: ubuntu-latest
-
-    steps:
-      # 1️⃣ Checkout
-      - name: Checkout do repositório
-        uses: actions/checkout@v4
-
-      # 2️⃣ Detectar número de versão
-      - name: Detectar número de versão no commit
-        id: version
-        run: |
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if [[ "$COMMIT_MSG" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            VERSION=$(echo "$COMMIT_MSG" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+")
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-          else
-            echo "SKIP=true" >> $GITHUB_ENV
-          fi
-
-      # 3️⃣ Atualizar badge de versão no README
-      - name: Atualizar badge de versão no README
-        if: env.SKIP != 'true'
-        run: |
-          sed -i -E "s/Version-[0-9]+\.[0-9]+\.[0-9]+/Version-${VERSION}/" readme.md
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add readme.md
-          git commit -m "Atualiza badge para ${VERSION}" || true
-          git push || true
-
-      # 4️⃣ Criar tag automática (modo seguro)
-      - name: Criar tag automática (modo seguro)
-        if: env.SKIP != 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
-            echo "⚠️ Tag $VERSION já existe. Pulando criação."
-          else
-            git tag $VERSION
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git $VERSION
-          fi
-
-      # 5️⃣ Extrair changelog e salvar em arquivo seguro
-      - name: Extrair changelog mais recente
-        if: env.SKIP != 'true'
-        run: |
-          echo "🔍 Extraindo changelog mais recente..."
-          awk '
-            /^## / {
-              if (found) exit;
-              found=1; next;
-            }
-            found
-          ' changelog.md > changelog_temp.md
-
-          if [ ! -s changelog_temp.md ]; then
-            echo "Nenhum changelog encontrado." > changelog_temp.md
-          fi
-
-          echo "✅ changelog_temp.md criado com sucesso."
-          head -n 10 changelog_temp.md || true
-
-      # 6️⃣ Enviar embed com divisão automática (interpolação correta no jq)
+      # 6️⃣ Enviar embed com log detalhado e debug do payload
       - name: Enviar notificação ao Discord
         if: env.SKIP != 'true'
         run: |
@@ -91,7 +13,7 @@ jobs:
           # Lê changelog como string literal segura (JSON)
           CHANGELOG=$(jq -Rs . < changelog_temp.md)
 
-          # Monta payload usando interpolação do jq (sem concatenação com '+')
+          # Monta payload usando jq (com funções auxiliares)
           PAYLOAD=$(jq -n \
             --arg username "The Bard" \
             --arg avatar "https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/assets/lyra_avatar.png" \
@@ -108,16 +30,15 @@ jobs:
               end;
 
             def changelog_fields(s):
-              # s vem como string JSON; decodifica para texto
               (s | fromjson) as $txt
-              | chunks($txt; 950)                 # margem para cercas ```md
+              | chunks($txt; 950)
               | to_entries
               | map({
                   "name": ("🪶 Parte " + ((.key + 1)|tostring)),
                   "value": ("```md\n" + .value + "\n```"),
                   "inline": false
                 })
-              | .[:22];                           # máximo de 22 partes (25 campos por embed)
+              | .[:22];
 
             {
               "username": $username,
@@ -142,13 +63,22 @@ jobs:
               ]
             }')
 
-          echo "🚀 Enviando payload ao Discord..."
-          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}" \
-            --fail --show-error --silent || (echo "❌ Falha ao enviar para o Discord" && exit 1)
+          echo "📦 Payload gerado (pré-envio):"
+          echo "$PAYLOAD" | jq . || echo "⚠️ Falha ao formatar payload com jq."
 
-          echo "✅ Embed enviado com sucesso!"
+          echo "🚀 Enviando payload ao Discord (modo debug)..."
+          RESPONSE=$(curl -v -s -o response.txt -w "%{http_code}" \
+            -X POST -H "Content-Type: application/json" \
+            -d "$PAYLOAD" "${{ secrets.DISCORD_WEBHOOK }}")
 
-      # 7️⃣ Confirmação final
-      - name: Confirmar envio
-        if: env.SKIP != 'true'
-        run: echo "✅ Versão ${VERSION} publicada e changelog enviado com sucesso!"
+          echo "📨 Código HTTP retornado: $RESPONSE"
+          echo "📜 Resposta completa do Discord:"
+          cat response.txt || echo "⚠️ Nenhuma resposta capturada."
+
+          if [ "$RESPONSE" -eq 204 ]; then
+            echo "✅ Embed enviado com sucesso (HTTP 204 - Sem conteúdo)."
+          elif [ "$RESPONSE" -eq 200 ]; then
+            echo "✅ Mensagem enviada com sucesso (HTTP 200)."
+          else
+            echo "❌ Falha ao enviar embed (HTTP $RESPONSE)."
+          fi
