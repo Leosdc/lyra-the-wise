@@ -237,7 +237,7 @@ Jogadores agem na ordem com `!acao`
    Tipo: 1d20+3
    Jogadores: @Elara
    
-   [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
+   [🎲 Rolar Dados] [🚫 Não Fazer Nada]
    ```
 
 3. **Jogadores Escolhem**
@@ -381,7 +381,7 @@ digamos que não é dos mais seguros."
 """
 
 # BOTÕES APARECEM:
-# [🎲 Rolar Dados] [🚫 Não Fazer Nada] [✏️ Outra Ação]
+# [🎲 Rolar Dados] [🚫 Não Fazer Nada]
 
 [Alice clica: 🎲 Rolar Dados]
 
@@ -523,7 +523,7 @@ R: Sim, use `!pausarsessao` novamente para retomar.
 ### Problemas Comuns
 
 **P: "Erro ao processar rolagem"**  
-R: A IA está usando formato inválido. Isso foi corrigido na v2.5.4. Atualize
+R: A IA está usando formato inválido. Isso foi corrigido na v2.5.4.
 
 **P: Botões não aparecem**  
 R: Verifique se o bot tem permissão de "Usar Botões" no canal.
