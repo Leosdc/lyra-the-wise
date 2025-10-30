@@ -160,27 +160,27 @@ Gerar Conteúdo
 📖 Caso 1: Preparar uma Sessão
 Objetivo: Mestre quer preparar sessão de D&D 5e para grupo nível 5
 
-1. Configurar sistema
+✨ Configurar sistema
 !sistema dnd5e
 
-2. Gerar vilão principal
+✨ Gerar vilão principal
 !vilao mago maligno
 
-3. Criar encontros
+✨ Criar encontros
 !encontro 5 medio
 !encontro 5 dificil
 
-4. Gerar NPCs
+✨ Gerar NPCs
 !npc taberneiro simpático
 !npc guarda corrupto
 
-5. Criar puzzles
+✨ Criar puzzles
 !puzzle estátuas antigas
 
-6. Gerar tesouro
+✨ Gerar tesouro
 !tesouro 5
 
-7. Adicionar monstros
+✨ Adicionar monstros
 !monstro orc
 !monstro dragão jovem
 
@@ -190,30 +190,30 @@ Objetivo: Mestre quer preparar sessão de D&D 5e para grupo nível 5
 
 [Canal privado é criado]
 
-2. Jogadores selecionam fichas
+✨ Jogadores selecionam fichas
 [Jogador1] !selecionarficha Thorin
 [Jogador2] !selecionarficha Elara
 [Jogador3] !selecionarficha Luna
 
-3. Mestre inicia aventura (botão)
+✨ Mestre inicia aventura (botão)
 Bot gera introdução épica
 
-4. Durante o jogo
+✨ Durante o jogo
 [Mestre] !cena floresta sombria à noite
 [Jogador1] !rolar 1d20+3
 [Mestre] !monstro lobos direcionais
 [Jogador2] !rolar 2d6+5
 
-5. Consultar IA
+✨ Consultar IA
 [Mestre] !mestre como balancear este encontro?
 [Jogador1] !regra ataque de oportunidade
 
-6. Gerar conteúdo improvisado
+✨ Gerar conteúdo improvisado
 [Mestre] !npc
 [Mestre] !item
 [Mestre] !armadilha media
 
-7. Fim da sessão
+✨ Fim da sessão
 [Mestre] !resumosessao
 Bot gera resumo narrativo
 
@@ -221,18 +221,18 @@ Bot gera resumo narrativo
 🔄 Caso 3: Converter Campanha Entre Sistemas
 Campanha em D&D 5e, quer mudar para Pathfinder
 
-1. Ver fichas atuais
+✨ Ver fichas atuais
 !minhasfichas
 
-2. Converter cada ficha
+✨ Converter cada ficha
 !converterficha pathfinder Thorin
 !converterficha pathfinder Elara
 !converterficha pathfinder Luna
 
-3. Mudar sistema do canal
+✨ Mudar sistema do canal
 !sistema pathfinder
 
-4. Continuar normalmente
+✨ Continuar normalmente
 !iniciarsessao @Jogador1 @Jogador2
 
 🎲 Sistemas Suportados (50+)
@@ -359,10 +359,10 @@ Backup manual
 !rolar 8d6             # Pool grande
 
 🎮 Organização de Sessão
-1.	Configure sistema ANTES de criar sessão
-2.	Peça para jogadores criarem fichas com antecedência
-3.	Use !infosessao para verificar quem falta
-4.	!resumosessao no início da próxima sessão
+✨ Configure sistema ANTES de criar sessão
+✨ Peça para jogadores criarem fichas com antecedência
+✨ Use !infosessao para verificar quem falta
+✨ !resumosessao no início da próxima sessão
 
 📝 Gestão de Fichas
 •	Use nomes únicos e memoráveis
