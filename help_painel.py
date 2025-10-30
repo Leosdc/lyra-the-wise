@@ -17,7 +17,7 @@ def register(bot: commands.Bot):
 
         # ---------------- Página 1 ----------------
         embed1 = discord.Embed(
-            title="🎲 RPG Master Bot - Comandos (1/4)",
+            title="🎲 Lyra, the Wise - Comandos (1/4)",
             description="Seu assistente completo de RPG de mesa!",
             color=discord.Color.teal(),
         )
@@ -58,7 +58,7 @@ def register(bot: commands.Bot):
 
         # ---------------- Página 2 ----------------
         embed2 = discord.Embed(
-            title="🎲 RPG Master Bot - Comandos (2/4)",
+            title="🎲 Lyra, the Wise - Comandos (2/4)",
             description="Ferramentas de combate, geração e planejamento",
             color=discord.Color.orange(),
         )
@@ -95,7 +95,7 @@ def register(bot: commands.Bot):
 
         # ---------------- Página 3 ----------------
         embed3 = discord.Embed(
-            title="🎲 RPG Master Bot - Comandos (3/4)",
+            title="🎲 Lyra, the Wise - Comandos (3/4)",
             description="Assistente e utilitários",
             color=discord.Color.blue(),
         )
@@ -140,7 +140,7 @@ Exemplos populares:
 
         # ---------------- Página 4 ----------------
         embed4 = discord.Embed(
-            title="🎮 RPG Master Bot - Sessões de RPG (4/4)",
+            title="🎮 Lyra, the Wise - Sessões de RPG (4/4)",
             description="Gerencie campanhas com canais privados e fichas integradas",
             color=discord.Color.dark_green(),
         )
@@ -179,6 +179,8 @@ Exemplos populares:
         pages.append(embed4)
 
         # ---------------- Navegação ----------------
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         class HelpView(View):
             def __init__(self):
                 super().__init__(timeout=None)
@@ -210,7 +212,9 @@ Exemplos populares:
         # Envia por DM
         try:
             await ctx.author.send(embed=pages[0], view=HelpView())
-            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+
+            if not is_dm:  # ← ADICIONAR ESTA LINHA
+                await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(
                 f"❌ {ctx.author.mention}, não consigo te enviar DM! "

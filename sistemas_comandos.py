@@ -41,6 +41,8 @@ def register(bot: commands.Bot):
         linhas = [f"**{info['nome']}** (`{codigo}`)" for codigo, info in SISTEMAS_DISPONIVEIS.items()]
         texto = "📚 **Sistemas Suportados:**\n" + "\n".join(linhas)
 
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         try:
             await ctx.message.delete()
         except:
@@ -50,8 +52,8 @@ def register(bot: commands.Bot):
             partes = enviar_em_partes(texto)
             for parte in partes:
                 await ctx.author.send(parte)
-            
-            await ctx.send(f"📨 {ctx.author.mention}, lista enviada no privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, lista enviada no privado!", delete_after=10)
         
         except discord.Forbidden:
             await ctx.send(
@@ -65,6 +67,8 @@ def register(bot: commands.Bot):
         if not termo:
             await ctx.send("❌ Use: `!buscarsistema <nome>`.")
             return
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
 
         resultados = [
             f"**{info['nome']}** (`{codigo}`)"
@@ -84,8 +88,8 @@ def register(bot: commands.Bot):
                 partes = enviar_em_partes(texto)
                 for parte in partes:
                     await ctx.author.send(parte)
-                
-                await ctx.send(f"📨 {ctx.author.mention}, resultados enviados no privado!", delete_after=10)
+                if not is_dm:
+                    await ctx.send(f"📨 {ctx.author.mention}, resultados enviados no privado!", delete_after=10)
             
             except discord.Forbidden:
                 await ctx.send(
@@ -106,6 +110,8 @@ def register(bot: commands.Bot):
         if not info:
             await ctx.send("❌ Sistema não encontrado! Use `!sistemas` para ver todos.")
             return
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
 
         embed = discord.Embed(
             title=f"📘 {info['nome']}",
@@ -128,7 +134,8 @@ def register(bot: commands.Bot):
         
         try:
             await ctx.author.send(embed=embed)
-            await ctx.send(f"📨 {ctx.author.mention}, informações enviadas no privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, informações enviadas no privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(
                 f"❌ {ctx.author.mention}, não consigo te enviar DM!",

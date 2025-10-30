@@ -1,5 +1,11 @@
 # 📜 Changelog
 
+## [2.5.6] - 2025-10-30
+### 🎉 Correções
+- **Mensagens privadas caso fale com Lyra em canais totalmente funcionais.**
+
+---
+
 ## [2.5.5] - 2025-10-29
 ### 🎉 Correções
 - **Sistema conciso realmente funcionando nas `!sessoes`**

@@ -84,75 +84,75 @@ Bot completo para gerenciamento de mesas de RPG no Discord, com suporte a 50+ si
 
 Configuração Inicial
 
-# Ver sistema atual
+✨ Ver sistema atual
 !sistema
 
-# Mudar para D&D 5e
+✨ Mudar para D&D 5e
 !sistema dnd5e
 
-# Ver todos os sistemas
+✨ Ver todos os sistemas
 !sistemas
 
-# Buscar sistema específico
+✨ Buscar sistema específico
 !buscarsistema pathfinder
 
 Criar Personagem
 
-# Criar ficha automática com IA
+✨ Criar ficha automática com IA
 !ficha Aragorn
 
-# Ver suas fichas
+✨ Ver suas fichas
 !minhasfichas
 
-# Ver ficha específica
+✨ Ver ficha específica
 !verficha Aragorn
 
-# Converter para outro sistema
+✨ Converter para outro sistema
 !converterficha pathfinder Aragorn
 
-# Exportar como JSON
+✨ Exportar como JSON
 !exportarficha Aragorn
 
 Iniciar Sessão
 
-# Criar sessão privada
+✨ Criar sessão privada
 !iniciarsessao @Alice @Bob @Carol
 
-# [No canal privado] Cada jogador escolhe ficha
+✨ [No canal privado] Cada jogador escolhe ficha
 !selecionarficha Elara
 
-# [Mestre] Clica no botão "🎬 Iniciar Aventura"
-# Bot gera introdução épica com IA
+✨ [Mestre] Clica no botão "🎬 Iniciar Aventura"
+✨ Bot gera introdução épica com IA
 
-# Durante o jogo
+✨ Durante o jogo
 !rolar 1d20+5
 !mestre como resolver esta situação?
 
-# Fim da sessão
+✨ Fim da sessão
 !resumosessao
 
-# [Mestre] Clica em "🚪 Encerrar Sessão"
+✨ [Mestre] Clica em "🚪 Encerrar Sessão"
 Gerar Conteúdo
 
-# Monstro do banco de dados
+✨ Monstro do banco de dados
 !monstro goblin
 
-# Monstro novo com IA
+✨ Monstro novo com IA
 !monstro
 
-# NPC
+✨ NPC
 !npc mercador corrupto
 
-# Encontro
+✨ Encontro
 !encontro 5 medio
 
-# Item mágico
+✨ Item mágico
 !item espada
 
-# Vilão
+✨ Vilão
 !vilao necromante
 
-# Puzzle
+✨ Puzzle
 !puzzle portas misteriosas
 
 🎯 Casos de Uso Detalhados
@@ -160,79 +160,79 @@ Gerar Conteúdo
 📖 Caso 1: Preparar uma Sessão
 Objetivo: Mestre quer preparar sessão de D&D 5e para grupo nível 5
 
-# 1. Configurar sistema
+1. Configurar sistema
 !sistema dnd5e
 
-# 2. Gerar vilão principal
+2. Gerar vilão principal
 !vilao mago maligno
 
-# 3. Criar encontros
+3. Criar encontros
 !encontro 5 medio
 !encontro 5 dificil
 
-# 4. Gerar NPCs
+4. Gerar NPCs
 !npc taberneiro simpático
 !npc guarda corrupto
 
-# 5. Criar puzzles
+5. Criar puzzles
 !puzzle estátuas antigas
 
-# 6. Gerar tesouro
+6. Gerar tesouro
 !tesouro 5
 
-# 7. Adicionar monstros
+7. Adicionar monstros
 !monstro orc
 !monstro dragão jovem
 
 🎮 Caso 2: Rodar uma Sessão Completa
-# 1. Criar sessão
+1. Criar sessão
 !iniciarsessao @Jogador1 @Jogador2 @Jogador3
 
-# [Canal privado é criado]
+[Canal privado é criado]
 
-# 2. Jogadores selecionam fichas
+2. Jogadores selecionam fichas
 [Jogador1] !selecionarficha Thorin
 [Jogador2] !selecionarficha Elara
 [Jogador3] !selecionarficha Luna
 
-# 3. Mestre inicia aventura (botão)
-# Bot gera introdução épica
+3. Mestre inicia aventura (botão)
+Bot gera introdução épica
 
-# 4. Durante o jogo
+4. Durante o jogo
 [Mestre] !cena floresta sombria à noite
 [Jogador1] !rolar 1d20+3
 [Mestre] !monstro lobos direcionais
 [Jogador2] !rolar 2d6+5
 
-# 5. Consultar IA
+5. Consultar IA
 [Mestre] !mestre como balancear este encontro?
 [Jogador1] !regra ataque de oportunidade
 
-# 6. Gerar conteúdo improvisado
+6. Gerar conteúdo improvisado
 [Mestre] !npc
 [Mestre] !item
 [Mestre] !armadilha media
 
-# 7. Fim da sessão
+7. Fim da sessão
 [Mestre] !resumosessao
-# Bot gera resumo narrativo
+Bot gera resumo narrativo
 
 [Mestre] Clica "🚪 Encerrar Sessão"
 🔄 Caso 3: Converter Campanha Entre Sistemas
-# Campanha em D&D 5e, quer mudar para Pathfinder
+Campanha em D&D 5e, quer mudar para Pathfinder
 
-# 1. Ver fichas atuais
+1. Ver fichas atuais
 !minhasfichas
 
-# 2. Converter cada ficha
+2. Converter cada ficha
 !converterficha pathfinder Thorin
 !converterficha pathfinder Elara
 !converterficha pathfinder Luna
 
-# 3. Mudar sistema do canal
+3. Mudar sistema do canal
 !sistema pathfinder
 
-# 4. Continuar normalmente
+4. Continuar normalmente
 !iniciarsessao @Jogador1 @Jogador2
 
 🎲 Sistemas Suportados (50+)
@@ -334,13 +334,13 @@ Total: 50+ sistemas
 
 🛠️ Comandos Administrativos
 
-# Diagnóstico completo
+Diagnóstico completo
 !troubleshoot
 
-# Recarregar módulo sem reiniciar
+Recarregar módulo sem reiniciar
 !reload fichas
 
-# Backup manual
+Backup manual
 !backup
 
 💡 Dicas e Truques
@@ -381,10 +381,10 @@ P: Posso usar em múltiplos servidores? R: Sim! Cada servidor tem seus próprios
 📞 Suporte
 •	Desenvolvedor: Leosdc_
 •	Comando: !suporte
-•	GitHub: RPGMasterBot
+•	GitHub: https://github.com/Leosdc/lyra-the-wise
 
 📄 Licença
-Bot desenvolvido para comunidades de RPG. Versão 2.0 - 2025
+Bot desenvolvido para comunidades de RPG. Versão 2.5.6 - 2025
 
 Tecnologias:
 •	Python 3.10+
@@ -402,6 +402,9 @@ def register(bot: commands.Bot):
         """Exibe a documentação completa do bot."""
         texto = DOCUMENTACAO_COMPLETA
         # Deleta o comando do usuário
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         try:
             await ctx.message.delete()
         except:
@@ -415,8 +418,8 @@ def register(bot: commands.Bot):
                 partes = [texto[i:i+2000] for i in range(0, len(texto), 2000)]
                 for parte in partes:
                     await ctx.author.send(parte)
-            
-            await ctx.send(f"📨 {ctx.author.mention}, documentação enviada no privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, documentação enviada no privado!", delete_after=10)
         
         except discord.Forbidden:
             await ctx.send(

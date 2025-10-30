@@ -55,7 +55,7 @@ def register(bot: commands.Bot):
     async def ajuda(ctx):
         """Mostra comandos básicos do bot."""
         msg = (
-            "🤖 **Comandos principais do RPG Master Bot:**\n\n"
+            "🤖 **Comandos principais do Lyra, the Wise:**\n\n"
             "📚 **Ajuda e Informações**\n"
             "• `!rpghelp` — Painel completo de comandos (recomendado)\n"
             "• `!documentacao` — Documentação detalhada\n"
@@ -72,6 +72,9 @@ def register(bot: commands.Bot):
             "• `!ajudasessao` — Guia completo de sessões\n\n"
             "💡 **Dica:** Use `!rpghelp` para ver todos os comandos organizados por categoria!"
         )
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         try:
             await ctx.message.delete()
         except:
@@ -83,7 +86,8 @@ def register(bot: commands.Bot):
                 description=msg,
                 color=discord.Color.green()
             ))
-            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(
                 f"❌ {ctx.author.mention}, não consigo te enviar DM!",
@@ -93,8 +97,11 @@ def register(bot: commands.Bot):
     @bot.command(name="suporte")
     async def suporte(ctx):
         """Link de suporte ou contato."""
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         embed = discord.Embed(
-            title="📨 Suporte do RPG Master Bot",
+            title="📨 Suporte do Lyra, the Wise",
             description=(
                 "Precisa de ajuda ou encontrou um bug?\n\n"
                 "**Opções de suporte:**\n"
@@ -106,7 +113,7 @@ def register(bot: commands.Bot):
             ),
             color=discord.Color.blue()
         )
-        embed.set_footer(text="Obrigado por usar o RPG Master Bot! 🎲")
+        embed.set_footer(text="Obrigado por usar o Lyra, the Wise! 🎲")
         try:
             await ctx.message.delete()
         except:
@@ -114,7 +121,8 @@ def register(bot: commands.Bot):
         
         try:
             await ctx.author.send(embed=embed)
-            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(
                 f"❌ {ctx.author.mention}, não consigo te enviar DM!",
@@ -124,8 +132,11 @@ def register(bot: commands.Bot):
     @bot.command(name="sobre")
     async def sobre(ctx):
         """Informações sobre o bot."""
+
+        is_dm = isinstance(ctx.channel, discord.DMChannel)
+
         embed = discord.Embed(
-            title="🎲 RPG Master Bot",
+            title="🎲 Lyra, the Wise",
             description=(
                 "Um assistente completo para mestres e jogadores de RPG de mesa!\n\n"
                 "**Recursos principais:**\n"
@@ -152,7 +163,7 @@ def register(bot: commands.Bot):
             value=f"Servidores: {len(bot.guilds)} • Usuários: {len(bot.users)}",
             inline=False
         )
-        embed.set_footer(text="Desenvolvido por Leosdc_ • Versão 2.0")
+        embed.set_footer(text="Desenvolvido por Leosdc_ • Versão 2.5.6")
         try:
             await ctx.message.delete()
         except:
@@ -160,7 +171,8 @@ def register(bot: commands.Bot):
         
         try:
             await ctx.author.send(embed=embed)
-            await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
+            if not is_dm:
+                await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(
                 f"❌ {ctx.author.mention}, não consigo te enviar DM!",
