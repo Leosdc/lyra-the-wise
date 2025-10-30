@@ -142,7 +142,7 @@ Exemplos populares:
 • Iniciativa — Inicia contagem de iniciativa
 ```
 
-### 👤 Ações individuais ou em grupo:
+### 🫂 Ações individuais ou em grupo:
 ```
 • Rolar dados — Rola dados conforme situação da história
 • Não fazer nada — Não faz nada naquela ação
