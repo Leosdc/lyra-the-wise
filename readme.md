@@ -28,11 +28,12 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ### ⚙️ Configuração
 ```
-!sistema - Ver seu sistema atual
-!sistema <código> - Mudar sistema pessoal
-!sistemas - Lista todos os sistemas
-!buscarsistema <nome> - Buscar sistemas
+!sistema - Ver/mudar sistema atual
+!sistema dnd5e - Mudar para D&D 5e
+!sistemas - Lista todos os 50+ sistemas
+!buscarsistema <nome> - Busca sistemas
 !infosistema <código> - Detalhes do sistema
+!limpar - Limpa histórico de conversa
 ```
 
 ### 🎲 Dados & Iniciativa
@@ -44,42 +45,108 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ### 👤 Fichas & Personagens
 ```
-!ficha <nome> - Criação rápida estruturada
-!criarficha - Modo interativo com 8 perguntas
-!verficha <nome> - Ver com navegação por páginas
-!editarficha <nome> - Editor interativo
-!converterficha <sistema> <nome> - Converte entre sistemas
-!minhasfichas [sistema] - Lista suas fichas
+!ficha <nome> - Cria ficha automática com IA
+!criarficha - Formulário interativo 📝
+!verficha / !verficha <nome> - Ver fichas
+!editarficha <nome> - Edita ficha ✏️
+!deletarficha <nome> - Deleta ficha
+!converterficha <sistema> <nome> - Converte ficha
+!minhasfichas [sistema] - Lista detalhada
 !exportarficha <nome> - Exporta como JSON
 ```
 
-### 🎮 Sessões de RPG
+### ⚔️ Combate & Encontros
 ```
-!iniciarsessao @jog1 @jog2
-!selecionarficha <nome>
-!sessoes
-!infosessao
-!cenanarrada <descrição>
-!acao <descrição>
+!monstro <nome> - Cria um monstro
+!encontro <nível> <dificuldade> - Gera encontro balanceado
+!armadilha <dificuldade> - Cria armadilha
+!cena <descrição> - Descreve cena dramaticamente
 ```
 
 ### ✨ Geração de Conteúdo
 ```
-!npc <descrição>
-!vilao <tipo>
-!item <tipo>
-!tesouro <nível>
-!puzzle <tema>
-!monstro <nome>
-!cena <descrição>
+!item <tipo> - Gera item mágico/especial
+!tesouro <nível> - Gera tesouro balanceado
+!puzzle <tema> - Cria enigma/quebra-cabeça
+!vilao <tipo> - Gera vilão completo
+!nome <tipo> - Lista 10 nomes criativos
+!motivacao - Sorteia motivação para NPC
+```
+
+### 🎭 Assistente do Mestre
+```
+!mestre <pergunta> - Pergunta qualquer coisa
+Use para: criar histórias, balancear encontros,
+improvisar situações e tirar dúvidas de regras.
+💡 Mantém memória da conversa por canal!
+
+📚 Sistemas Suportados
+50+ sistemas de RPG disponíveis:
+!sistemas ou !listarsistemas - Ver todos
+!buscarsistema <nome> - Buscar sistema
+!infosistema [código] - Detalhes do sistema
+
+Exemplos populares:
+• D&D 5e, 3.5, Pathfinder 1e/2e, 13th Age
+• Call of Cthulhu, World of Darkness
+• Shadowrun, Cyberpunk, Star Wars
+• GURPS, FATE, Savage Worlds
+• Blades in the Dark, Dungeon World
 ```
 
 ### 📖 História & Campanha
 ```
-!mestre <pergunta>
-!plot <tema>
-!sessao <tema>
-!regra <dúvida>
+!plot <tema> - Gera ideias de missão/aventura
+!sessao <tema> - Planeja sessão completa 📋
+!regra <dúvida> - Consulta regras do sistema
+```
+
+### 🧠 Administração e Utilidades
+```
+!stats - Mostra estatísticas do bot
+!reload <módulo> - Recarrega partes do bot (admin)
+!backup - Cria backup manual dos dados
+!documentacao - Exibe documentação completa
+!ajuda - Mostra comandos básicos
+!suporte - Link de suporte ou contato
+```
+
+### 🎬 Sessões e Jogadores
+```
+!iniciarsessao @Jogador1 @Jogador2 - Cria sessão privada
+!sessoes - Lista sessões ativas
+!infosessao - Mostra detalhes da sessão
+!convidarsessao @Jogador - Adiciona jogador
+!removerjogador @Jogador - Remove jogador
+```
+
+### 👤 Fichas em Sessão
+```
+!selecionarficha <nome> - Escolhe ficha
+!mudarficha <nome> - Troca personagem
+!verficha <nome> - Mostra ficha
+!resumosessao - Gera resumo narrativo com IA
+```
+
+### ⚙️ Controle e Botões
+```
+!pausarsessao - Pausa/retoma sessão
+!ajudasessao - Guia completo de sessões
+```
+
+### 🎬 Botões no canal:
+```
+• Iniciar Aventura — Introdução épica
+• Ver Fichas — Mostra status dos jogadores
+• Encerrar Sessão — Deleta canal com confirmação
+• Iniciativa — Inicia contagem de iniciativa
+```
+
+### 👤 Ações individuais ou em grupo:
+```
+• Rolar dados — Rola dados conforme situação da história
+• Não fazer nada — Não faz nada naquela ação
+• !acao — Descreve uma ação do jogador
 ```
 
 ---
