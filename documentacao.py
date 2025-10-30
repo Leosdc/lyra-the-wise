@@ -122,7 +122,7 @@ Iniciar Sessão
 !selecionarficha Elara
 
 ✨ [Mestre] Clica no botão "🎬 Iniciar Aventura"
-✨ Bot gera introdução épica com IA
+Bot gera introdução épica com IA
 
 ✨ Durante o jogo
 !rolar 1d20+5
