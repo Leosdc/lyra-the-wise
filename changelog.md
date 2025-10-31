@@ -1,5 +1,11 @@
 # 📜 Changelog
 
+## [2.5.7] - 2025-10-31
+### 🎉 Mega reestruturação
+- **Todo o código foi modularizado!**
+- **Comandos otimizados e muito mais responsivos!**
+---
+
 ## [2.5.6] - 2025-10-30
 ### 🎉 Correções
 - **Mensagens privadas caso fale com Lyra em canais totalmente funcionais.**

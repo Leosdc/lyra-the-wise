@@ -6,7 +6,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.6-purple.svg)
+![Version](https://img.shields.io/badge/Version-v2.5.7-purple.svg)
 
 ---
 
@@ -274,38 +274,56 @@ Jogadores agem na ordem com `!acao`
 ## 🧩 Estrutura do Projeto
 ```
 lyra-the-wise/
-├── main.py                   # Ponto de entrada
-├── config.py                 # Configurações globais
-├── utils.py                  # Funções auxiliares
-├── sistemas_rpg.py           # Banco de dados de sistemas + estrutura de fichas
-├── fichas_estruturadas.py    # Sistema de fichas estruturadas
-├── sessoes_rpg.py            # Sistema de sessões
-├── rpg_core.py               # Comandos principais
-├── geracao_conteudo.py       # Geração de NPCs, monstros, etc
-├── monstros_database.py      # Banco de monstros
-├── help_painel.py            # Sistema de ajuda interativo
-├── documentacao.py           # Documentação completa
-├── utilidades.py             # Comandos administrativos
-├── admin.py                  # Ferramentas de debug
-├── bot_data/                 # Dados persistentes
-│   ├── fichas_personagens.json
-│   ├── sistemas_usuarios.json
-│   └── sessoes_ativas.json
+├── main.py
+├── config.py
 ├── commands/
+├── admin.py
+├── changelog.md
+├── documentacao.py
+├── fichas_estruturadas.py
+├── geracao_conteudo.py
+├── help_painel.py
+├── monstros_database.py
+├── readme.md
+├── rpg_core.py
+├── sessoes_rpg.py
+├── sistemas_comandos.py
+├── sistemas_rpg.py
+├── utilidades.py
+├── utils.py
+│   ├── dados.py
+│   ├── mestre_ia.py
+│   ├── fichas_crud.py
+│   ├── fichas_conversao.py
+│   ├── fichas_edicao.py
+│   ├── geracao_npc.py
+│   ├── geracao_mundo.py
+│   ├── geracao_combate.py
+│   ├── geracao_itens.py
 │   ├── sessoes_acao.py
 │   └── sessoes_commands.py
-│   └── __init__.py
 ├── core/
-│   ├── sessao_helpers.py
-│   └── __init__.py
+│   ├── data_manager.py
+│   ├── groq_client.py
+│   ├── text_utils.py
+│   ├── ficha_helpers.py
+│   ├── sistemas_helpers.py
+│   ├── monstros_helpers.py
+│   └── sessao_helpers.py
 ├── views/
-│   ├── sessao_views.py
+│   ├── ficha_views.py
+│   ├── sessao_control_views.py
+│   ├── sessao_roll_views.py
+│   ├── sessao_continue_views.py
 │   └── __init__.py
-├── .env                      # Variáveis de ambiente
-├── requirements.txt          # Dependências Python
-├── LICENSE                   # Licença MIT
-├── README.md                 # Este arquivo
-└── changelog.md              # Histórico de mudanças
+├── data/
+│   ├── sistemas_definicoes.py
+│   ├── estruturas_fichas.py
+│   ├── monstros_dnd.py
+│   ├── monstros_horror.py
+│   └── monstros_outros.py
+├── requirements.txt
+└── LICENSE.txt
 ```
 
 ---

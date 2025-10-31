@@ -384,7 +384,7 @@ P: Posso usar em múltiplos servidores? R: Sim! Cada servidor tem seus próprios
 •	GitHub: https://github.com/Leosdc/lyra-the-wise
 
 📄 Licença
-Bot desenvolvido para comunidades de RPG. Versão 2.5.6 - 2025
+Bot desenvolvido para comunidades de RPG. Versão 2.5.7 - 2025
 
 Tecnologias:
 •	Python 3.10+

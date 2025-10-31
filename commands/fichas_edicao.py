@@ -52,11 +52,14 @@ def register_fichas_edicao_commands(bot: commands.Bot):
                 f"**1/8** - Qual o **nome** do seu personagem?"
             )
             
-            await ctx.send(
-                f"✅ {ctx.author.mention}, processo de criação iniciado no privado! "
-                f"Confira sua DM.",
-                delete_after=10
-            )
+            is_dm = isinstance(ctx.channel, discord.DMChannel)
+
+            if not is_dm:
+                await ctx.send(
+                    f"✅ {ctx.author.mention}, processo de criação iniciado no privado! "
+                    f"Confira sua DM.",
+                    delete_after=10
+                )
         
         except discord.Forbidden:
             await ctx.send(

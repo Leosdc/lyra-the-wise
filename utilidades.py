@@ -163,7 +163,7 @@ def register(bot: commands.Bot):
             value=f"Servidores: {len(bot.guilds)} • Usuários: {len(bot.users)}",
             inline=False
         )
-        embed.set_footer(text="Desenvolvido por Leosdc_ • Versão 2.5.6")
+        embed.set_footer(text="Desenvolvido por Leosdc_ • Versão 2.5.7")
         try:
             await ctx.message.delete()
         except:
