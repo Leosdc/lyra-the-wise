@@ -5,7 +5,8 @@ import discord
 from discord.ext import commands
 import re
 
-from views.sessao_views import RollRequestView, ContinueStoryView
+from views.sessao_roll_views import RollRequestView
+from views.sessao_continue_views import ContinueStoryView
 
 
 def register_acao_commands(

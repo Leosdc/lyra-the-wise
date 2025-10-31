@@ -10,7 +10,7 @@ from core.sessao_helpers import (
     user_mention, coletar_fichas_usuario, formatar_lista_fichas,
     garantir_categoria, criar_canal_de_sessao
 )
-from views.sessao_views import SessionControlView
+from views.sessao_control_views import SessionControlView
 
 
 def register_sessoes_commands(
