@@ -24,6 +24,12 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Leosdc/lyra-the-wise&type=date&legend=top-left)](https://www.star-history.com/#Leosdc/lyra-the-wise&type=date&legend=top-left)
+
+---
+
 ## 📋 **Comandos Principais**
 
 ### ⚙️ Configuração
