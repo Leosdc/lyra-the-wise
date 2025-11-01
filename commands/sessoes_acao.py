@@ -190,6 +190,28 @@ def register_acao_commands(
         historia.append({"role": "assistant", "content": resposta})
         sessao["historia"] = historia
         salvar_dados()
+
+        # ✅ DETECÇÃO AUTOMÁTICA DE COMBATE
+        from core.combat_system import detect_combat_in_text
+        
+        is_combat, enemies_found = detect_combat_in_text(resposta)
+        
+        if is_combat and not sessao.get("combat"):
+            # Iniciou combate! Notifica e sugere adicionar inimigos
+            await ctx.send(
+                embed=discord.Embed(
+                    title="⚔️ Combate Detectado!",
+                    description=(
+                        f"A narrativa indica início de combate!\n\n"
+                        f"**Inimigos detectados:** {', '.join(enemies_found) if enemies_found else 'Não identificados'}\n\n"
+                        f"**Próximos passos:**\n"
+                        f"1. Use `!iniciarcombate` para ativar sistema\n"
+                        f"2. Use `!addinimigo <nome> <HP> <CA>` para cada inimigo\n"
+                        f"3. Use o botão **⚔️ Rolar Iniciativa** para começar"
+                    ),
+                    color=discord.Color.red()
+                ).set_footer(text="💡 Combate é opcional — você pode continuar narrativamente também")
+            )
         
         # Detecta solicitação de rolagem
         roll_match = re.search(r'\[ROLL:\s*([^,\]]+),\s*([^\]]+)\]', resposta, re.IGNORECASE)
@@ -295,6 +317,119 @@ def register_acao_commands(
         historia.append({"role": "assistant", "content": resposta})
         sessao["historia"] = historia
         salvar_dados()
+
+        # ✅ DETECÇÃO AUTOMÁTICA DE COMBATE COM AUTO-ADICIONAR
+        from core.combat_system import detect_combat_in_text, CombatTracker
+        
+        is_combat, enemies_data = detect_combat_in_text(resposta)
+        
+        if is_combat and not sessao.get("combat"):
+            # Iniciou combate! Cria tracker e adiciona inimigos automaticamente
+            await ctx.send(
+                embed=discord.Embed(
+                    title="⚔️ Combate Detectado!",
+                    description="A IA detectou início de combate! Preparando sistema...",
+                    color=discord.Color.red()
+                )
+            )
+            
+            # Cria combat tracker
+            from core.combat_system import CombatTracker, extract_character_stats
+            
+            combat = CombatTracker()
+            combat.start_combat()
+            
+            # Adiciona jogadores automaticamente
+            for player_id in sessao.get("jogadores", []):
+                user = ctx.guild.get_member(player_id) if ctx.guild else None
+                if not user:
+                    continue
+                
+                # Busca ficha do jogador
+                ficha_nome = sessao.get("fichas_selecionadas", {}).get(player_id)
+                if not ficha_nome:
+                    # Usa fichas alternativas
+                    fichas_sel = sessao.get("fichas", {})
+                    chave = fichas_sel.get(str(player_id)) or fichas_sel.get(player_id)
+                    if chave:
+                        ficha_nome = chave
+                
+                if ficha_nome:
+                    ficha = fichas_personagens.get(ficha_nome)
+                    if ficha:
+                        hp_max, hp_atual, ca = extract_character_stats(ficha)
+                        nome_personagem = ficha.get("nome", user.display_name)
+                        combat.add_participant(
+                            name=nome_personagem,
+                            hp=hp_atual,
+                            max_hp=hp_max,
+                            ca=ca,
+                            is_player=True
+                        )
+            
+            # Adiciona inimigos detectados automaticamente
+            inimigos_adicionados = []
+            if enemies_data:
+                for enemy in enemies_data:
+                    quantidade = enemy["quantidade"]
+                    tipo = enemy["nome"]
+                    hp = enemy["hp_sugerido"]
+                    ca = enemy["ca_sugerido"]
+                    
+                    if quantidade == 1:
+                        nome_inimigo = tipo
+                        combat.add_participant(
+                            name=nome_inimigo,
+                            hp=hp,
+                            max_hp=hp,
+                            ca=ca,
+                            is_player=False
+                        )
+                        inimigos_adicionados.append(f"• {nome_inimigo} (HP: {hp}, CA: {ca})")
+                    else:
+                        for i in range(1, quantidade + 1):
+                            nome_inimigo = f"{tipo} {i}"
+                            combat.add_participant(
+                                name=nome_inimigo,
+                                hp=hp,
+                                max_hp=hp,
+                                ca=ca,
+                                is_player=False
+                            )
+                            inimigos_adicionados.append(f"• {nome_inimigo} (HP: {hp}, CA: {ca})")
+            
+            sessao["combat"] = combat.to_dict()
+            salvar_dados()
+            
+            # Notifica
+            if inimigos_adicionados:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="✅ Combate Iniciado Automaticamente!",
+                        description=(
+                            f"**Inimigos adicionados:**\n" + "\n".join(inimigos_adicionados) + "\n\n"
+                            f"**Próximos passos:**\n"
+                            f"1. Use `!rolariniciativa` para rolar iniciativa\n"
+                            f"2. Use `!statuscombate` para ver status\n"
+                            f"3. Use `!atacar <alvo> <dano>` para atacar\n"
+                            f"4. Use `!encerrarcombate` quando terminar"
+                        ),
+                        color=discord.Color.green()
+                    )
+                )
+            else:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="⚠️ Combate Iniciado - Adicione Inimigos",
+                        description=(
+                            "A IA detectou combate mas não identificou inimigos específicos.\n\n"
+                            "**Adicione manualmente:**\n"
+                            "`!addinimigo <nome> <HP> <CA>`\n\n"
+                            "Depois use `!rolariniciativa`"
+                        ),
+                        color=discord.Color.orange()
+                    )
+                )
         
         # Detecta rolagem
         roll_match = re.search(r'\[ROLL:\s*([^,\]]+),\s*([^\]]+)\]', resposta, re.IGNORECASE)

@@ -63,7 +63,7 @@ def register(bot: commands.Bot):
             color=discord.Color.orange(),
         )
         embed2.add_field(
-            name="⚔️ Combate & Encontros",
+            name="🎮 Geração de Encontros",
             value="""\
 !monstro <nome> - Cria um monstro
 !encontro <nível> <dificuldade> - Gera encontro balanceado
@@ -152,6 +152,19 @@ Exemplos populares:
 !infosessao - Mostra detalhes da sessão
 !convidarsessao @Jogador - Adiciona jogador
 !removerjogador @Jogador - Remove jogador""",
+            inline=False,
+        )
+        embed4.add_field(
+            name="⚔️ Sistema de Combate Tático",
+            value="""\
+!iniciarcombate - Ativa modo de combate
+!addinimigo <nome> <HP> <CA> [bonus] - Adiciona inimigo
+!rolariniciativa - Rola iniciativa para todos
+!statuscombate - Mostra status (HP, CA, turno)
+!atacar <alvo> <dano> - Ataca inimigo
+!curar <alvo> <HP> - Cura aliado
+!proximoturno - Avança turno (mestre)
+!encerrarcombate - Finaliza e salva HP""",
             inline=False,
         )
         embed4.add_field(

@@ -6,7 +6,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.5.7-purple.svg)
+![Version](https://img.shields.io/badge/Version-v2.6.0-purple.svg)
 
 ---
 
@@ -63,11 +63,19 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ### ⚔️ Combate & Encontros
 ```
+!iniciarcombate - Ativa modo de combate tático
+!addinimigo <nome> <HP> <CA> [bonus_ini] - Adiciona inimigo
+!rolariniciativa - Rola iniciativa para todos
+!statuscombate - Mostra status completo (HP, CA, turnos)
+!atacar <alvo> <dano> - Ataca causando dano
+!curar <alvo> <HP> - Cura aliado
+!proximoturno - Avança para próximo turno
+!encerrarcombate - Finaliza e salva HP nas fichas
+
 !monstro <nome> - Cria um monstro
 !encontro <nível> <dificuldade> - Gera encontro balanceado
 !armadilha <dificuldade> - Cria armadilha
 !cena <descrição> - Descreve cena dramaticamente
-```
 
 ### ✨ Geração de Conteúdo
 ```

@@ -10,4 +10,5 @@ __all__ = [
     'NarrativeStyleView',
     'RollRequestView',
     'ContinueStoryView',
+    'CombatControlView',
 ]

@@ -1,5 +1,60 @@
 # 📜 Changelog
 
+## [2.6.0] - 2025-11-01
+### ⚔️ NOVO - Sistema de Combate Tático Completo
+- **Rastreamento de Combate**: HP, CA, iniciativa, turnos e rodadas
+- **Detecção Automática**: IA identifica combate na narrativa e sugere configuração
+- **8 Comandos Novos**:
+  - `!iniciarcombate` - Ativa modo de combate
+  - `!addinimigo <nome> <HP> <CA> [bonus]` - Adiciona inimigos
+  - `!rolariniciativa` - Rola iniciativa para todos
+  - `!statuscombate` - Mostra status visual completo
+  - `!atacar <alvo> <dano>` - Causa dano
+  - `!curar <alvo> <HP>` - Cura aliados
+  - `!proximoturno` - Avança turno
+  - `!encerrarcombate` - Finaliza e salva HP
+- **4 Botões Interativos** (aparecem apenas durante combate):
+  - ⚔️ Rolar Iniciativa
+  - 📊 Status Combate
+  - ⏭️ Próximo Turno
+  - 🏁 Encerrar Combate
+- **Integração com Fichas**:
+  - Extrai HP e CA automaticamente das fichas estruturadas
+  - Atualiza HP nas fichas ao encerrar combate
+  - Suporta fichas antigas (valores padrão)
+- **Interface Visual Rica**:
+  - Barras de HP coloridas (🟩🟨🟥💀)
+  - Ordem de iniciativa com medalhas (🥇🥈🥉)
+  - Ícones de jogadores (👤) e inimigos (👹)
+  - Indicador de turno atual (👉)
+- **Recursos Avançados**:
+  - Detecção automática de vitória/derrota
+  - Busca flexível de alvos (ex: "gob" encontra "Goblin 1")
+  - Bônus de iniciativa por inimigo
+  - Sistema persistente (combates são salvos)
+
+### 🎨 Melhorado - Experiência de Sessão
+- **Botões Condicionais**: Botão "Continuar História" detecta combate ativo e oferece botões apropriados
+- **Feedback Visual**: Mensagens coloridas e embeds informativos em todas as ações
+- **Detecção Inteligente**: IA identifica até 10+ tipos de inimigos automaticamente
+- **Logs Detalhados**: Debug completo para troubleshooting (pode ser desativado)
+
+### 🏗️ Arquitetura Modular
+- **core/combat_system.py**: Classe `CombatTracker` e funções de detecção
+- **commands/combate_commands.py**: Todos os comandos de combate
+- **views/sessao_combat_views.py**: Botões interativos de combate
+- **Separação Clara**: Lógica, comandos e interface separados
+- **Escalável**: Fácil adicionar condições, reações, ataques de oportunidade
+
+### 📚 Documentação Expandida
+- README.md com seção completa sobre combate
+- Guia passo-a-passo de uso
+- Tabela de comandos e botões
+- Troubleshooting detalhado
+- Exemplos práticos de fluxo completo
+
+---
+
 ## [2.5.7] - 2025-10-31
 ### 🎉 Mega reestruturação
 - **Todo o código foi modularizado!**

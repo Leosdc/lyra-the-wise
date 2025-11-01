@@ -61,6 +61,15 @@ def setup_sessoes(
         get_system_prompt=get_system_prompt,
         salvar_dados=salvar_dados
     )
+
+    # ✅ Registra comandos de combate
+    from commands.combate_commands import register_combat_commands
+    register_combat_commands(
+        bot=bot,
+        sessoes_ativas=sessoes_ativas,
+        fichas_personagens=fichas_personagens,
+        salvar_dados=salvar_dados
+    )
     
     # Comando de ajuda específico de sessões
     @bot.command(name="ajudasessao")
@@ -80,6 +89,15 @@ def setup_sessoes(
             "• `!acao <descrição>` — Jogadores descrevem ações\n"
             "• `!cenanarrada <descrição>` — Mestre narra cenas\n\n"
             
+            "**⚔️ Sistema de Combate**\n"
+            "• `!iniciarcombate` — Ativa modo de combate\n"
+            "• `!addinimigo <nome> <HP> <CA>` — Adiciona inimigo\n"
+            "• `!statuscombate` — Mostra status atual\n"
+            "• `!atacar <alvo> <dano>` — Ataca inimigo\n"
+            "• `!curar <alvo> <HP>` — Cura aliado\n"
+            "• `!proximoturno` — Avança turno\n"
+            "• `!encerrarcombate` — Finaliza combate\n\n"
+            
             "**🎲 Sistema de Rolagens Inteligente**\n"
             "Quando a IA solicita, aparecem botões:\n"
             "• 🎲 Rolar Dados — Rola os dados\n"
@@ -88,7 +106,10 @@ def setup_sessoes(
             
             "**🎬 Botões de Controle**\n"
             "• 🎬 Continuar História — Pede próxima cena\n"
-            "• ⚔️ Rolar Iniciativa — Rola para TODOS\n\n"
+            "• ⚔️ Rolar Iniciativa — Rola para combate\n"
+            "• 📊 Status Combate — Mostra HP e turno\n"
+            "• ⏭️ Próximo Turno — Avança (mestre)\n"
+            "• 🏁 Encerrar Combate — Finaliza luta\n\n"
             
             "**💡 Fluxo Completo:**\n"
             "1️⃣ `!iniciarsessao @jogadores`\n"
@@ -96,9 +117,10 @@ def setup_sessoes(
             "3️⃣ Mestre clica **🎬 Iniciar Aventura**\n"
             "4️⃣ Escolhe estilo (Extensa/Concisa)\n"
             "5️⃣ Jogadores usam `!acao`\n"
-            "6️⃣ Mestre usa `!cenanarrada`\n"
-            "7️⃣ Ao final: `!resumosessao`\n"
-            "8️⃣ Clica **🚪 Encerrar Sessão**"
+            "6️⃣ Se combate: `!iniciarcombate` → adiciona inimigos → rola iniciativa\n"
+            "7️⃣ Durante combate: `!atacar`, `!curar`, `!proximoturno`\n"
+            "8️⃣ Ao final: `!encerrarcombate` (HP salvo automaticamente)\n"
+            "9️⃣ Fim da sessão: `!resumosessao` → **🚪 Encerrar Sessão**"
         )
         
         import discord
