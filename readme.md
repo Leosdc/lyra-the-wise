@@ -1,6 +1,6 @@
 # 🎲 Lyra, the Wise
 
-Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**, **IA integrada (Lyra, the Wise)** e **sessões privadas com narrativa contínua**.
+**Lyra the Wise** é um bot de Discord que transforma seu servidor em uma **mesa de RPG completa e inteligente**, unindo narrativa, automação e combate em um só sistema.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
@@ -10,17 +10,40 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 
 ---
 
-## 🌟 Visão Geral
+### 🧙 Principais Recursos
 
-**Lyra the Wise** é um bot de Discord que transforma seu servidor em uma mesa de RPG completa, com:
+- 🤖 **IA Narrativa Contextual**  
+  A IA Groq (Llama 3) interpreta o mestre, gera histórias, descreve cenas e responde com base na memória da sessão.
 
-- 🤖 **IA Narrativa** - Groq AI gera histórias dinâmicas e contextuais
-- 🎲 **Rolagens Interativas** - Sistema de botões para rolagens colaborativas
-- 🎭 **Narrativa Adaptativa** - Escolha entre estilo extenso ou conciso
-- 🎙️ **Voz Automática** - Canais de voz criados e gerenciados automaticamente
-- 📊 **Gestão Completa** - Fichas, iniciativa, histórico e muito mais
-- 🔒 **Sessões Privadas** - Canais exclusivos para cada grupo
-- 👹 **Geração de conteúdo** - Gera monstros, NPCs, itens, puzzles e muito mais
+- 🧩 **50+ Sistemas de RPG Suportados**  
+  Inclui D&D 5e, Pathfinder 1e/2e, CoC, WoD, GURPS, Shadowrun, Cyberpunk, Star Wars, FATE, Savage Worlds, Blades in the Dark e muitos outros.
+
+- 🎲 **Rolagens e Combate Interativos**  
+  Interface de botões para rolar dados, atacar, curar, avançar turnos e encerrar combates — tudo automatizado com cálculo de CA, HP e iniciativa.
+
+- 🎭 **Fichas Inteligentes com IA**  
+  Criação automática de fichas com IA, edição interativa, exportação em JSON, conversão entre sistemas e seleção em sessão.
+
+- 🧠 **Assistente do Mestre**  
+  Responde perguntas, cria NPCs, balanceia encontros, escreve descrições e improvisa cenas — mantendo memória por canal.
+
+- 🧱 **Gestão de Sessões e Campanhas**  
+  Cria canais privados por grupo, gerencia convites, controla pausas, gera resumos automáticos e integra fichas ativas.
+
+- ⚔️ **Sistema de Combate Tático Completo**  
+  Adiciona inimigos, rola iniciativas, alterna turnos, aplica dano e cura — com persistência de HP salva ao fim da batalha.
+
+- ✨ **Geração Procedural de Conteúdo**  
+  Cria monstros, NPCs, itens, vilões, puzzles, tesouros, armadilhas, encontros e cenas com base em tema e dificuldade.
+
+- 📚 **Regras e Documentação Dinâmica**  
+  Consulta regras, detalhes de sistemas e referências diretamente no chat.
+
+- 🎙️ **Integração com Voz (opcional)**  
+  Criação automática de canais de voz e narração sintetizada via ElevenLabs.
+
+- 💾 **Administração e Manutenção Avançadas**  
+  Backup manual, reload modular, estatísticas de uso e painel de ajuda interativo com 4 páginas.
 
 ---
 
