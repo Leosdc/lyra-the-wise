@@ -202,96 +202,11 @@ python main.py
 
 ---
 
-## 🎮 Guia Rápido
-
-### 1️⃣ Criando uma Sessão
-
-```bash
-!iniciarsessao @Jogador1 @Jogador2 @Jogador3
-```
-
-**O que acontece:**
-- ✅ Canal de texto privado criado
-- ✅ Canal de voz privado criado
-- ✅ Todos movidos automaticamente
-- ✅ Botões de controle aparecem
-- ✅ Fichas de cada jogador listadas
-
-### 2️⃣ Selecionando Fichas
-
-```bash
-!selecionarficha Elara Corações de Cristal
-```
-
-**Sistema notifica:**
-```
-✅ Ficha Elara Corações de Cristal selecionada!
-⏳ Aguardando 2 jogadores selecionarem ficha...
-```
-
-Quando todos selecionarem:
-```
-🎉 Todos os jogadores selecionaram suas fichas! O mestre pode iniciar a aventura.
-```
-
-### 3️⃣ Iniciando a Aventura
-
-**Mestre clica:** `🎬 Iniciar Aventura`
-
-**Escolhe estilo:**
-- 📖 Narrativa Extensa
-- 📝 Narrativa Concisa
-
-**IA gera introdução épica!**
-
-### 4️⃣ Durante a Sessão
-
-**Jogadores descrevem ações:**
-```bash
-!acao examino a porta procurando armadilhas
-```
-
-**Mestre narra cenas:**
-```bash
-!cenanarrada um dragão pousa no topo da torre
-```
-
-**IA detecta quando precisa rolagens:**
-```
-🎲 Rolagem Necessária!
-Tipo: 1d20+Percepção
-Jogadores: @Elara, @Thorin
-```
-
-### 5️⃣ Combate
-
-**Mestre clica:** `⚔️ Rolar Iniciativa`
-
-```
-⚔️ Iniciativa Rolada!
-🥇 Elara → 22
-🥈 Thorin → 18
-🥉 Goblin → 12
-```
-
-Jogadores agem na ordem com `!acao`
-
-### 6️⃣ Encerrando
-
-**Mestre clica:** `🚪 Encerrar Sessão`
-
-- ✅ Jogadores movidos para Torre da Maga
-- ✅ Canais de voz e texto apagados
-- ✅ Dados salvos
-
----
-
 ## 🧩 Estrutura do Projeto
 ```
 lyra-the-wise/
 ├── main.py
 ├── config.py
-├── commands/
 ├── admin.py
 ├── changelog.md
 ├── documentacao.py
@@ -306,6 +221,8 @@ lyra-the-wise/
 ├── sistemas_rpg.py
 ├── utilidades.py
 ├── utils.py
+├── commands/
+│   ├── combate_commands.py
 │   ├── dados.py
 │   ├── mestre_ia.py
 │   ├── fichas_crud.py
@@ -324,12 +241,14 @@ lyra-the-wise/
 │   ├── ficha_helpers.py
 │   ├── sistemas_helpers.py
 │   ├── monstros_helpers.py
-│   └── sessao_helpers.py
+│   ├── sessao_helpers.py
+│   └── combat_system.py  
 ├── views/
 │   ├── ficha_views.py
 │   ├── sessao_control_views.py
 │   ├── sessao_roll_views.py
 │   ├── sessao_continue_views.py
+│   ├── sessao_combat_views.py
 │   └── __init__.py
 ├── data/
 │   ├── sistemas_definicoes.py
