@@ -121,7 +121,7 @@ jobs:
             echo -e "\033[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 
             if [ $part_count -eq 1 ]; then
-              INTRO="🎶 *Lyra toca sua harpa e anuncia a nova versão...* ✨"
+              INTRO="🎶 *O bardo toca sua harpa e anuncia a nova versão...* ✨"
             else
               INTRO=""
             fi
