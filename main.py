@@ -1,3 +1,4 @@
+# main.py (ATUALIZADO v3.0)
 import discord
 from discord.ext import commands
 import os
@@ -31,10 +32,10 @@ DATA_DIR.mkdir(exist_ok=True)
 @bot.event
 async def on_ready():
     await bot.change_presence(
-        activity=discord.Game(name="!rpghelp 🎲")
+        activity=discord.Game(name="!rpghelp 🎲 v3.0")
     )
 
-    print(f"🎲 {bot.user} está online!")
+    print(f"🎲 {bot.user} está online! (v3.0)")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
 
     print("📂 Carregando dados salvos...")
@@ -52,29 +53,8 @@ async def ping(ctx):
     latency = round(bot.latency * 1000)
     await ctx.send(f"🏓 Pong! Latência: {latency}ms")
 
-@bot.command(name="testegroq")
-async def teste_groq(ctx):
-    """Testa a conexão com a API Groq."""
-    await ctx.send("🔍 Testando conexão com Groq...")
-    
-    try:
-        mensagens = [
-            {"role": "system", "content": "Você é um assistente prestativo."},
-            {"role": "user", "content": "Diga apenas: 'Conexão OK!'"}
-        ]
-        
-        resposta = await chamar_groq(mensagens, max_tokens=50)
-        
-        if "Erro" in resposta or "erro" in resposta:
-            await ctx.send(f"❌ Erro na API Groq:\n```{resposta}```")
-        else:
-            await ctx.send(f"✅ Groq funcionando!\n**Resposta:** {resposta}")
-            
-    except Exception as e:
-        await ctx.send(f"❌ Erro ao testar Groq: {str(e)}")
-
 # ==== REGISTRO DE MÓDULOS ====
-print("📦 Carregando módulos...")
+print("📦 Carregando módulos (v3.0)...")
 
 try:
     # 1. Comandos de sistemas
@@ -93,7 +73,7 @@ except Exception as e:
     print(f"❌ Erro ao carregar rpg_core: {e}")
 
 try:
-    # 3. Sistema de fichas ESTRUTURADAS (NOVO!)
+    # 3. Sistema de fichas ESTRUTURADAS
     import fichas_estruturadas
     fichas_estruturadas.register(bot)
     print("✅ fichas_estruturadas carregado")
@@ -144,8 +124,29 @@ except Exception as e:
     import traceback
     traceback.print_exc()
 
+# ===== NOVOS MÓDULOS v3.0 =====
 try:
-    # 9. Sistema de sessões
+    # 9. Sistema de Inventário
+    from commands.inventario_commands import register_inventario_commands
+    register_inventario_commands(bot, fichas_personagens, salvar_dados)
+    print("✅ Sistema de inventário carregado")
+except Exception as e:
+    print(f"❌ Erro ao carregar inventário: {e}")
+    import traceback
+    traceback.print_exc()
+
+try:
+    # 10. Sistema de XP e Progressão
+    from commands.xp_commands import register_xp_commands
+    register_xp_commands(bot, fichas_personagens, salvar_dados)
+    print("✅ Sistema de XP carregado")
+except Exception as e:
+    print(f"❌ Erro ao carregar XP: {e}")
+    import traceback
+    traceback.print_exc()
+
+try:
+    # 11. Sistema de sessões (REFATORADO v3.0)
     from sessoes_rpg import setup_sessoes
     
     # Cria wrapper de salvar_dados compatível com sessões
@@ -162,13 +163,13 @@ try:
         get_system_prompt,
         salvar_dados_wrapper,
     )
-    print("✅ Sistema de sessões carregado")
+    print("✅ Sistema de sessões carregado (v3.0)")
 except Exception as e:
     print(f"❌ Erro ao carregar sistema de sessões: {e}")
     import traceback
     traceback.print_exc()
 
-print("🎲 Todos os módulos carregados!")
+print("🎲 Todos os módulos carregados! (v3.0)")
 
 # ==== Tratamento de erros ====
 @bot.event
@@ -186,7 +187,7 @@ async def on_command_error(ctx, error):
         print(f"⚠️ Erro não tratado: {error}")
         await ctx.send(f"⚠️ Ocorreu um erro ao executar o comando. O erro foi registrado.")
 
-# ==== Evento de mensagens (para debug) ====
+# ==== Evento de mensagens ====
 @bot.event
 async def on_message(message):
     """Processa mensagens e comandos."""
@@ -206,7 +207,7 @@ if __name__ == "__main__":
         print("   GROQ_API_KEY=sua_chave_groq_aqui")
     else:
         try:
-            print("🚀 Iniciando bot...")
+            print("🚀 Iniciando bot v3.0...")
             bot.run(TOKEN)
         except Exception as e:
             print(f"❌ Erro ao iniciar o bot: {e}")

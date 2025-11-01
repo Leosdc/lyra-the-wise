@@ -1,4 +1,4 @@
-# help_painel.py
+# help_painel.py (ATUALIZADO v3.0)
 import discord
 from discord.ext import commands
 from discord.ui import View, button
@@ -15,9 +15,9 @@ def register(bot: commands.Bot):
     async def rpghelp(ctx):
         pages = []
 
-        # ---------------- Página 1 ----------------
+        # ---------------- Página 1 - Configuração & Dados ----------------
         embed1 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos (1/4)",
+            title="🎲 Lyra, the Wise - Comandos v3.0 (1/5)",
             description="Seu assistente completo de RPG de mesa!",
             color=discord.Color.teal(),
         )
@@ -45,7 +45,7 @@ def register(bot: commands.Bot):
             value="""\
 !ficha <nome> - Cria ficha automática com IA
 !criarficha - Formulário interativo 📝
-!verficha / !verficha <nome> - Ver fichas
+!verficha <nome> - Ver fichas
 !editarficha <nome> - Edita ficha ✏️
 !deletarficha <nome> - Deleta ficha
 !converterficha <sistema> <nome> - Converte ficha
@@ -53,16 +53,50 @@ def register(bot: commands.Bot):
 !exportarficha <nome> - Exporta como JSON""",
             inline=False,
         )
-        embed1.set_footer(text="📄 Página 1/4 • Use os botões abaixo para navegar")
+        embed1.set_footer(text="📄 Página 1/5 • Use os botões abaixo para navegar")
         pages.append(embed1)
 
-        # ---------------- Página 2 ----------------
+        # ---------------- Página 2 - Inventário & XP (NOVO v3.0) ----------------
         embed2 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos (2/4)",
-            description="Ferramentas de combate, geração e planejamento",
-            color=discord.Color.orange(),
+            title="🎲 Lyra, the Wise - Comandos v3.0 (2/5)",
+            description="Inventário, XP e progressão de personagens",
+            color=discord.Color.gold(),
         )
         embed2.add_field(
+            name="🎒 Sistema de Inventário",
+            value="""\
+!inventario [nome] - Ver inventário completo
+!addinventario <item> [qtd] [tipo] - Adicionar item
+!equiparitem <item> - Equipar arma/armadura
+!usaritem <item> - Usar/consumir item
+!jogarfora <item> - Descartar item
+!vender <item> [preço] - Vender item
+
+💡 Exemplo: !addinventario "Poção de Cura" 3 consumível""",
+            inline=False,
+        )
+        embed2.add_field(
+            name="📊 Sistema de XP e Progressão",
+            value="""\
+!xp [nome] - Ver XP e progressão
+!darxp <@jogador> <quantidade> - Dar XP individual 🔒
+!darxpgrupo <quantidade> - Dar XP para todos 🔒
+
+✨ Level up automático quando atingir XP necessário
+📈 Barra de progresso visual (🟩⬜)
+🎯 XP Total acumulado rastreado""",
+            inline=False,
+        )
+        embed2.set_footer(text="📄 Página 2/5 • 🔒 = Apenas Mestre")
+        pages.append(embed2)
+
+        # ---------------- Página 3 - Geração & IA ----------------
+        embed3 = discord.Embed(
+            title="🎲 Lyra, the Wise - Comandos v3.0 (3/5)",
+            description="Ferramentas de geração e IA",
+            color=discord.Color.orange(),
+        )
+        embed3.add_field(
             name="🎮 Geração de Encontros",
             value="""\
 !monstro <nome> - Cria um monstro
@@ -71,125 +105,120 @@ def register(bot: commands.Bot):
 !cena <descrição> - Descreve cena dramaticamente""",
             inline=False,
         )
-        embed2.add_field(
+        embed3.add_field(
             name="✨ Geração de Conteúdo",
             value="""\
 !item <tipo> - Gera item mágico/especial
 !tesouro <nível> - Gera tesouro balanceado
 !puzzle <tema> - Cria enigma/quebra-cabeça
 !vilao <tipo> - Gera vilão completo
+!npc [descrição] - Cria NPC detalhado
 !nome <tipo> - Lista 10 nomes criativos
 !motivacao - Sorteia motivação para NPC""",
             inline=False,
-        )
-        embed2.add_field(
-            name="📖 História & Campanha",
-            value="""\
-!plot <tema> - Gera ideias de missão/aventura
-!sessao <tema> - Planeja sessão completa 📋
-!regra <dúvida> - Consulta regras do sistema""",
-            inline=False,
-        )
-        embed2.set_footer(text="📄 Página 2/4")
-        pages.append(embed2)
-
-        # ---------------- Página 3 ----------------
-        embed3 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos (3/4)",
-            description="Assistente e utilitários",
-            color=discord.Color.blue(),
         )
         embed3.add_field(
             name="🎭 Assistente do Mestre",
             value="""\
 !mestre <pergunta> - Pergunta qualquer coisa
-Use para: criar histórias, balancear encontros,
-improvisar situações e tirar dúvidas de regras.
+!plot <tema> - Gera ideias de missão/aventura
+!regra <dúvida> - Consulta regras do sistema
+!sessao <tema> - Planeja sessão completa 📋
+
 💡 Mantém memória da conversa por canal!""",
             inline=False,
         )
-        embed3.add_field(
-            name="📚 Sistemas Suportados",
-            value="""\
-50+ sistemas de RPG disponíveis:
-!sistemas ou !listarsistemas - Ver todos
-!buscarsistema <nome> - Buscar sistema
-!infosistema [código] - Detalhes do sistema
-
-Exemplos populares:
-• D&D 5e, 3.5, Pathfinder 1e/2e, 13th Age
-• Call of Cthulhu, World of Darkness
-• Shadowrun, Cyberpunk, Star Wars
-• GURPS, FATE, Savage Worlds
-• Blades in the Dark, Dungeon World""",
-            inline=False,
-        )
-        embed3.add_field(
-            name="🧠 Administração e Utilidades",
-            value="""\
-!stats - Mostra estatísticas do bot
-!reload <módulo> - Recarrega partes do bot (admin)
-!backup - Cria backup manual dos dados
-!documentacao - Exibe documentação completa
-!ajuda - Mostra comandos básicos
-!suporte - Link de suporte ou contato""",
-            inline=False,
-        )
-        embed3.set_footer(text="📄 Página 3/4")
+        embed3.set_footer(text="📄 Página 3/5")
         pages.append(embed3)
 
-        # ---------------- Página 4 ----------------
+        # ---------------- Página 4 - Sessões v3.0 (ATUALIZADO) ----------------
         embed4 = discord.Embed(
-            title="🎮 Lyra, the Wise - Sessões de RPG (4/4)",
-            description="Gerencie campanhas com canais privados e fichas integradas",
+            title="🎮 Lyra, the Wise - Sessões v3.0 (4/5)",
+            description="Sistema de sessões TOTALMENTE controlado pelo mestre",
             color=discord.Color.dark_green(),
         )
         embed4.add_field(
-            name="🎬 Sessões e Jogadores",
+            name="🎬 Comandos de Sessão",
             value="""\
-!iniciarsessao @Jogador1 @Jogador2 - Cria sessão privada
+!iniciarsessao @jog1 @jog2 - Cria sessão privada
+!selecionarficha <nome> - Escolhe sua ficha
 !sessoes - Lista sessões ativas
-!infosessao - Mostra detalhes da sessão
-!convidarsessao @Jogador - Adiciona jogador
-!removerjogador @Jogador - Remove jogador""",
+!pausarsessao - Pausa/retoma
+!resumosessao - Resumo com IA""",
             inline=False,
         )
         embed4.add_field(
+            name="📖 Narrativa e Ações (v3.0)",
+            value="""\
+**[MESTRE]**
+!narrativa <descrição> - Lyra narra a cena
+!acoespendentes - Ver ações dos jogadores
+!limparacoes - Limpar ações
+
+**[JOGADORES]**
+!acao <descrição> - Descrever ação do personagem
+
+💡 Lyra apenas narra - mestre controla tudo!""",
+            inline=False,
+        )
+        embed4.add_field(
+            name="🎮 Botões de Controle do Mestre",
+            value="""\
+🎲 **Solicitar Rolagens** - Escolhe jogadores e dados
+⚔️ **Iniciar Combate** - Ativa modo de combate
+📊 **Status Geral** - Mostra HP/CA de todos
+📖 **Ver Ações Pendentes** - Lista ações declaradas""",
+            inline=False,
+        )
+        embed4.set_footer(text="📄 Página 4/5 • v3.0: Mestre tem controle total")
+        pages.append(embed4)
+
+        # ---------------- Página 5 - Combate & Admin ----------------
+        embed5 = discord.Embed(
+            title="🎮 Lyra, the Wise - Combate & Admin (5/5)",
+            description="Sistema de combate tático e administração",
+            color=discord.Color.red(),
+        )
+        embed5.add_field(
             name="⚔️ Sistema de Combate Tático",
             value="""\
-!iniciarcombate - Ativa modo de combate
-!addinimigo <nome> <HP> <CA> [bonus] - Adiciona inimigo
-!rolariniciativa - Rola iniciativa para todos
+!iniciarcombate - Ativa modo de combate 🔒
+!addinimigo <nome> <HP> <CA> [bonus] - Adiciona inimigo 🔒
+!rolariniciativa - Rola iniciativa para todos 🔒
 !statuscombate - Mostra status (HP, CA, turno)
 !atacar <alvo> <dano> - Ataca inimigo
 !curar <alvo> <HP> - Cura aliado
-!proximoturno - Avança turno (mestre)
-!encerrarcombate - Finaliza e salva HP""",
+!proximoturno - Avança turno 🔒
+!encerrarcombate - Finaliza e salva HP 🔒""",
             inline=False,
         )
-        embed4.add_field(
-            name="👤 Fichas em Sessão",
+        embed5.add_field(
+            name="🧠 Administração e Utilidades",
             value="""\
-!selecionarficha <nome> - Escolhe ficha
-!mudarficha <nome> - Troca personagem
-!verficha <nome> - Mostra ficha
-!resumosessao - Gera resumo narrativo com IA""",
+!stats - Mostra estatísticas do bot
+!reload <módulo> - Recarrega partes do bot 🔒
+!backup - Cria backup manual dos dados 🔒
+!documentacao - Exibe documentação completa
+!ajuda - Mostra comandos básicos
+!suporte - Link de suporte ou contato
+!sobre - Informações sobre o bot""",
             inline=False,
         )
-        embed4.add_field(
-            name="⚙️ Controle e Botões",
+        embed5.add_field(
+            name="💡 Fluxo Completo v3.0",
             value="""\
-!pausarsessao - Pausa/retoma sessão
-!ajudasessao - Guia completo de sessões
-
-🎬 **Botões no canal:**
-• Iniciar Aventura — Introdução épica
-• Ver Fichas — Mostra status dos jogadores
-• Encerrar Sessão — Deleta canal com confirmação""",
+1️⃣ `!iniciarsessao @jogadores`
+2️⃣ Jogadores: `!selecionarficha <nome>`
+3️⃣ Mestre: Clica **Iniciar Aventura**
+4️⃣ Mestre: `!narrativa <situação>`
+5️⃣ Jogadores: `!acao <o que fazem>`
+6️⃣ Mestre: Usa botões de controle
+7️⃣ Mestre: `!darxpgrupo 300`
+8️⃣ Jogadores: `!inventario`, `!xp`""",
             inline=False,
         )
-        embed4.set_footer(text="📄 Página 4/4 • Sistema de Sessões com IA e botões interativos")
-        pages.append(embed4)
+        embed5.set_footer(text="📄 Página 5/5 • v3.0 • 🔒 = Apenas Mestre")
+        pages.append(embed5)
 
         # ---------------- Navegação ----------------
         is_dm = isinstance(ctx.channel, discord.DMChannel)
@@ -226,7 +255,7 @@ Exemplos populares:
         try:
             await ctx.author.send(embed=pages[0], view=HelpView())
 
-            if not is_dm:  # ← ADICIONAR ESTA LINHA
+            if not is_dm:
                 await ctx.send(f"📨 {ctx.author.mention}, confira seu privado!", delete_after=10)
         except discord.Forbidden:
             await ctx.send(

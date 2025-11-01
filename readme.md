@@ -70,7 +70,7 @@ E forjaremos o impossível — com magia, coragem e paixão.”
   <img src="https://img.shields.io/badge/Discord.py-2.0+-brightgreen?style=for-the-badge&logo=discord&logoColor=white" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=open-source-initiative&logoColor=white" />
   <img src="https://img.shields.io/badge/Groq-Llama%203.3%2070B-orange?style=for-the-badge&logo=ai&logoColor=white" />
-  <img src="https://img.shields.io/badge/Version-v2.6.0-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
+  <img src="https://img.shields.io/badge/Version-v3.0.0-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
 </p>
 
 ---
@@ -380,46 +380,6 @@ python main.py
 ├── 📜 requirements.txt
 └── 📄 LICENSE.txt
 ```
-
----
-
-## ❓ FAQ
-
-### Perguntas Gerais
-
-**P: Quantos jogadores por sessão?**  
-R: Recomendado 3-6 jogadores. Tecnicamente suporta até 20, mas fica lento.
-
-**P: Posso ter múltiplas sessões simultâneas?**  
-R: Sim! Cada sessão é independente com seus próprios canais.
-
-**P: As sessões são salvas?**  
-R: Sim, automaticamente a cada 5 minutos e ao encerrar.
-
-**P: Posso retomar uma sessão pausada?**  
-R: Sim, use `!pausarsessao` novamente para retomar.
-
-### Sistemas de RPG
-
-**P: Quais sistemas são suportados?**  
-R: D&D 5e, Call of Cthulhu, Vampire, Shadowrun, FATE, PBtA, Ordem Paranormal, Tormenta20, 3D&T, Old Dragon e mais.
-
-**P: Como mudar o sistema da sessão?**  
-R: O sistema é definido pelo mestre com `!sistema <código>` ANTES de criar a sessão.
-
-**P: Posso criar meu próprio sistema?**  
-R: Sim! Edite `sistemas_rpg.py` e adicione as regras.
-
-### IA e Narrativa
-
-**P: A IA pode quebrar o jogo?**  
-R: Ela segue as regras do sistema configurado. Mestres podem corrigir com `!cenanarrada`.
-
-**P: Posso mudar o estilo durante a sessão?**  
-R: Não diretamente. Você precisa criar nova sessão. Use `!pausarsessao` e recrie.
-
-**P: A IA lembra de eventos anteriores?**  
-R: Sim, mantém 20 últimas interações no contexto.
 
 ---
 

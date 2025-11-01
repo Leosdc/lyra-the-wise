@@ -1,6 +1,259 @@
 # 📜 Changelog
 
 ## [2.6.0] - 2025-11-01
+## 🎯 **Sistema de Sessões Refatorado**
+### 1️⃣ **Lyra como Narradora Passiva**
+❌ **REMOVIDO:**
+- Detecção automática de combate
+- Auto-adição de inimigos
+- Solicitação automática de rolagens
+- Decisões autônomas da IA
+
+✅ **NOVO:**
+- Lyra **apenas narra e descreve**
+- Mestre humano controla **TODAS** as ações
+- Sistema de comandos explícitos
+- Fluxo de jogo mais controlado
+
+---
+
+### 2️⃣ **Controle Total do Mestre**
+
+#### **Novos Comandos do Mestre:**
+```
+!narrativa <descrição> — Lyra narra a cena descrita
+!acoespendentes — Ver ações declaradas pelos jogadores
+!limparacoes — Limpar ações após narrativa
+!darxp <jogador> <quantidade> — Dar XP individual
+!darxpgrupo <quantidade> — Dar XP para todos
+```
+
+#### **Botões de Controle do Mestre:**
+- 🎲 **Solicitar Rolagens** — Escolhe jogadores e tipo de dado
+- ⚔️ **Iniciar Combate** — Ativa modo de combate manualmente
+- 📊 **Status Geral** — Mostra HP/CA de todos
+- 📖 **Ver Ações Pendentes** — Lista ações dos jogadores
+
+#### **Fluxo de Jogo:**
+1. Mestre usa `!narrativa` para descrever a cena
+2. Lyra narra de forma imersiva (SEM sugerir ações)
+3. Mestre recebe botões de controle
+4. Mestre decide:
+   - Solicitar rolagens (escolhe QUEM rola)
+   - Iniciar combate
+   - Ver ações pendentes
+   - Ver status dos jogadores
+
+---
+
+### 3️⃣ **Sistema de Inventário Completo**
+
+#### **Novos Comandos:**
+```
+!inventario [nome] — Ver inventário completo
+!addinventario <item> [qtd] [tipo] — Adicionar item
+!equiparitem <item> — Equipar arma/armadura
+!usaritem <item> — Usar/consumir item
+!jogarfora <item> — Descartar item
+!vender <item> [preço] — Vender item
+```
+
+#### **Estrutura de Inventário:**
+```json
+{
+  "equipamento": {
+    "Inventário": [
+      {
+        "nome": "Poção de Cura",
+        "quantidade": 3,
+        "tipo": "consumível"
+      }
+    ],
+    "Equipado": {
+      "Arma": "Espada Longa +1",
+      "Armadura": "Cota de Malha"
+    },
+    "Dinheiro": "150 PO"
+  }
+}
+```
+
+---
+
+### 4️⃣ **Sistema de XP Obrigatório**
+
+#### **Novos Comandos:**
+```
+!xp [nome] — Ver XP e progressão
+!darxp <jogador> <quantidade> — Dar XP individual
+!darxpgrupo <quantidade> — Dar XP para todos
+```
+
+#### **Features:**
+- ✅ Barra de progresso visual (🟩⬜)
+- ✅ XP Atual vs XP Próximo Nível
+- ✅ XP Total acumulado
+- ✅ Level up automático
+- ✅ Notificação de level up com embed especial
+
+#### **Estrutura de Progressão:**
+```json
+{
+  "progressao": {
+    "XP Atual": 450,
+    "XP Total": 2450,
+    "XP Próximo Nível": 900
+  }
+}
+```
+
+---
+
+### 5️⃣ **Integração Total de Dados das Fichas**
+
+#### **TODAS as seções são usadas:**
+- ✅ **Básico** — Nome, raça, classe, nível
+- ✅ **Atributos** — FOR, DES, CON, INT, SAB, CAR
+- ✅ **Recursos** — HP Máximo, HP Atual, recursos especiais
+- ✅ **Combate** — CA, iniciativa, ataques
+- ✅ **Equipamento** — Inventário, equipado, dinheiro
+- ✅ **Progressão** — XP Atual, XP Total, próximo nível
+- ✅ **História** — Personalidade, motivações, aparência
+
+---
+
+## 📂 **Arquivos Criados/Modificados**
+
+### ✨ **Novos Arquivos:**
+```
+commands/sessoes_acao.py (refatorado v3.0)
+commands/inventario_commands.py
+commands/xp_commands.py
+views/sessao_master_control_views.py
+```
+
+### 🔧 **Arquivos Modificados:**
+```
+data/estruturas_fichas.py — Adicionado seção "progressao" obrigatória
+sessoes_rpg.py — Registra novos comandos
+main.py — Carrega novos módulos
+```
+
+---
+
+## 🎮 **Fluxo de Jogo Completo**
+
+### **1. Início da Sessão:**
+```
+!iniciarsessao @jogadores
+[Jogadores selecionam fichas]
+[Mestre clica "Iniciar Aventura"]
+[Escolhe estilo narrativo]
+```
+
+### **2. Durante a Aventura:**
+```
+1. Mestre: !narrativa Os heróis entram na caverna escura...
+2. Lyra narra a cena
+3. Mestre recebe botões de controle
+4. Jogadores: !acao Acendo uma tocha e avanço
+5. Mestre: [Clica "Ver Ações Pendentes"]
+6. Mestre: [Decide se solicita rolagens ou continua]
+```
+
+### **3. Combate:**
+```
+1. Mestre: [Clica "Iniciar Combate"]
+2. Mestre: !addinimigo Goblin 10 15
+3. Mestre: !rolariniciativa
+4. Jogadores: !atacar Goblin 8
+5. Mestre: !proximoturno
+6. Mestre: !encerrarcombate
+```
+
+### **4. Recompensas:**
+```
+1. Mestre: !darxpgrupo 300
+2. Mestre: !addinventario Poção 2 consumível
+3. Jogadores: !inventario
+4. Jogadores: !xp
+```
+
+---
+
+## 🔮 **Benefícios da v3.0**
+
+### ✅ **Para Mestres:**
+- Controle total sobre o ritmo da história
+- Escolha de quais jogadores participam de cada cena
+- Visibilidade completa das ações dos jogadores
+- Sistema de recompensas integrado (XP, itens)
+
+### ✅ **Para Jogadores:**
+- Sistema de inventário completo
+- Progressão clara com XP visual
+- Ações registradas e visíveis
+- Fichas sempre atualizadas
+
+### ✅ **Para Lyra:**
+- Foco em narrativa de qualidade
+- Sem responsabilidade de gerenciar mecânicas
+- Respostas mais consistentes
+- Menor chance de erros
+
+---
+
+## 📋 **Checklist de Migração**
+
+Se você já tem fichas antigas, siga este processo:
+
+1. ✅ Adicione seção `progressao` manualmente:
+```python
+ficha["secoes"]["progressao"] = {
+    "XP Atual": 0,
+    "XP Total": 0
+}
+```
+
+2. ✅ Atualize seção `equipamento`:
+```python
+ficha["secoes"]["equipamento"]["Inventário"] = []
+ficha["secoes"]["equipamento"]["Equipado"] = {
+    "Arma": "—",
+    "Armadura": "—"
+}
+```
+
+3. ✅ Salve as fichas:
+```python
+from core.ficha_helpers import salvar_fichas_agora
+salvar_fichas_agora()
+```
+
+---
+
+## 🐛 **Correções de Bugs**
+
+- ❌ Removida detecção automática de combate (causava falsos positivos)
+- ❌ Removida auto-adição de inimigos (valores incorretos)
+- ✅ Sistema de rolagens agora é explícito e controlado
+- ✅ Ações dos jogadores são registradas corretamente
+
+---
+
+## 📞 **Suporte**
+
+Se tiver dúvidas sobre a v3.0:
+- Use `!ajudasessao` para guia completo
+- Use `!rpghelp` para todos os comandos
+- Entre no Discord: [Taverna](https://discord.gg/SdWnWJ6w)
+
+---
+
+**Desenvolvido com ❤️ por Leosdc_ — Lyra the Wise v3.0**
+
+
+## [2.6.0] - 2025-11-01
 ### ⚔️ NOVO - Sistema de Combate Tático Completo
 - **Rastreamento de Combate**: HP, CA, iniciativa, turnos e rodadas
 - **Detecção Automática**: IA identifica combate na narrativa e sugere configuração

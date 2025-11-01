@@ -34,6 +34,6 @@ class ContinueStoryView(discord.ui.View):
         
         await interaction.response.send_message(
             "📝 **Descreva a próxima cena ou acontecimento:**\n"
-            "Use o comando `!cenanarrada <descrição>` ou aguarde as ações dos jogadores com `!acao`.",
+            "Use o comando `!narrativa <descrição>` ou peça ações dos jogadores com `!acao`.",
             ephemeral=True
         )
