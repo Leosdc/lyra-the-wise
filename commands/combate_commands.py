@@ -1,5 +1,5 @@
 """
-Comandos de combate para Lyra RPG Bot.
+Comandos de combate para Lyra the Wise.
 """
 
 import discord
@@ -10,7 +10,6 @@ from core.combat_system import CombatTracker, extract_character_stats
 
 
 def ensure_combat_tracker(sessao: Dict[str, Any]) -> None:
-    """Garante que combat é um CombatTracker, não um dict."""
     if "combat" in sessao and isinstance(sessao["combat"], dict):
         sessao["combat"] = CombatTracker.from_dict(sessao["combat"])
     elif "combat" not in sessao:
