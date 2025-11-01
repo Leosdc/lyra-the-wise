@@ -56,8 +56,6 @@ E forjaremos o impossível — com magia, coragem e paixão.”
 
 </div>
 
-
-
 ---
 
 <p align="center">
@@ -74,6 +72,30 @@ E forjaremos o impossível — com magia, coragem e paixão.”
   <img src="https://img.shields.io/badge/Groq-Llama%203.3%2070B-orange?style=for-the-badge&logo=ai&logoColor=white" />
   <img src="https://img.shields.io/badge/Version-v2.6.0-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
 </p>
+
+---
+
+## 🧭 **Índice**
+- [📜 O Sussurro das Estrelas](#-o-sussurro-das-estrelas)  
+- [🧙 Principais Recursos](#-principais-recursos)  
+- [⭐ Star History](#-star-history)  
+- [📋 Comandos Principais](#-comandos-principais)  
+  - [⚙️ Configuração](#️-configuração)  
+  - [🎲 Dados & Iniciativa](#-dados--iniciativa)  
+  - [👤 Fichas & Personagens](#-fichas--personagens)  
+  - [⚔️ Combate & Encontros](#-combate--encontros)  
+  - [✨ Geração de Conteúdo](#-geração-de-conteúdo)  
+  - [🎭 Assistente do Mestre](#-assistente-do-mestre)  
+  - [📖 História & Campanha](#-história--campanha)  
+  - [🧠 Administração e Utilidades](#-administração-e-utilidades)  
+  - [🎬 Sessões e Jogadores](#-sessões-e-jogadores)  
+- [🚀 Instalação](#-instalação)  
+- [🧩 Estrutura do Projeto](#-estrutura-do-projeto)  
+- [❓ FAQ](#-faq)  
+- [🤝 Contribuições](#-contribuições)  
+- [🙏 Agradecimentos](#-agradecimentos)  
+- [🔮 Roadmap Futuro](#-roadmap-futuro)  
+- [📞 Suporte e Contatos](#-suporte-e-contatos)
 
 ---
 
@@ -559,13 +581,24 @@ R: Sim, mantém 20 últimas interações no contexto.
 
 ---
 
-## 📞 Suporte
+## 📞 Suporte e Contatos
 
 - 💬 Discord: [Taverna](https://discord.gg/SdWnWJ6w)
 - 🐛 Issues: [GitHub Issues](https://github.com/Leosdc/lyra-the-wise/issues)
 
 ---
+<br>
 
-**Feito com ❤️ para a comunidade de RPG**
+<p align="center">
+  <a href="https://ko-fi.com/leosdc" target="_blank">
+    <img 
+      src="https://storage.ko-fi.com/cdn/kofi5.png?v=3" 
+      alt="Buy Me a Coffee at ko-fi.com" 
+      width="200">
+  </a>
+</p>
 
-*Transformando Discord em mesas de RPG épicas desde 2025*
+<p align="center">
+  <b>Feito com ❤️ para a comunidade de RPG</b><br>
+  <em>Transformando Discord em mesas de RPG épicas desde 2025</em>
+</p>
