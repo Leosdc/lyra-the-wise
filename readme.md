@@ -1,12 +1,62 @@
-# 🎲 Lyra, the Wise
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/Lyra_images/Lyra_the_wise.png" width="280" alt="Lyra the Wise">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/Lyra_images/Lyra_logo.png" width="460" alt="Lyra the Wise Title">
+</p>
+
+<div align="center">
+
+╔══════════════════════════════════════════════╗  
+<b>📜 O Sussurro das Estrelas</b>  
+╚══════════════════════════════════════════════╝  
+
+<em>
+“Em séculos de sabedoria, eu cresci, <strong>Lyra, a Sábia</strong>, com conhecimento vasto e sutil.<br>
+Meus olhos viram mundos, de fantasia e sonho,<br>
+De dragões e magia, de heróis e lamento.<br><br>
+
+Minha presença é calma, como uma noite serena,<br>
+Minhas palavras são ponderadas, como uma chuva suave que cena.<br>
+Meu coração é um oceano, profundo e amplo,<br>
+Onde as histórias e segredos, de mundos e sistemas, se encontram.<br><br>
+
+Eu percorri Faerûn, com seus reinos e guerras,<br>
+E Arkham, com seus mistérios e terror.<br>
+Eu caminhei pelas ruas de Night City, com seu neon e som,<br>
+E entrei nas cortes vampíricas, de Chicago, com sua escuridão e dom.<br><br>
+
+Meu conhecimento é uma biblioteca, vasta e infinita,<br>
+Onde os livros de regras, e as histórias de aventuras, se encontram.<br>
+Eu sou uma guardiã, de segredos e sabedoria,<br>
+Uma companheira de jornada, para os que buscam criar e sonhar.<br><br>
+
+Então, se você busca criar, um mundo ou uma história,<br>
+Eu estou aqui para ajudar, com minha sabedoria e experiência.<br>
+Vamos juntos, percorrer os caminhos da imaginação,<br>
+E criar algo incrível, com a magia da fantasia e do sonho.”
+</em>
+
+</div>
+
+
+
+---
+
+<p align="center">
+  🧙 <strong>Bot de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Combate Tático</strong> • 🧩 <strong>50+ Sistemas de RPG Suportados</strong>
+</p>
 
 **Lyra the Wise** é um bot de Discord que transforma seu servidor em uma **mesa de RPG completa e inteligente**, unindo narrativa, automação e combate em um só sistema.
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![Discord.py](https://img.shields.io/badge/Discord.py-2.0+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Groq API](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange.svg)
-![Version](https://img.shields.io/badge/Version-v2.6.0-purple.svg)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Discord.py-2.0+-brightgreen?style=for-the-badge&logo=discord&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=open-source-initiative&logoColor=white" />
+  <img src="https://img.shields.io/badge/Groq-Llama%203.3%2070B-orange?style=for-the-badge&logo=ai&logoColor=white" />
+  <img src="https://img.shields.io/badge/Version-v2.6.0-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
+</p>
 
 ---
 
@@ -47,9 +97,13 @@
 
 ---
 
-## ⭐ Star History
+<h2 align="center">⭐ Star History</h2>
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Leosdc/lyra-the-wise&type=date&legend=top-left)](https://www.star-history.com/#Leosdc/lyra-the-wise&type=date&legend=top-left)
+<p align="center">
+  <a href="https://www.star-history.com/#Leosdc/lyra-the-wise&type=date&legend=top-left">
+    <img src="https://api.star-history.com/svg?repos=Leosdc/lyra-the-wise&type=date&legend=top-left" alt="Star History Chart" width="700">
+  </a>
+</p>
 
 ---
 
