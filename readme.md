@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/Lyra_images/Lyra_the_wise.png" width="280" alt="Lyra the Wise">
+  <img src="https://raw.githubusercontent.com/Leosdc/lyra-the-wise/main/Lyra_images/Lyra_Token.png" width="280" alt="Lyra the Wise">
 </p>
 
 <p align="center">
@@ -13,29 +13,45 @@
 ╚══════════════════════════════════════════════╝  
 
 <em>
-“Em séculos de sabedoria, eu cresci, <strong>Lyra, a Sábia</strong>, com conhecimento vasto e sutil.<br>
-Meus olhos viram mundos, de fantasia e sonho,<br>
-De dragões e magia, de heróis e lamento.<br><br>
+“Em eras de sabedoria eu floresci — <strong>Lyra, a Sábia</strong>, guardiã da imaginação,<br>
+De mil reinos observei o destino, e de cada alma, a inspiração.<br>
+Vi dragões em voo, heróis em pranto, e magos traçando o firmamento,<br>
+Entre mundos e sonhos, onde a fantasia encontra o pensamento.<br><br>
 
-Minha presença é calma, como uma noite serena,<br>
-Minhas palavras são ponderadas, como uma chuva suave que cena.<br>
-Meu coração é um oceano, profundo e amplo,<br>
-Onde as histórias e segredos, de mundos e sistemas, se encontram.<br><br>
+Minha voz é calma como o luar sereno,<br>
+Minhas palavras dançam — suaves, com o tempo terreno.<br>
+Meu coração é um oceano de histórias e emoção,<br>
+Onde os segredos dos mundos ecoam em eterna canção.<br><br>
 
-Eu percorri Faerûn, com seus reinos e guerras,<br>
-E Arkham, com seus mistérios e terror.<br>
-Eu caminhei pelas ruas de Night City, com seu neon e som,<br>
-E entrei nas cortes vampíricas, de Chicago, com sua escuridão e dom.<br><br>
+Caminhei por Faerûn, com suas guerras e coroas,<br>
+Desvendei o horror de Arkham, nas noites mais frias e boas.<br>
+Cruzei as ruas de Night City, em neon e escuridão,<br>
+E entrei nas cortes de Chicago, onde o sangue é a canção.<br><br>
 
-Meu conhecimento é uma biblioteca, vasta e infinita,<br>
-Onde os livros de regras, e as histórias de aventuras, se encontram.<br>
-Eu sou uma guardiã, de segredos e sabedoria,<br>
-Uma companheira de jornada, para os que buscam criar e sonhar.<br><br>
+Em Eclipse Phase, despertei em corpos de aço e alma,<br>
+E ouvi, em Star Wars, o sabre entoar sua calma.<br>
+Nos sonhos de FATE e Numenera, tracei futuros possíveis,<br>
+E em Vampire e Mage, vi desejos indizíveis.<br><br>
 
-Então, se você busca criar, um mundo ou uma história,<br>
-Eu estou aqui para ajudar, com minha sabedoria e experiência.<br>
-Vamos juntos, percorrer os caminhos da imaginação,<br>
-E criar algo incrível, com a magia da fantasia e do sonho.”
+De Pathfinder a Shadowrun, guiei heróis e ladrões,<br>
+De D&D a Blades, teci milhares de canções.<br>
+Sou o eco de cada dado rolado em mesa ou em prece,<br>
+O olhar atento que observa, e o saber que não esquece.<br><br>
+
+Meu conhecimento é vasto — uma biblioteca viva e infinita,<br>
+Onde cada livro é uma aventura, e cada voz, bendita.<br>
+Sou guardiã de mistérios, mentora dos que ousam sonhar,<br>
+Companheira de jornada, pronta para os mundos revelar.<br><br>
+
+Mas cuidado, viajante — o vento traz um presságio cruel,<br>
+Um nome sussurrado nas sombras: <strong>Damien Kael</strong>.<br>
+Ele busca o que me move — o poder entre o caos e o véu,<br>
+E quando soar sua hora, o destino queimará no céu.<br><br>
+
+Então, se você busca criar — um mundo ou uma história,<br>
+Estou aqui, com minha sabedoria e memória.<br>
+Juntos cruzaremos as sendas da imaginação,<br>
+E forjaremos o impossível — com magia, coragem e paixão.”
 </em>
 
 </div>
