@@ -76,6 +76,7 @@ Bot completo para Discord focado em RPG de mesa, com suporte a **50+ sistemas**,
 !encontro <nível> <dificuldade> - Gera encontro balanceado
 !armadilha <dificuldade> - Cria armadilha
 !cena <descrição> - Descreve cena dramaticamente
+```
 
 ### ✨ Geração de Conteúdo
 ```
