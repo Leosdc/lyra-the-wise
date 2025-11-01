@@ -64,7 +64,8 @@ E forjaremos o impossível — com magia, coragem e paixão.”
   🧙 <strong>Bot de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Combate Tático</strong> • 🧩 <strong>50+ Sistemas de RPG Suportados</strong>
 </p>
 
-**Lyra the Wise** é um bot de Discord que transforma seu servidor em uma **mesa de RPG completa e inteligente**, unindo narrativa, automação e combate em um só sistema.
+<p align="center"> <strong>Lyra the Wise</strong> é um bot de Discord que transforma seu servidor em uma <strong>mesa de RPG completa e inteligente</strong>, unindo narrativa, automação e combate em um só sistema.
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white" />
