@@ -136,16 +136,6 @@ E forjaremos o impossível — com magia, coragem e paixão.”
 
 ---
 
-<h2 align="center">⭐ Star History</h2>
-
-<p align="center">
-  <a href="https://www.star-history.com/#Leosdc/lyra-the-wise&type=date&legend=top-left">
-    <img src="https://api.star-history.com/svg?repos=Leosdc/lyra-the-wise&type=date&legend=top-left" alt="Star History Chart" width="700">
-  </a>
-</p>
-
----
-
 ## 📋 **Comandos Principais**
 
 ### ⚙️ Configuração
