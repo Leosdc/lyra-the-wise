@@ -406,6 +406,10 @@ def register_combat_commands(
                 fichas_personagens[player_name]["hp_atual"] = hp
         
         safe_save(sessao, salvar_dados)
+
+        # ✅ Reset combate
+        combat.is_active = False
+        sessao["combat"] = None  # Permite nova detecção automática depois
         
         await ctx.send(
             embed=discord.Embed(
