@@ -204,60 +204,65 @@ python main.py
 
 ## 🧩 Estrutura do Projeto
 ```
-lyra-the-wise/
-├── main.py
-├── config.py
-├── admin.py
-├── changelog.md
-├── documentacao.py
-├── fichas_estruturadas.py
-├── geracao_conteudo.py
-├── help_painel.py
-├── monstros_database.py
-├── readme.md
-├── rpg_core.py
-├── sessoes_rpg.py
-├── sistemas_comandos.py
-├── sistemas_rpg.py
-├── utilidades.py
-├── utils.py
-├── commands/
-│   ├── combate_commands.py
-│   ├── dados.py
-│   ├── mestre_ia.py
-│   ├── fichas_crud.py
-│   ├── fichas_conversao.py
-│   ├── fichas_edicao.py
-│   ├── geracao_npc.py
-│   ├── geracao_mundo.py
-│   ├── geracao_combate.py
-│   ├── geracao_itens.py
-│   ├── sessoes_acao.py
-│   └── sessoes_commands.py
-├── core/
-│   ├── data_manager.py
-│   ├── groq_client.py
-│   ├── text_utils.py
-│   ├── ficha_helpers.py
-│   ├── sistemas_helpers.py
-│   ├── monstros_helpers.py
-│   ├── sessao_helpers.py
-│   └── combat_system.py  
-├── views/
-│   ├── ficha_views.py
-│   ├── sessao_control_views.py
-│   ├── sessao_roll_views.py
-│   ├── sessao_continue_views.py
-│   ├── sessao_combat_views.py
-│   └── __init__.py
-├── data/
-│   ├── sistemas_definicoes.py
-│   ├── estruturas_fichas.py
-│   ├── monstros_dnd.py
-│   ├── monstros_horror.py
-│   └── monstros_outros.py
-├── requirements.txt
-└── LICENSE.txt
+📦 lyra-the-wise/
+├── 🧠 main.py
+├── ⚙️ config.py
+├── 🧾 admin.py
+├── 🕮 changelog.md
+├── 📘 documentacao.py
+├── 🧩 fichas_estruturadas.py
+├── 🪄 geracao_conteudo.py
+├── 🧭 help_painel.py
+├── 🐉 monstros_database.py
+├── 📖 readme.md
+├── 🧱 rpg_core.py
+├── 🧩 sessoes_rpg.py
+├── 🗡️ sistemas_comandos.py
+├── 🎲 sistemas_rpg.py
+├── 🧰 utilidades.py
+├── 🔧 utils.py
+│
+├── 📁 commands/
+│ ├── ⚔️ combate_commands.py
+│ ├── 🎲 dados.py
+│ ├── 🧙 mestre_ia.py
+│ ├── 🧾 fichas_crud.py
+│ ├── 🔄 fichas_conversao.py
+│ ├── 🧩 fichas_edicao.py
+│ ├── 👤 geracao_npc.py
+│ ├── 🌍 geracao_mundo.py
+│ ├── ⚔️ geracao_combate.py
+│ ├── 💎 geracao_itens.py
+│ ├── 🕹️ sessoes_acao.py
+│ └── 🪶 sessoes_commands.py
+│
+├── 📁 core/
+│ ├── 💾 data_manager.py
+│ ├── 🧠 groq_client.py
+│ ├── ✍️ text_utils.py
+│ ├── 📄 ficha_helpers.py
+│ ├── ⚙️ sistemas_helpers.py
+│ ├── 🧟 monstros_helpers.py
+│ ├── 🧩 sessao_helpers.py
+│ └── ⚔️ combat_system.py
+│
+├── 📁 views/
+│ ├── 🧾 ficha_views.py
+│ ├── 🧭 sessao_control_views.py
+│ ├── 🎲 sessao_roll_views.py
+│ ├── 🔁 sessao_continue_views.py
+│ ├── ⚔️ sessao_combat_views.py
+│ └── 📦 init.py
+│
+├── 📁 data/
+│ ├── ⚙️ sistemas_definicoes.py
+│ ├── 🧩 estruturas_fichas.py
+│ ├── 🐉 monstros_dnd.py
+│ ├── 👻 monstros_horror.py
+│ └── 🧿 monstros_outros.py
+│
+├── 📜 requirements.txt
+└── 📄 LICENSE.txt
 ```
 
 ---
