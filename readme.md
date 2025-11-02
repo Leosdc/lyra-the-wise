@@ -76,7 +76,7 @@ E forjaremos o impossível — com magia, coragem e paixão.”
 ---
 
 ## 🧭 **Índice**
-- [📜 O Sussurro das Estrelas](#-o-sussurro-das-estrelas)  
+- [📜 Novidades](#-novidades-da-v30)  
 - [🧙 Principais Recursos](#-principais-recursos)  
 - [⭐ Star History](#-star-history)  
 - [📋 Comandos Principais](#-comandos-principais)  
@@ -99,40 +99,119 @@ E forjaremos o impossível — com magia, coragem e paixão.”
 
 ---
 
-### 🧙 Principais Recursos
+## 🌟 **Novidades da v3.0**
 
-- 🤖 **IA Narrativa Contextual**  
-  A IA Groq (Llama 3) interpreta o mestre, gera histórias, descreve cenas e responde com base na memória da sessão.
+### 🎭 **Lyra como Narradora Passiva**
+- ✅ Descreve cenas, NPCs e ambientes com riqueza de detalhes
+- ✅ Usa os 5 sentidos para criar imersão
+- ❌ **NÃO solicita rolagens automaticamente**
+- ❌ **NÃO inicia combate sozinha**
+- ❌ **NÃO toma decisões mecânicas**
 
-- 🧩 **50+ Sistemas de RPG Suportados**  
-  Inclui D&D 5e, Pathfinder 1e/2e, CoC, WoD, GURPS, Shadowrun, Cyberpunk, Star Wars, FATE, Savage Worlds, Blades in the Dark e muitos outros.
+### 🎮 **Controle Total do Mestre**
+- **`!narrativa`** — Mestre descreve a cena, Lyra expande
+- **`!acoespendentes`** — Vê ações dos jogadores
+- **`!limparacoes`** — Limpa fila de ações
+- **Botões de Controle:**
+  - 🎲 Solicitar Rolagens
+  - ⚔️ Iniciar Combate
+  - 📊 Status Geral
+  - 📖 Ver Ações Pendentes
 
-- 🎲 **Rolagens e Combate Interativos**  
-  Interface de botões para rolar dados, atacar, curar, avançar turnos e encerrar combates — tudo automatizado com cálculo de CA, HP e iniciativa.
+### 🎒 **Sistema de Inventário Completo**
+```
+!inventario [jogador]         — Ver itens
+!addinventario <item> [qtd]   — Adicionar item
+!equiparitem <item>            — Equipar arma/armadura
+!usaritem <item>               — Usar consumível
+!jogarfora <item>              — Descartar item
+!vender <item> [preço]         — Vender item
+```
 
-- 🎭 **Fichas Inteligentes com IA**  
-  Criação automática de fichas com IA, edição interativa, exportação em JSON, conversão entre sistemas e seleção em sessão.
+### 📊 **Sistema de XP e Progressão**
+```
+!xp [jogador]                  — Ver XP atual
+!darxp <jogador> <quantidade>  — Dar XP individual
+!darxpgrupo <quantidade>       — Dar XP para todos
+```
 
-- 🧠 **Assistente do Mestre**  
-  Responde perguntas, cria NPCs, balanceia encontros, escreve descrições e improvisa cenas — mantendo memória por canal.
+- ✅ Barra de progresso visual
+- ✅ Level up automático
+- ✅ Notificações de progressão
 
-- 🧱 **Gestão de Sessões e Campanhas**  
-  Cria canais privados por grupo, gerencia convites, controla pausas, gera resumos automáticos e integra fichas ativas.
+---
 
-- ⚔️ **Sistema de Combate Tático Completo**  
-  Adiciona inimigos, rola iniciativas, alterna turnos, aplica dano e cura — com persistência de HP salva ao fim da batalha.
+## 📋 **Recursos Principais**
 
-- ✨ **Geração Procedural de Conteúdo**  
-  Cria monstros, NPCs, itens, vilões, puzzles, tesouros, armadilhas, encontros e cenas com base em tema e dificuldade.
+### 🎲 **Sistema de Dados Avançado**
+- **Rolagens complexas:** `!d 3d20kh1+5` (mantém maior), `!d 4d6dl1` (descarta menor)
+- **Múltiplos sistemas:** D&D 5e, Pathfinder, Savage Worlds, GURPS, Call of Cthulhu, Tormenta20, Ordem Paranormal
+- **Modificadores dinâmicos:** Vantagem/desvantagem, críticos, penalidades
+- **Rolagens da ficha:** `!roll Percepção` usa modificadores automáticos
+- **Rolagens secretas do mestre:** Resultados visíveis apenas para o mestre
+- **Histórico de rolagens:** Rastreamento de todas as rolagens da sessão
 
-- 📚 **Regras e Documentação Dinâmica**  
-  Consulta regras, detalhes de sistemas e referências diretamente no chat.
+### 📝 **Sistema Completo de Fichas**
+- **Adaptável a qualquer sistema:** Templates personalizáveis
+- **7 seções completas:** Básico, Atributos, Recursos, Combate, Equipamento, **Progressão** (XP/Inventário), História
+- **Edição intuitiva:** Interface por botões e comandos
+- **Cálculos automáticos:** Modificadores, CA, HP, recursos
+- **Importação/Exportação:** Compartilhe fichas entre servidores
+- **Validação de dados:** Impede erros de preenchimento
+- **Comandos:** `!ficha`, `!criarficha`, `!editarficha`, `!verficha`, `!deletarficha`
 
-- 🎙️ **Integração com Voz (opcional)**  
-  Criação automática de canais de voz e narração sintetizada via ElevenLabs.
+### 🎒 **Sistema de Inventário (NOVO v3.0)**
+- **Gestão completa de itens:** Adicionar, equipar, usar, vender, descartar
+- **Equipamento funcional:** Armas/armaduras afetam CA e dano
+- **Consumíveis:** Poções, pergaminhos com efeitos automáticos
+- **Organização:** Separa equipados vs. não equipados
+- **Quantidade:** Empilhamento automático de itens idênticos
+- **Comandos:** `!inventario`, `!addinventario`, `!equiparitem`, `!usaritem`, `!jogarfora`, `!vender`
 
-- 💾 **Administração e Manutenção Avançadas**  
-  Backup manual, reload modular, estatísticas de uso e painel de ajuda interativo com 4 páginas.
+### 📊 **Sistema de XP e Progressão (NOVO v3.0)**
+- **Barra de progresso visual:** Veja o avanço até o próximo nível
+- **Level up automático:** Quando atingir XP necessário
+- **Distribuição flexível:** XP individual ou para grupo
+- **Tabela configurável:** Suporte a diferentes curvas de progressão
+- **Notificações:** Alertas de conquistas e níveis
+- **Comandos:** `!xp`, `!darxp`, `!darxpgrupo`
+
+### ⚔️ **Combate Tático**
+- **Iniciativa automática:** Ordem de turnos calculada
+- **Rastreamento em tempo real:** HP, CA, condições, recursos
+- **Controle de turnos:** Avançar, pular, reordenar
+- **Múltiplos combatentes:** Jogadores e inimigos simultâneos
+- **Efeitos de área:** Aplica dano/cura em grupo
+- **Salvamento automático:** HP atualizado nas fichas ao fim do combate
+- **Visualização clara:** Embeds coloridos com status de todos
+- **Comandos:** `!iniciarcombate`, `!addinimigo`, `!atacar`, `!curar`, `!proximoturno`, `!fimcombate`
+
+### 🎭 **Narrativa com IA (Groq/Llama 3.1)**
+- **Descrições imersivas:** 5 sentidos, atmosfera, tensão dramática
+- **Adaptação contextual:** Considera sistema, estilo e ações dos jogadores
+- **NPCs únicos:** Personalidade, motivações, diálogo natural
+- **Locais detalhados:** Geografia, história, segredos ocultos
+- **Itens mágicos balanceados:** Efeitos interessantes sem quebrar o jogo
+- **Plot hooks dinâmicos:** Missões adaptadas ao grupo
+- **Memória de sessão:** Lyra lembra eventos anteriores
+- **Estilos narrativos:** Épico, sombrio, cômico, investigativo, horror
+
+### 🎮 **Sessões Interativas (v3.0)**
+- **Controle total do mestre:** Decisões mecânicas 100% humanas
+- **Fila de ações:** Jogadores declaram, mestre resolve
+- **Botões inteligentes:** Solicitar rolagens, iniciar combate, ver status
+- **Narrativa colaborativa:** Mestre + Lyra + Jogadores
+- **Ritmo flexível:** Teatro da mente ou combate tático
+- **Multi-canal:** Sessões paralelas em canais diferentes
+- **Logs automáticos:** Histórico completo da aventura
+
+### 🛠️ **Ferramentas do Mestre**
+- **Geração rápida:** NPCs, encontros, tesouros, dungeon em segundos
+- **Tabelas de referência:** Todas as perícias, condições, regras
+- **Notas secretas:** Informações visíveis apenas para o mestre
+- **Balanceamento:** Sugestões de CR/nível apropriado
+- **Templates:** Salvamento de encontros/NPCs favoritos
+- **Comandos administrativos:** Backup, migração, validação de dados
 
 ---
 
@@ -311,64 +390,81 @@ python main.py
 ## 🧩 Estrutura do Projeto
 ```
 📦 lyra-the-wise/
-├── 🧠 main.py
-├── ⚙️ config.py
-├── 🧾 admin.py
-├── 🕮 changelog.md
-├── 📘 documentacao.py
-├── 🧩 fichas_estruturadas.py
-├── 🪄 geracao_conteudo.py
-├── 🧭 help_painel.py
-├── 🐉 monstros_database.py
-├── 📖 readme.md
-├── 🧱 rpg_core.py
-├── 🧩 sessoes_rpg.py
-├── 🗡️ sistemas_comandos.py
-├── 🎲 sistemas_rpg.py
-├── 🧰 utilidades.py
-├── 🔧 utils.py
 │
-├── 📁 commands/
-│ ├── ⚔️ combate_commands.py
-│ ├── 🎲 dados.py
-│ ├── 🧙 mestre_ia.py
-│ ├── 🧾 fichas_crud.py
-│ ├── 🔄 fichas_conversao.py
-│ ├── 🧩 fichas_edicao.py
-│ ├── 👤 geracao_npc.py
-│ ├── 🌍 geracao_mundo.py
-│ ├── ⚔️ geracao_combate.py
-│ ├── 💎 geracao_itens.py
-│ ├── 🕹️ sessoes_acao.py
-│ └── 🪶 sessoes_commands.py
+├── 🧠 main.py                              # Ponto de entrada do bot
+├── ⚙️ config.py                            # Configurações globais e variáveis de ambiente
+├── 🧾 admin.py                             # Comandos administrativos (backup, reset)
+├── 🕮 changelog.md                         # Histórico completo de versões
+├── 📘 documentacao.py                      # Sistema de help e documentação in-bot
+├── 🧩 fichas_estruturadas.py               # Estruturas de dados para fichas
+├── 🪄 geracao_conteudo.py                  # Geração de conteúdo com IA (NPCs, itens, locais)
+├── 🧭 help_painel.py                       # Menu interativo de ajuda
+├── 🐉 monstros_database.py                 # Database completo de monstros
+├── 📖 readme.md                            # Documentação principal
+├── 🧱 rpg_core.py                          # Mecânicas fundamentais de RPG
+├── 🧩 sessoes_rpg.py                       # Sistema de sessões v3.0
+├── 🗡️ sistemas_comandos.py                 # Comandos específicos por sistema
+├── 🎲 sistemas_rpg.py                      # Definições de sistemas (D&D, Pathfinder, etc)
+├── 🧰 utilidades.py                        # Funções auxiliares diversas
+├── 🔧 utils.py                             # Utilitários principais (carregar/salvar dados)
 │
-├── 📁 core/
-│ ├── 💾 data_manager.py
-│ ├── 🧠 groq_client.py
-│ ├── ✍️ text_utils.py
-│ ├── 📄 ficha_helpers.py
-│ ├── ⚙️ sistemas_helpers.py
-│ ├── 🧟 monstros_helpers.py
-│ ├── 🧩 sessao_helpers.py
-│ └── ⚔️ combat_system.py
+├── 📁 commands/                            # Módulos de comandos
+│   ├── ⚔️ combate_commands.py              # Sistema de combate tático
+│   ├── 🎲 dados.py                         # Rolagens avançadas de dados
+│   ├── 🧙 mestre_ia.py                     # Comandos exclusivos do mestre com IA
+│   ├── 🧾 fichas_crud.py                   # Criar, ler, atualizar, deletar fichas
+│   ├── 🔄 fichas_conversao.py              # Conversão entre sistemas de RPG
+│   ├── 🧩 fichas_edicao.py                 # Edição detalhada de fichas
+│   ├── 👤 geracao_npc.py                   # Geração de NPCs com IA
+│   ├── 🌍 geracao_mundo.py                 # Geração de locais e worldbuilding
+│   ├── ⚔️ geracao_combate.py               # Geração de encontros balanceados
+│   ├── 💎 geracao_itens.py                 # Geração de itens mágicos/equipamentos
+│   ├── 🎒 inventario_commands.py           # Sistema de inventário (v3.0)
+│   ├── 📊 xp_commands.py                   # Sistema de XP e progressão (v3.0)
+│   ├── 🕹️ sessoes_acao.py                  # Fila de ações dos jogadores (v3.0)
+│   └── 🪶 sessoes_commands.py              # Comandos de controle de sessões
 │
-├── 📁 views/
-│ ├── 🧾 ficha_views.py
-│ ├── 🧭 sessao_control_views.py
-│ ├── 🎲 sessao_roll_views.py
-│ ├── 🔁 sessao_continue_views.py
-│ ├── ⚔️ sessao_combat_views.py
-│ └── 📦 init.py
+├── 📁 core/                                # Lógica central do sistema
+│   ├── 💾 data_manager.py                  # Gerenciamento de dados (save/load/backup)
+│   ├── 🧠 groq_client.py                   # Cliente da API Groq (IA)
+│   ├── ✍️ text_utils.py                    # Formatação de texto e embeds
+│   ├── 📄 ficha_helpers.py                 # Funções auxiliares para fichas
+│   ├── ⚙️ sistemas_helpers.py              # Helpers específicos por sistema
+│   ├── 🧟 monstros_helpers.py              # Busca e manipulação de monstros
+│   ├── 🧩 sessao_helpers.py                # Helpers de sessões (estado, contexto)
+│   ├── 📖 sessao_prompts.py                # System prompts para narrativa v3.0
+│   └── ⚔️ combat_system.py                 # Motor de combate (iniciativa, turnos, dano)
 │
-├── 📁 data/
-│ ├── ⚙️ sistemas_definicoes.py
-│ ├── 🧩 estruturas_fichas.py
-│ ├── 🐉 monstros_dnd.py
-│ ├── 👻 monstros_horror.py
-│ └── 🧿 monstros_outros.py
+├── 📁 views/                               # Interfaces interativas (botões/menus)
+│   ├── 🧾 ficha_views.py                   # Botões de criação/edição de fichas
+│   ├── 🧭 sessao_control_views.py          # Painel de controle do mestre (v3.0)
+│   ├── 🎲 sessao_roll_views.py             # Interface de solicitação de rolagens
+│   ├── 🔁 sessao_continue_views.py         # Botões de continuação narrativa
+│   ├── ⚔️ sessao_combat_views.py           # Interface de combate tático
+│   ├── ⚔️ sessao_master_control_views.py   # Interface do mestre
 │
-├── 📜 requirements.txt
-└── 📄 LICENSE.txt
+├── 📁 data/                                # Dados estáticos e banco de dados
+│   ├── ⚙️ sistemas_definicoes.py           # Definições completas de sistemas de RPG
+│   ├── 🧩 estruturas_fichas.py             # Templates de fichas por sistema
+│   ├── 🐉 monstros_dnd.py                  # Bestiário D&D 5e
+│   ├── 👻 monstros_horror.py               # Criaturas de horror (CoC, Vampiro)
+│   └── 🧿 monstros_outros.py               # Monstros de outros sistemas
+│
+├── 📁 docs/                                # Documentação adicional
+│   ├── 🔄 guia_migracao_v3.md              # Guia de migração v2 → v3
+│   ├── 🔄 exemplo_visual_v3.md             # Exemplo visual do sistema v3 de sessões
+│   └── 🔧 troubleshooting.md               # Solução de problemas comuns
+│
+├── 📁 scripts/                             # Scripts de manutenção
+│   ├── 🔄 migrate_to_v3.py                 # Migração automática para v3.0
+│   ├── 🧹 fix_inventario_structure.py      # Correção de estruturas antigas
+│   ├── ✅ validate_fichas.py               # Validação de integridade de fichas
+│   └── 📦 backup_data.py                   # Backup automatizado
+│
+├── 📜 requirements.txt                     # Dependências Python
+├── 📄 LICENSE.txt                          # Licença MIT
+├── 🔐 .env                                 # Exemplo de variáveis de ambiente
+└── 🚫 .gitignore                           # Arquivos ignorados pelo Git
 ```
 
 ---
@@ -404,6 +500,7 @@ python main.py
 
 ## 🙏 Agradecimentos
 
+- **[Mário](https://github.com/ItMeMario)** - Por todo o apoio e amizade de sempre
 - **Discord.py** - Framework incrível
 - **Groq** - IA rápida e poderosa
 - **Comunidade RPG** - Feedback e ideias
@@ -422,10 +519,6 @@ python main.py
 - [ ] E mais 30+ sistemas restantes
 
 ### 🆕 **Novas Features - Gameplay**
-- [ ] Sistema de progressão automática (level up)
-  - XP tracking automático
-  - Sugestões de escolhas por classe
-  - Atualização de fichas via IA
 
 - [ ] Sistema de Economia e Comércio
   - Loja procedural (itens por nível)
