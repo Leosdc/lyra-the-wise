@@ -461,6 +461,11 @@ python main.py
 │   ├── ✅ validate_fichas.py               # Validação de integridade de fichas
 │   └── 📦 backup_data.py                   # Backup automatizado
 │
+├── 📁 scripts/  
+│   ├── 🧾 dmd5e_masters_book.pdf           # Livro de mestre oficial do D&D 5ª Edição
+│   ├── 🧾 dnd5e_players_book.pdf           # Livro de jogador oficial do D&D 5ª Edição
+│   └── 🧾 dnd5e.pdf                        # Ficha oficial do D&D 5ª Edição
+│
 ├── 📜 requirements.txt                     # Dependências Python
 ├── 📄 LICENSE.txt                          # Licença MIT
 ├── 🔐 .env                                 # Exemplo de variáveis de ambiente
