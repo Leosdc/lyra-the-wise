@@ -164,7 +164,7 @@ def main():
     print("=" * 60)
     
     # Caminho das fichas
-    caminho_fichas = Path("data/fichas_personagens.json")
+    caminho_fichas = Path("C:\\Users\\PC\\OneDrive\\Documentos\\Bots\\Lyra the Wise\\data\\fichas_personagens.json")
     
     if not caminho_fichas.exists():
         print(f"\n❌ Arquivo não encontrado: {caminho_fichas}")
