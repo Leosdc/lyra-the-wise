@@ -9,50 +9,48 @@
 <div align="center">
 
 ╔══════════════════════════╗  
-<b>📜 O Sussurro das Estrelas</b>  
+<b>📜 The Whisper of the Stars</b>  
 ╚══════════════════════════╝  
 
-<em>
-“Em eras de sabedoria eu floresci — <strong>Lyra, a Sábia</strong>, guardiã da imaginação,<br>
-De mil reinos observei o destino, e de cada alma, a inspiração.<br>
-Vi dragões em voo, heróis em pranto, e magos traçando o firmamento,<br>
-Entre mundos e sonhos, onde a fantasia encontra o pensamento.<br><br>
+In ages of wisdom I did bloom and rise — <strong>Lyra the Wise</strong>, guardian of imagination's flame,<br>
+A thousand kingdoms I watched in their time, and from each soul, I drew their name.<br>
+I saw dragons in flight, heroes in tears, and mages who traced the starry dome,<br>
+Between worlds and dreams, where fantasy finds its home.<br><br>
 
-Minha voz é calma como o luar sereno,<br>
-Minhas palavras dançam — suaves, com o tempo terreno.<br>
-Meu coração é um oceano de histórias e emoção,<br>
-Onde os segredos dos mundos ecoam em eterna canção.<br><br>
+My voice is calm as moonlight's gentle glow,<br>
+My words dance softly — with time's eternal flow.<br>
+My heart's an ocean of stories and emotion deep,<br>
+Where secrets of the worlds in endless echoes sleep.<br><br>
 
-Caminhei por Faerûn, com suas guerras e coroas,<br>
-Desvendei o horror de Arkham, nas noites mais frias e boas.<br>
-Cruzei as ruas de Night City, em neon e escuridão,<br>
-E entrei nas cortes de Chicago, onde o sangue é a canção.<br><br>
+I walked through Faerûn, with its wars and crowns of gold,<br>
+Unraveled Arkham's horror, in nights both dark and cold.<br>
+I crossed the neon streets where Night City bleeds its light,<br>
+And entered Chicago's courts, where blood sings through the night.<br><br>
 
-Em Eclipse Phase, despertei em corpos de aço e alma,<br>
-E ouvi, em Star Wars, o sabre entoar sua calma.<br>
-Nos sonhos de FATE e Numenera, tracei futuros possíveis,<br>
-E em Vampire e Mage, vi desejos indizíveis.<br><br>
+In Eclipse Phase I woke in bodies made of steel and soul,<br>
+And heard, in Star Wars' realm, the saber's singing toll.<br>
+In dreams of FATE and Numenera, I traced futures yet to be,<br>
+And in Vampire and Mage, saw desires wild and free.<br><br>
 
-De Pathfinder a Shadowrun, guiei heróis e ladrões,<br>
-De D&D a Blades, teci milhares de canções.<br>
-Sou o eco de cada dado rolado em mesa ou em prece,<br>
-O olhar atento que observa, e o saber que não esquece.<br><br>
+From Pathfinder to Shadowrun, I guided heroes and thieves,<br>
+From D&D to Blades in shadow, I wove a thousand weaves.<br>
+I am the echo of each die that's rolled on table or in prayer,<br>
+The watchful eye observing, and knowledge beyond compare.<br><br>
 
-Meu conhecimento é vasto — uma biblioteca viva e infinita,<br>
-Onde cada livro é uma aventura, e cada voz, bendita.<br>
-Sou guardiã de mistérios, mentora dos que ousam sonhar,<br>
-Companheira de jornada, pronta para os mundos revelar.<br><br>
+My wisdom is vast — a living library without end,<br>
+Where every book's an adventure, and every voice a friend.<br>
+I am keeper of mysteries, mentor to those who dare to dream,<br>
+A journey's companion, ready to reveal each world's gleam.<br><br>
 
-Mas cuidado, viajante — o vento traz um presságio cruel,<br>
-Um nome sussurrado nas sombras: <strong>Damien Kael</strong>.<br>
-Ele busca o que me move — o poder entre o caos e o véu,<br>
-E quando soar sua hora, o destino queimará no céu.<br><br>
+But beware, traveler — the wind brings a cruel warning's wail,<br>
+A name whispered in the shadows: <strong>Damien Kael</strong>.<br>
+He seeks what moves me — the power between chaos and the veil,<br>
+And when his hour sounds, destiny shall burn without fail.<br><br>
 
-Então, se você busca criar — um mundo ou uma história,<br>
-Estou aqui, com minha sabedoria e memória.<br>
-Juntos cruzaremos as sendas da imaginação,<br>
-E forjaremos o impossível — com magia, coragem e paixão.”
-</em>
+So if you seek to create — a world or story yet untold,<br>
+I'm here with wisdom and memory of old.<br>
+Together we'll cross the paths of imagination's grand design,<br>
+And forge the impossible — with magic, courage, and passion divine."
 
 </div>
 
