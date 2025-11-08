@@ -12,7 +12,7 @@
 <b>📜 The Whisper of the Stars</b>  
 ╚══════════════════════════╝  
 
-In ages of wisdom I did bloom and rise — <strong>Lyra the Wise</strong>, guardian of imagination's flame,<br>
+"In ages of wisdom I did bloom and rise — <strong>Lyra the Wise</strong>, guardian of imagination's flame,<br>
 A thousand kingdoms I watched in their time, and from each soul, I drew their name.<br>
 I saw dragons in flight, heroes in tears, and mages who traced the starry dome,<br>
 Between worlds and dreams, where fantasy finds its home.<br>
