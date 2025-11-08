@@ -1,7 +1,4 @@
-# core/sessao_prompts.py (NOVO ARQUIVO)
-"""
-System prompts específicos para o sistema de sessões v3.0.
-"""
+# core/sessao_prompts.py
 
 def get_narrative_system_prompt(sistema: str, estilo: str) -> str:
     """
@@ -18,10 +15,10 @@ def get_narrative_system_prompt(sistema: str, estilo: str) -> str:
     
     base_prompt = get_system_prompt(sistema)
     
-    # Instruções específicas v3.0
+    # Instruções específicas
     v3_instructions = """
 
-🎭 **INSTRUÇÕES CRÍTICAS v3.0 — LYRA COMO NARRADORA:**
+🎭 **INSTRUÇÕES CRÍTICAS — LYRA COMO NARRADORA:**
 
 **VOCÊ É APENAS UMA NARRADORA. NÃO TOME DECISÕES DE MECÂNICA.**
 

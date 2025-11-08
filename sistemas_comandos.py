@@ -37,10 +37,9 @@ def register(bot: commands.Bot):
 
     @bot.command(name="sistemas")
     async def sistemas(ctx):
-        """Lista todos os sistemas suportados."""
-        linhas = [f"**{info['nome']}** (`{codigo}`)" for codigo, info in SISTEMAS_DISPONIVEIS.items()]
-        texto = "📚 **Sistemas Suportados:**\n" + "\n".join(linhas)
-
+        """Lista todos os sistemas suportados com paginação."""
+        from views.pagination_views import create_sistemas_pages
+        
         is_dm = isinstance(ctx.channel, discord.DMChannel)
 
         try:
@@ -49,9 +48,9 @@ def register(bot: commands.Bot):
             pass
         
         try:
-            partes = enviar_em_partes(texto)
-            for parte in partes:
-                await ctx.author.send(parte)
+            view = create_sistemas_pages(SISTEMAS_DISPONIVEIS)
+            await ctx.author.send(embed=view.get_embed(), view=view)
+            
             if not is_dm:
                 await ctx.send(f"📨 {ctx.author.mention}, lista enviada no privado!", delete_after=10)
         

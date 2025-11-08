@@ -1,4 +1,4 @@
-# commands/sessoes_acao.py (REFATORADO v3.0)
+# commands/sessoes_acao.py
 """
 Comandos de ação CONTROLADOS PELO MESTRE.
 Lyra só narra - mestre decide tudo.
@@ -53,7 +53,7 @@ def register_acao_commands(
         historia.append({"role": "user", "content": f"Mestre descreve situação: {prompt}"})
         historia_recente = historia[-20:]
         
-        # Usa novos prompts v3.0
+        # Usa novos prompts
         from core.sessao_prompts import get_narrative_system_prompt, get_master_narrative_instructions
         
         system_prompt = get_narrative_system_prompt(sistema, estilo)

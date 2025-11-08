@@ -63,6 +63,8 @@ def register_combate_commands(bot: commands.Bot, sistemas_rpg, SISTEMAS_DISPONIV
     @bot.command(name="monstros")
     async def listar_monstros(ctx):
         """Lista todos os monstros disponíveis no banco de dados para o sistema atual."""
+        from views.pagination_views import create_monstros_pages
+        
         sistema = get_sistema_usuario(ctx.author.id)
         monstros = listar_monstros_por_sistema(sistema)
         
@@ -70,14 +72,20 @@ def register_combate_commands(bot: commands.Bot, sistemas_rpg, SISTEMAS_DISPONIV
             await ctx.send(f"❌ Nenhum monstro catalogado para {SISTEMAS_DISPONIVEIS[sistema]['nome']} ainda.")
             return
         
-        lista = "\n".join([f"• {m}" for m in monstros])
-        embed = discord.Embed(
-            title=f"👹 Monstros - {SISTEMAS_DISPONIVEIS[sistema]['nome']}",
-            description=f"Use `!monstro <nome>` para ver detalhes\n\n{lista}",
-            color=discord.Color.dark_red()
-        )
-        embed.set_footer(text=f"{len(monstros)} monstros disponíveis")
-        await ctx.send(embed=embed)
+        try:
+            view = create_monstros_pages(monstros, SISTEMAS_DISPONIVEIS[sistema]['nome'])
+            await ctx.send(embed=view.get_embed(), view=view)
+        except Exception as e:
+            print(f"❌ Erro ao criar view paginada: {e}")
+            # Fallback para método antigo
+            lista = "\n".join([f"• {m}" for m in monstros])
+            embed = discord.Embed(
+                title=f"👹 Monstros - {SISTEMAS_DISPONIVEIS[sistema]['nome']}",
+                description=f"Use `!monstro <nome>` para ver detalhes\n\n{lista}",
+                color=discord.Color.dark_red()
+            )
+            embed.set_footer(text=f"{len(monstros)} monstros disponíveis")
+            await ctx.send(embed=embed)
 
     @bot.command(name="encontro")
     async def encontro(ctx, nivel: int = None, dificuldade: str = "medio"):

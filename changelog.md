@@ -1,5 +1,13 @@
 # 📜 Changelog
 
+## [2.6.0] - 2025-11-08
+## 🎯 **Paginação de menus**
+- Menu de !monstros
+- Menu de !sistemas
+- Sistema de paginação geral
+
+---
+
 ## [2.6.0] - 2025-11-01
 ## 🎯 **Sistema de Sessões Refatorado**
 ### 1️⃣ **Lyra como Narradora Passiva**

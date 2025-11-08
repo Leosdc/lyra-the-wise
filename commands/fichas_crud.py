@@ -300,7 +300,9 @@ CRÍTICO: Retorne APENAS o JSON válido, nada antes ou depois."""
 
     @bot.command(name="minhasfichas")
     async def minhas_fichas(ctx, sistema_filtro: str = None):
-        """Lista suas fichas."""
+        """Lista suas fichas com paginação."""
+        from views.pagination_views import create_fichas_pages
+        
         user_id = ctx.author.id
         fichas_user = {k: v for k, v in fichas_personagens.items() if v.get("autor") == user_id}
         
@@ -312,28 +314,38 @@ CRÍTICO: Retorne APENAS o JSON válido, nada antes ou depois."""
             from sistemas_rpg import resolver_alias
             sistema_filtro = resolver_alias(sistema_filtro.lower())
             fichas_user = {k: v for k, v in fichas_user.items() if v.get("sistema") == sistema_filtro}
+            
+            if not fichas_user:
+                await ctx.send(f"❌ Você não tem fichas para o sistema `{sistema_filtro}`.")
+                return
 
-        total = len(fichas_user)
-        sistemas_dict = {}
-        for f in fichas_user.values():
-            sistemas_dict.setdefault(f["sistema"], []).append(f)
+        try:
+            view = create_fichas_pages(fichas_user, user_id, SISTEMAS_DISPONIVEIS)
+            await ctx.send(embed=view.get_embed(), view=view)
+        except Exception as e:
+            print(f"❌ Erro ao criar view paginada: {e}")
+            # Fallback para método antigo
+            total = len(fichas_user)
+            sistemas_dict = {}
+            for f in fichas_user.values():
+                sistemas_dict.setdefault(f["sistema"], []).append(f)
 
-        descricao = f"Total: {total} ficha(s)\n\n"
-        for s, lista in sistemas_dict.items():
-            descricao += f"🎲 {SISTEMAS_DISPONIVEIS[s]['nome']} ({len(lista)})\n"
-            for f in lista:
-                nome = f['nome']
-                tipo = " 📋" if "secoes" in f and f["secoes"] else " 📄"
-                descricao += f"• {nome}{tipo}\n"
-            descricao += "\n"
+            descricao = f"Total: {total} ficha(s)\n\n"
+            for s, lista in sistemas_dict.items():
+                descricao += f"🎲 {SISTEMAS_DISPONIVEIS[s]['nome']} ({len(lista)})\n"
+                for f in lista:
+                    nome = f['nome']
+                    tipo = " 📋" if "secoes" in f and f["secoes"] else " 📄"
+                    descricao += f"• {nome}{tipo}\n"
+                descricao += "\n"
 
-        await ctx.send(
-            embed=discord.Embed(
-                title="📚 Suas Fichas de Personagem",
-                description=descricao[:4000],
-                color=discord.Color.blurple(),
-            ).set_footer(text="📋 = Estruturada (com páginas) | 📄 = Formato antigo | Use !verficha <nome>")
-        )
+            await ctx.send(
+                embed=discord.Embed(
+                    title="📚 Suas Fichas de Personagem",
+                    description=descricao[:4000],
+                    color=discord.Color.blurple(),
+                ).set_footer(text="📋 = Estruturada (com páginas) | 📄 = Formato antigo | Use !verficha <nome>")
+            )
 
     @bot.command(name="deletarficha")
     async def deletar_ficha(ctx, *, nome: str = None):

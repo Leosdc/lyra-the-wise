@@ -1,4 +1,4 @@
-# 🎨 EXEMPLO VISUAL - Interface v3.0
+# 🎨 EXEMPLO VISUAL
 
 ## 📺 **Como Ficará a Interface Durante o Jogo**
 
