@@ -24,7 +24,7 @@ def register(bot: commands.Bot):
             name="🎲 Visão Geral",
             value=(
                 "Bot completo para gerenciamento de mesas de RPG no Discord.\n"
-                "Suporte a **50+ sistemas**, **IA narrativa**, **sessões privadas** "
+                "Suporte a **40+ sistemas**, **IA narrativa**, **sessões privadas** "
                 "e **combate tático** automatizado."
             ),
             inline=False
@@ -33,7 +33,7 @@ def register(bot: commands.Bot):
             name="⚙️ Configuração e Sistemas",
             value="""\
 !sistema [código] — Ver/mudar sistema atual  
-!sistemas — Lista os 50+ sistemas disponíveis  
+!sistemas — Lista os 40+ sistemas disponíveis  
 !buscarsistema <termo> — Busca sistemas por nome  
 !infosistema <código> — Mostra detalhes de um sistema  
 !limpar — Limpa histórico de conversa do canal""",
@@ -177,7 +177,7 @@ D&D 5e / 3.5 • Pathfinder 1e/2e • Call of Cthulhu
 Vampire / Werewolf / Mage • GURPS • FATE • Shadowrun  
 Cyberpunk RED / 2020 • Star Wars d20 / FFG  
 Savage Worlds • Blades in the Dark • Dungeon World  
-E muitos outros! Total: **50+ sistemas**""",
+E muitos outros! Total: **40+ sistemas**""",
             inline=False
         )
         embed5_pt.add_field(
@@ -212,7 +212,7 @@ Tecnologias: Python 3.10+, Discord.py 2.0+, Groq API (Llama 3.3 70B)
             name="🎲 Overview",
             value=(
                 "Full-featured bot to run tabletop RPG games on Discord.\n"
-                "Supports **50+ systems**, **narrative AI**, **private sessions**, "
+                "Supports **40+ systems**, **narrative AI**, **private sessions**, "
                 "and **automated tactical combat**."
             ),
             inline=False
@@ -221,7 +221,7 @@ Tecnologias: Python 3.10+, Discord.py 2.0+, Groq API (Llama 3.3 70B)
             name="⚙️ Setup & Systems",
             value="""\
 !sistema [code] — View/change current system  
-!sistemas — List all 50+ available systems  
+!sistemas — List all 40+ available systems  
 !buscarsistema <term> — Search systems by name  
 !infosistema <code> — System details  
 !limpar — Clear channel conversation history""",
@@ -365,7 +365,7 @@ D&D 5e / 3.5 • Pathfinder 1e/2e • Call of Cthulhu
 Vampire / Werewolf / Mage • GURPS • FATE • Shadowrun  
 Cyberpunk RED / 2020 • Star Wars d20 / FFG  
 Savage Worlds • Blades in the Dark • Dungeon World  
-And many more! Total: **50+ systems**""",
+And many more! Total: **40+ systems**""",
             inline=False
         )
         embed5_en.add_field(

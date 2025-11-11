@@ -614,7 +614,7 @@ Se tiver dúvidas sobre a v3.0:
 - Prompt dinâmico adaptado à estrutura de cada sistema
 - Geração automática de exemplo JSON baseado nos campos do sistema
 - Parser robusto com fallback inteligente por sistema
-- Compatível com todos os 50+ sistemas suportados
+- Compatível com todos os 40+ sistemas suportados
 
 ### 🧠 IA Mais Inteligente
 - Prompts específicos por sistema para melhor preenchimento
@@ -783,7 +783,7 @@ Estruturas em desenvolvimento para:
 ### Adicionado
 - Integração com **Groq (Llama 3.3 70B)** para geração de conteúdo com IA.
 - Banco de dados com 15+ monstros pré-cadastrados.
-- 50+ sistemas de RPG suportados.
+- 40+ sistemas de RPG suportados.
 - Sessões privadas com canais dedicados.
 - Auto-save e comando `!backup`.
 - 50 comandos funcionais organizados.

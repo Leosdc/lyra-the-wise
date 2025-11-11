@@ -26,7 +26,7 @@ def register(bot: commands.Bot):
             value="""\
 !sistema - Ver/mudar sistema atual
 !sistema dnd5e - Mudar para D&D 5e
-!sistemas - Lista todos os 50+ sistemas
+!sistemas - Lista todos os 40+ sistemas
 !buscarsistema <nome> - Busca sistemas
 !infosistema <código> - Detalhes do sistema
 !limpar - Limpa histórico de conversa""",

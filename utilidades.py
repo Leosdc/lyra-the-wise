@@ -140,7 +140,7 @@ def register(bot: commands.Bot):
             description=(
                 "Um assistente completo para mestres e jogadores de RPG de mesa!\n\n"
                 "**Recursos principais:**\n"
-                "• 50+ sistemas de RPG suportados\n"
+                "• 40+ sistemas de RPG suportados\n"
                 "• Geração de fichas com IA\n"
                 "• Sessões privadas com canais dedicados\n"
                 "• Assistente de mestre inteligente\n"

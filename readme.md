@@ -57,7 +57,7 @@ And forge the impossible — with magic, courage, and passion divine."
 ---
 
 <p align="center">
-  🧙 <strong>Bot de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Combate Tático</strong> • 🧩 <strong>50+ Sistemas de RPG Suportados</strong>
+  🧙 <strong>Bot de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Combate Tático</strong> • 🧩 <strong>40+ Sistemas de RPG Suportados</strong>
 </p>
 
 <p align="center"> <strong>Lyra the Wise</strong> é um bot de Discord que transforma seu servidor em uma <strong>mesa de RPG completa e inteligente</strong>, unindo narrativa, automação e combate em um só sistema.
@@ -219,7 +219,7 @@ And forge the impossible — with magic, courage, and passion divine."
 ```
 !sistema - Ver/mudar sistema atual
 !sistema dnd5e - Mudar para D&D 5e
-!sistemas - Lista todos os 50+ sistemas
+!sistemas - Lista todos os 40+ sistemas
 !buscarsistema <nome> - Busca sistemas
 !infosistema <código> - Detalhes do sistema
 !limpar - Limpa histórico de conversa
@@ -279,7 +279,7 @@ improvisar situações e tirar dúvidas de regras.
 💡 Mantém memória da conversa por canal!
 
 📚 Sistemas Suportados
-50+ sistemas de RPG disponíveis:
+40+ sistemas de RPG disponíveis:
 !sistemas ou !listarsistemas - Ver todos
 !buscarsistema <nome> - Buscar sistema
 !infosistema [código] - Detalhes do sistema
