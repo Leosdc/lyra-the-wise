@@ -1,6 +1,6 @@
 # 📜 Changelog
 
-## [3.0.2] - 2025-11-08
+## [3.0.2] - 2025-11-29
 ## 🎯 **Bugs reportados corrigidos**
 - Edição de ficha livre consegue criar novas informações no Json do personagem, mas não aparece no !verficha
 - !ficha <nome> pode reescrever personagem ja criado sem confirmação, apagando todo o personagem anterior e criando um aleatório em cima
