@@ -1,4 +1,4 @@
-# help_painel.py (ATUALIZADO v3.0)
+# help_painel.py
 import discord
 from discord.ext import commands
 from discord.ui import View, button
@@ -17,7 +17,7 @@ def register(bot: commands.Bot):
 
         # ---------------- Página 1 - Configuração & Dados ----------------
         embed1 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos v3.0 (1/5)",
+            title="🎲 Lyra, the Wise (1/5)",
             description="Seu assistente completo de RPG de mesa!",
             color=discord.Color.teal(),
         )
@@ -56,9 +56,9 @@ def register(bot: commands.Bot):
         embed1.set_footer(text="📄 Página 1/5 • Use os botões abaixo para navegar")
         pages.append(embed1)
 
-        # ---------------- Página 2 - Inventário & XP (NOVO v3.0) ----------------
+        # ---------------- Página 2 - Inventário & XP ----------------
         embed2 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos v3.0 (2/5)",
+            title="🎲 Lyra, the Wise (2/5)",
             description="Inventário, XP e progressão de personagens",
             color=discord.Color.gold(),
         )
@@ -92,7 +92,7 @@ def register(bot: commands.Bot):
 
         # ---------------- Página 3 - Geração & IA ----------------
         embed3 = discord.Embed(
-            title="🎲 Lyra, the Wise - Comandos v3.0 (3/5)",
+            title="🎲 Lyra, the Wise (3/5)",
             description="Ferramentas de geração e IA",
             color=discord.Color.orange(),
         )
@@ -131,9 +131,9 @@ def register(bot: commands.Bot):
         embed3.set_footer(text="📄 Página 3/5")
         pages.append(embed3)
 
-        # ---------------- Página 4 - Sessões v3.0 (ATUALIZADO) ----------------
+        # ---------------- Página 4 ----------------
         embed4 = discord.Embed(
-            title="🎮 Lyra, the Wise - Sessões v3.0 (4/5)",
+            title="🎮 Lyra, the Wise (4/5)",
             description="Sistema de sessões TOTALMENTE controlado pelo mestre",
             color=discord.Color.dark_green(),
         )
@@ -148,7 +148,7 @@ def register(bot: commands.Bot):
             inline=False,
         )
         embed4.add_field(
-            name="📖 Narrativa e Ações (v3.0)",
+            name="📖 Narrativa e Ações",
             value="""\
 **[MESTRE]**
 !narrativa <descrição> - Lyra narra a cena
@@ -205,7 +205,7 @@ def register(bot: commands.Bot):
             inline=False,
         )
         embed5.add_field(
-            name="💡 Fluxo Completo v3.0",
+            name="💡 Fluxo Completo",
             value="""\
 1️⃣ `!iniciarsessao @jogadores`
 2️⃣ Jogadores: `!selecionarficha <nome>`

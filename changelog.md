@@ -1,6 +1,16 @@
 # 📜 Changelog
 
-## [2.6.0] - 2025-11-08
+## [3.0.2] - 2025-11-08
+## 🎯 **Bugs reportados corrigidos**
+- Edição de ficha livre consegue criar novas informações no Json do personagem, mas não aparece no !verficha
+- !ficha <nome> pode reescrever personagem ja criado sem confirmação, apagando todo o personagem anterior e criando um aleatório em cima
+
+## 🎯 **Bugs reportados ainda em correção**
+- Sincronização do !inventario com criação de personagem não funcionando
+
+---
+
+## [3.0.1] - 2025-11-08
 ## 🎯 **Paginação de menus**
 - Menu de !monstros
 - Menu de !sistemas
@@ -8,7 +18,7 @@
 
 ---
 
-## [2.6.0] - 2025-11-01
+## [3.0.0] - 2025-11-01
 ## 🎯 **Sistema de Sessões Refatorado**
 ### 1️⃣ **Lyra como Narradora Passiva**
 ❌ **REMOVIDO:**

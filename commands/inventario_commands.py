@@ -84,20 +84,84 @@ def register_inventario_commands(bot: commands.Bot, fichas_personagens: Dict[str
         await ctx.send(embed=embed)
     
     @bot.command(name="addinventario")
-    async def add_inventario(ctx: commands.Context, nome_item: str, quantidade: int = 1, *, tipo: str = "geral"):
-        """Adicionar item ao inventário."""
+    async def add_inventario(ctx: commands.Context, *args):
+        """
+        Adicionar item ao inventário.
+        Uso: 
+        - !addinventario <item> [quantidade] [tipo]
+        - !addinventario "item com espaços" 5 arma
+        """
         from core.ficha_helpers import encontrar_ficha, salvar_fichas_agora
         from config import sessoes_ativas
         
+        if not args:
+            return await ctx.send(
+                "❌ **Uso correto:**\n"
+                "• `!addinventario <item>` — Adiciona 1 unidade\n"
+                "• `!addinventario <item> <quantidade>` — Adiciona quantidade específica\n"
+                "• `!addinventario <item> <quantidade> <tipo>` — Com tipo (arma/armadura/consumível/geral)\n\n"
+                "**Exemplos:**\n"
+                "• `!addinventario Espada` — Adiciona 1 Espada\n"
+                "• `!addinventario Poção 5` — Adiciona 5 Poções\n"
+                "• `!addinventario \"Cajado Mágico\" 1 arma` — Adiciona 1 Cajado Mágico (tipo: arma)"
+            )
+        
+        # Parse de argumentos flexível
+        # args pode ser: ("item",) ou ("item", "5") ou ("item", "5", "arma")
+        # ou com aspas: ("item com espaços", "5", "arma")
+        
+        nome_item = args[0]
+        quantidade = 1
+        tipo = "geral"
+        
+        # Tenta extrair quantidade (segundo argumento)
+        if len(args) >= 2:
+            try:
+                quantidade = int(args[1])
+            except ValueError:
+                # Se não for número, assume que é tipo e quantidade é 1
+                tipo = args[1]
+        
+        # Tenta extrair tipo (terceiro argumento)
+        if len(args) >= 3:
+            tipo = args[2]
+        
+        # Valida quantidade
+        if quantidade < 1:
+            return await ctx.send("❌ Quantidade deve ser no mínimo 1!")
+        
         # Detecta ficha ativa
         sessao = sessoes_ativas.get(ctx.channel.id)
+        
         if sessao:
+            # DENTRO de sessão - usa ficha ativa
             fichas_sel = sessao.get("fichas", {})
             chave = fichas_sel.get(str(ctx.author.id)) or fichas_sel.get(ctx.author.id)
             ficha = fichas_personagens.get(chave) if chave else None
         else:
-            # Fora de sessão - precisa nome
-            return await ctx.send("❌ Use este comando dentro de uma sessão ou especifique: `!addinventario <nome_ficha> <item>`")
+            # FORA de sessão - precisa especificar nome da ficha
+            # Mas... isso complica muito. Melhor sempre usar dentro de sessão
+            # OU buscar ficha pelo nome do autor (se tiver só uma)
+            
+            fichas_user = {k: v for k, v in fichas_personagens.items() if v.get("autor") == ctx.author.id}
+            
+            if len(fichas_user) == 0:
+                return await ctx.send(
+                    "❌ Você não tem fichas criadas!\n"
+                    "💡 Use `!ficha <nome>` ou `!criarficha` para criar uma."
+                )
+            elif len(fichas_user) == 1:
+                # Tem só uma ficha - usa ela
+                chave = list(fichas_user.keys())[0]
+                ficha = fichas_user[chave]
+            else:
+                # Tem múltiplas - precisa especificar
+                nomes = [f['nome'] for f in fichas_user.values()]
+                return await ctx.send(
+                    f"❌ Você tem múltiplas fichas: {', '.join(nomes)}\n\n"
+                    f"💡 Use este comando **dentro de uma sessão** após `!selecionarficha <nome>`,\n"
+                    f"OU use `!inventario <nome_ficha>` para especificar qual ficha."
+                )
         
         if not ficha:
             return await ctx.send("❌ Ficha não encontrada!")
@@ -125,7 +189,10 @@ def register_inventario_commands(bot: commands.Bot, fichas_personagens: Dict[str
         if item_encontrado:
             # Aumenta quantidade
             item_encontrado["quantidade"] = item_encontrado.get("quantidade", 1) + quantidade
-            await ctx.send(f"✅ **{nome_item}** x{quantidade} adicionado! Total: {item_encontrado['quantidade']}")
+            await ctx.send(
+                f"✅ **{nome_item}** x{quantidade} adicionado! "
+                f"Total: {item_encontrado['quantidade']}"
+            )
         else:
             # Adiciona novo item
             novo_item = {
@@ -134,7 +201,10 @@ def register_inventario_commands(bot: commands.Bot, fichas_personagens: Dict[str
                 "tipo": tipo
             }
             inventario.append(novo_item)
-            await ctx.send(f"✅ **{nome_item}** x{quantidade} adicionado ao inventário de **{nome_personagem}**!")
+            await ctx.send(
+                f"✅ **{nome_item}** x{quantidade} adicionado ao inventário de **{nome_personagem}**!\n"
+                f"🏷️ Tipo: {tipo}"
+            )
         
         salvar_fichas_agora()
     

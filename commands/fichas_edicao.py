@@ -1,4 +1,4 @@
-# commands/fichas_edicao.py
+# commands/fichas_edicao.py (CORRIGIDO - Parte 1)
 """Comandos de criação interativa e edição de fichas."""
 
 import discord
@@ -151,6 +151,7 @@ def register_fichas_edicao_commands(bot: commands.Bot):
 4. CRIE equipamento inicial completo e apropriado
 5. ADICIONE habilidades de classe do nível apropriado
 6. DESENVOLVA história em 3-4 parágrafos envolventes
+7. SEMPRE inclua seções "equipamento" com "Inventário": [] e "Equipado": {{"Arma": "—", "Armadura": "—"}}
 
 **FORMATO JSON OBRIGATÓRIO - PREENCHA TODOS OS CAMPOS:**
 
@@ -179,14 +180,16 @@ def register_fichas_edicao_commands(bot: commands.Bot):
   }},
   "combate": {{
     "CA": [CALCULAR: 10 + mod_DES + armadura],
-    "Iniciativa": [modificador de Destreza com sinal: +2, -1, etc],
+    "Iniciativa": "[modificador de Destreza com sinal: +2, -1, etc]",
     "Velocidade": "9m",
     "Ataques": ["[ARMA 1]: +[bônus] para acertar, [dano]+[mod]", "[ARMA 2]: +[bônus] para acertar, [dano]+[mod]"]
   }},
   "equipamento": {{
-    "Armas": ["[LISTAR 2-3 armas apropriadas com bônus mágico se nível alto]"],
-    "Armadura": "[TIPO de armadura apropriada (ex: Cota de Malha, Armadura de Placas +1)]",
+    "Armas": ["[LISTAR 2-3 armas apropriadas]"],
+    "Armadura": "[TIPO de armadura apropriada]",
     "Itens": ["[LISTAR 6-10 itens: poções, ferramentas, itens mundanos]"],
+    "Inventário": [],
+    "Equipado": {{"Arma": "[nome da arma principal]", "Armadura": "[tipo de armadura]"}},
     "Dinheiro": "[QUANTIDADE apropriada] PO"
   }},
   "magia": {{
@@ -204,16 +207,6 @@ def register_fichas_edicao_commands(bot: commands.Bot):
     "História": "[ESCREVER 3-4 parágrafos completos integrando: {aparencia}, {historia}, {objetivos} de forma coesa e envolvente]"
   }}
 }}
-
-**VALIDAÇÃO FINAL OBRIGATÓRIA:**
-✓ TODOS os campos têm valores reais (não "—", "A definir", ou vazios)
-✓ Atributos somam entre 70-78 (método padrão 4d6 descartando menor)
-✓ HP calculado corretamente conforme dado de vida da classe
-✓ CA inclui armadura apropriada
-✓ Ataques têm bônus de ataque e dano calculados
-✓ Equipamento faz sentido para o nível e classe
-✓ Magias apropriadas para nível de conjurador
-✓ História é rica, coerente e bem desenvolvida
 
 **RETORNE APENAS O JSON PURO - SEM TEXTO ANTES OU DEPOIS, SEM MARKDOWN, SEM EXPLICAÇÕES.**"""
 
@@ -259,11 +252,24 @@ def register_fichas_edicao_commands(bot: commands.Bot):
                     "atributos": {"Força": 10, "Destreza": 10, "Constituição": 10, "Inteligência": 10, "Sabedoria": 10, "Carisma": 10},
                     "recursos": {},
                     "combate": {},
-                    "equipamento": {},
+                    "equipamento": {
+                        "Inventário": [],
+                        "Equipado": {"Arma": "—", "Armadura": "—"}
+                    },
                     "magia": {},
                     "historia": {"Personalidade": conceito, "Aparência": aparencia, "História": historia, "Objetivos": objetivos}
                 }
                 await ctx.author.send("⚠️ IA teve dificuldades. Criada ficha básica. Use `!editarficha` para completar!")
+            
+            if "equipamento" in secoes_estruturadas:
+                if "Inventário" not in secoes_estruturadas["equipamento"]:
+                    secoes_estruturadas["equipamento"]["Inventário"] = []
+                
+                if "Equipado" not in secoes_estruturadas["equipamento"]:
+                    secoes_estruturadas["equipamento"]["Equipado"] = {
+                        "Arma": "—",
+                        "Armadura": "—"
+                    }
             
             # Salva ficha
             chave = key_from_name(f"{ctx.author.id}_{nome}")
@@ -392,7 +398,6 @@ def register_fichas_edicao_commands(bot: commands.Bot):
                 conteudo_atual = ficha.get("conteudo", "")
                 formato = "texto"
             
-            # PROMPT CRÍTICO REFORMULADO
             prompt = f"""Você receberá uma ficha de personagem completa e uma instrução de edição.
 
 **SISTEMA:** {SISTEMAS_DISPONIVEIS[sistema]['nome']}
@@ -403,7 +408,7 @@ def register_fichas_edicao_commands(bot: commands.Bot):
 **FICHA ATUAL COMPLETA (formato {formato}):**
 {conteudo_atual}
 
-**INSTRUÇÕES OBRIGATÓRIAS:**
+**INSTRUÇÕES CRÍTICAS:**
 1. Leia toda a ficha acima
 2. Aplique APENAS as mudanças mencionadas na instrução
 3. RETORNE A FICHA COMPLETA com as alterações aplicadas
@@ -411,6 +416,8 @@ def register_fichas_edicao_commands(bot: commands.Bot):
 5. Se a instrução pedir para ADICIONAR itens, adicione à lista existente (não substitua)
 6. Se a instrução pedir para ALTERAR valores, altere apenas esses valores
 7. Valores calculados (HP, CA, bônus) devem ser recalculados se atributos mudarem
+8. Se a instrução criar NOVOS campos/seções que não existiam, ADICIONE-os ao JSON (ex: "adicione uma nova seção X" ou "crie um campo Y")
+9. SEMPRE inclua "Inventário": [] e "Equipado": {{"Arma": "...", "Armadura": "..."}} na seção "equipamento"
 
 **FORMATO DE RETORNO:**
 Retorne o JSON COMPLETO da ficha com as modificações aplicadas.
@@ -418,13 +425,19 @@ NÃO retorne apenas os campos alterados.
 NÃO adicione texto explicativo antes ou depois.
 NÃO use markdown (```json).
 
-**EXEMPLO:**
+**EXEMPLO 1:**
 Se a instrução for "aumentar Força para 18", você deve:
 - Alterar o campo "Força" de [valor atual] para 18
 - Recalcular bônus de ataque corpo a corpo se necessário
 - Recalcular dano de armas corpo a corpo
 - MANTER todos os outros campos inalterados
 - RETORNAR a ficha completa com essas alterações
+
+**EXEMPLO 2:**
+Se a instrução for "adicionar nova seção 'segredos' com campo 'segredo_pessoal'", você deve:
+- ADICIONAR nova seção "segredos": {{"segredo_pessoal": "[conteúdo apropriado]"}}
+- MANTER todos os outros campos inalterados
+- RETORNAR a ficha completa incluindo a nova seção
 
 Agora, retorne a ficha COMPLETA com as alterações aplicadas:"""
 
@@ -439,7 +452,7 @@ Agora, retorne a ficha COMPLETA com as alterações aplicadas:"""
                 await ctx.send(f"⚠️ Erro ao editar ficha: {conteudo_novo}")
                 return
             
-            # Parser MAIS RIGOROSO
+            # Parser
             if "secoes" in ficha and ficha["secoes"]:
                 try:
                     import re
@@ -460,12 +473,13 @@ Agora, retorne a ficha COMPLETA com as alterações aplicadas:"""
                     # Parseia
                     nova_secao = json.loads(conteudo_limpo)
                     
-                    # VALIDAÇÃO CRÍTICA: Verifica se tem pelo menos as mesmas seções
+                    # VALIDAÇÃO: Verifica se tem pelo menos as mesmas seções
                     secoes_antigas = set(ficha["secoes"].keys())
                     secoes_novas = set(nova_secao.keys())
                     
-                    if len(secoes_novas) < len(secoes_antigas) * 0.7:  # Perdeu mais de 30% das seções
-                        raise ValueError(f"Edição incompleta: apenas {len(secoes_novas)}/{len(secoes_antigas)} seções retornadas")
+                    secoes_removidas = secoes_antigas - secoes_novas
+                    if len(secoes_removidas) > len(secoes_antigas) * 0.3:  # Perdeu mais de 30% das seções
+                        raise ValueError(f"Edição incompleta: {len(secoes_removidas)} seções removidas")
                     
                     # VALIDAÇÃO: Conta campos não-vazios
                     campos_preenchidos = 0
@@ -483,22 +497,35 @@ Agora, retorne a ficha COMPLETA com as alterações aplicadas:"""
                     
                     # Detecta mudanças
                     campos_editados = []
+                    campos_novos = []
+                    
                     for secao_nome, conteudo_secao in nova_secao.items():
+                        # Seção nova?
+                        if secao_nome not in ficha["secoes"]:
+                            campos_novos.append(f"Nova seção: {secao_nome}")
+                            continue
+                        
                         if isinstance(conteudo_secao, dict):
                             for campo, valor in conteudo_secao.items():
-                                valor_antigo = ficha["secoes"].get(secao_nome, {}).get(campo)
+                                # Campo novo?
+                                if campo not in ficha["secoes"].get(secao_nome, {}):
+                                    campos_novos.append(f"{secao_nome}.{campo}")
+                                    continue
+                                
+                                # Campo editado?
+                                valor_antigo = ficha["secoes"][secao_nome].get(campo)
                                 if str(valor) != str(valor_antigo):
                                     campos_editados.append(f"{secao_nome}.{campo}: {valor_antigo} → {valor}")
                     
-                    if not campos_editados:
+                    if not campos_editados and not campos_novos:
                         await ctx.send("⚠️ Nenhuma mudança foi detectada. A IA pode não ter entendido a instrução. Tente ser mais específico.")
                         return
                     
-                    # Aplica mudanças
+                    # ✅ Aplica mudanças (incluindo novas seções/campos)
                     fichas_personagens[chave]["secoes"] = nova_secao
                     
-                    print(f"✅ {len(campos_editados)} campos editados:")
-                    for mudanca in campos_editados[:10]:  # Mostra até 10 mudanças
+                    print(f"✅ {len(campos_editados)} campos editados, {len(campos_novos)} novos:")
+                    for mudanca in (campos_editados + campos_novos)[:10]:
                         print(f"  - {mudanca}")
                     
                 except json.JSONDecodeError as je:
@@ -534,9 +561,9 @@ Agora, retorne a ficha COMPLETA com as alterações aplicadas:"""
                 view = FichaNavigationView(fichas_personagens[chave], sistema)
                 
                 # Feedback detalhado
-                resumo_mudancas = "\n".join([f"• {m}" for m in campos_editados[:5]])
-                if len(campos_editados) > 5:
-                    resumo_mudancas += f"\n• ... e mais {len(campos_editados) - 5} mudanças"
+                resumo_mudancas = "\n".join([f"• {m}" for m in (campos_editados + campos_novos)[:10]])
+                if len(campos_editados) + len(campos_novos) > 10:
+                    resumo_mudancas += f"\n• ... e mais {len(campos_editados) + len(campos_novos) - 10} mudanças"
                 
                 await ctx.send(
                     content=f"✅ **Ficha Atualizada com Sucesso!**\n\n**Mudanças aplicadas:**\n{resumo_mudancas}",

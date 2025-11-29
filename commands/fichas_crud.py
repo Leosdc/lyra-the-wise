@@ -1,4 +1,4 @@
-# commands/fichas_crud.py
+# commands/fichas_crud.py (CORRIGIDO)
 """Comandos básicos de CRUD de fichas (criar, ver, listar, deletar)."""
 
 import discord
@@ -21,6 +21,33 @@ def register_fichas_crud_commands(bot: commands.Bot):
         if not nome:
             await ctx.send("❌ Use `!ficha <nome>` para criação rápida ou `!criarficha` para modo interativo estruturado.")
             return
+
+        chave_existente, ficha_existente = encontrar_ficha(ctx.author.id, nome)
+        
+        if ficha_existente:
+            await ctx.send(
+                f"⚠️ **ATENÇÃO:** Já existe uma ficha chamada **{nome}**!\n\n"
+                f"Se continuar, a ficha antiga será **SOBRESCRITA** e todos os dados serão perdidos.\n\n"
+                f"**Opções:**\n"
+                f"• Use `!editarficha {nome}` para editar a ficha existente\n"
+                f"• Use `!ficha {nome}_v2` para criar uma versão nova\n"
+                f"• Responda `CONFIRMAR` nos próximos 30 segundos para sobrescrever\n"
+                f"• Qualquer outra resposta cancela a operação"
+            )
+            
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel
+            
+            try:
+                msg = await bot.wait_for('message', check=check, timeout=30.0)
+                
+                if msg.content.strip().upper() != "CONFIRMAR":
+                    return await ctx.send("❌ Criação cancelada. Ficha antiga preservada.")
+                
+                await ctx.send("⚠️ Confirmado! Sobrescrevendo ficha antiga...")
+                
+            except:
+                return await ctx.send("⏰ Tempo esgotado. Criação cancelada. Ficha antiga preservada.")
 
         sistema = sistemas_rpg.get(ctx.author.id, "dnd5e")
         system_prompt = get_system_prompt(sistema)
@@ -109,11 +136,10 @@ def register_fichas_crud_commands(bot: commands.Bot):
             print(f"Conteúdo recebido (primeiros 500 chars): {conteudo_bruto[:500]}...")
             parse_success = False
         
-        # FALLBACK INTELIGENTE - Gera ficha completa via segunda chamada à IA
+        # FALLBACK INTELIGENTE
         if not parse_success or not secoes_estruturadas:
             await ctx.send("⚙️ Ajustando abordagem... gerando ficha completa...")
             
-            # Prompt mais direto e específico
             fallback_prompt = f"""Crie uma ficha COMPLETA para {nome} em {sistema_nome}.
 
 Retorne APENAS este formato JSON (sem markdown, sem explicações):
@@ -148,6 +174,8 @@ Retorne APENAS este formato JSON (sem markdown, sem explicações):
     "Armas": ["[liste 2-3 armas]"],
     "Armadura": "[tipo de armadura]",
     "Itens": ["[liste 5-8 itens]"],
+    "Inventário": [],
+    "Equipado": {{"Arma": "—", "Armadura": "—"}},
     "Dinheiro": "[quantidade] PO"
   }},
   "historia": {{
@@ -218,6 +246,12 @@ CRÍTICO: Retorne APENAS o JSON válido, nada antes ou depois."""
                         "Armas": ["Espada Longa", "Arco Longo", "20 Flechas"],
                         "Armadura": "Cota de Malha",
                         "Itens": ["Mochila", "Corda 15m", "Pederneira", "Ração (5 dias)", "Cantil", "Tocha (3x)", "Kit de Primeiros Socorros"],
+                        # ✅ CORREÇÃO PROBLEMA 1: Inicializa estrutura de inventário
+                        "Inventário": [],
+                        "Equipado": {
+                            "Arma": "Espada Longa",
+                            "Armadura": "Cota de Malha"
+                        },
                         "Dinheiro": "15 PO"
                     },
                     "historia": {
@@ -227,6 +261,16 @@ CRÍTICO: Retorne APENAS o JSON válido, nada antes ou depois."""
                 }
                 
                 await ctx.send("⚠️ Usando template padrão. Você pode personalizar com `!editarficha`!")
+
+        if "equipamento" in secoes_estruturadas:
+            if "Inventário" not in secoes_estruturadas["equipamento"]:
+                secoes_estruturadas["equipamento"]["Inventário"] = []
+            
+            if "Equipado" not in secoes_estruturadas["equipamento"]:
+                secoes_estruturadas["equipamento"]["Equipado"] = {
+                    "Arma": "—",
+                    "Armadura": "—"
+                }
         
         # Salva ficha
         chave = key_from_name(f"{ctx.author.id}_{nome}")

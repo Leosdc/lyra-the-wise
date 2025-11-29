@@ -68,7 +68,7 @@ And forge the impossible — with magic, courage, and passion divine."
   <img src="https://img.shields.io/badge/Discord.py-2.0+-brightgreen?style=for-the-badge&logo=discord&logoColor=white" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=open-source-initiative&logoColor=white" />
   <img src="https://img.shields.io/badge/Groq-Llama%203.3%2070B-orange?style=for-the-badge&logo=ai&logoColor=white" />
-  <img src="https://img.shields.io/badge/Version-v3.0.1-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
+  <img src="https://img.shields.io/badge/Version-v3.0.2-8A2BE2?style=for-the-badge&logo=github&logoColor=white" />
 </p>
 
 ---

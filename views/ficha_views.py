@@ -1,4 +1,4 @@
-# views/ficha_views.py
+# views/ficha_views.py (CORRIGIDO)
 """Views (botões de navegação) para fichas estruturadas."""
 
 import discord
@@ -18,15 +18,20 @@ class FichaNavigationView(View):
         from core.ficha_helpers import get_estrutura_ficha
         self.estrutura = get_estrutura_ficha(sistema)
         
+        secoes_json = list(ficha_data.get("secoes", {}).keys())
+        secoes_estrutura = self.estrutura["secoes"]
+        
+        # Combina seções estruturadas + seções extras do JSON
+        self.all_sections = list(dict.fromkeys(secoes_estrutura + secoes_json))
+        
         self.current_page = 0
-        self.max_pages = len(self.estrutura["secoes"])
+        self.max_pages = len(self.all_sections)
         
     def get_embed(self) -> discord.Embed:
         """Gera embed para a página atual."""
         from sistemas_rpg import SISTEMAS_DISPONIVEIS
         
-        secao_nome = self.estrutura["secoes"][self.current_page]
-        campos = self.estrutura["campos"][secao_nome]
+        secao_nome = self.all_sections[self.current_page]
         
         # Títulos bonitos para as seções
         titulos_secoes = {
@@ -39,7 +44,9 @@ class FichaNavigationView(View):
             "disciplinas": "🩸 Disciplinas Vampíricas",
             "pericia": "🔍 Perícias",
             "perícias": "🔍 Perícias",
-            "historia": "📖 História e Personalidade"
+            "pericias": "🔍 Perícias",
+            "historia": "📖 História e Personalidade",
+            "progressao": "📊 Progressão e XP"
         }
         
         titulo = titulos_secoes.get(secao_nome, secao_nome.title())
@@ -49,43 +56,55 @@ class FichaNavigationView(View):
             conteudo_secao = self.ficha_data["secoes"].get(secao_nome, {})
             descricao = ""
             
-            # NORMALIZA nomes de campos (remove acentos quebrados)
-            for campo in campos:
-                # Tenta encontrar o campo com encoding correto OU incorreto
-                valor = None
-                
-                # 1. Tenta nome correto
-                if campo in conteudo_secao:
-                    valor = conteudo_secao[campo]
-                else:
-                    # 2. Tenta variações com encoding quebrado
-                    campo_lower = campo.lower()
-                    for k, v in conteudo_secao.items():
-                        if k.lower().replace('ã§', 'ç').replace('ã£', 'ã').replace('ãª', 'ê') == campo_lower:
-                            valor = v
-                            break
-                
-                if valor is None:
-                    valor = "—"
-                
-                # Formata o valor
-                if isinstance(valor, list):
-                    valor = ", ".join(str(item) for item in valor)
-                elif isinstance(valor, dict):
-                    valor = json.dumps(valor, ensure_ascii=False)
-                
-                descricao += f"**{campo}:** {valor}\n"
+            if isinstance(conteudo_secao, dict):
+                for campo, valor in conteudo_secao.items():
+                    # Formata o valor
+                    if valor is None:
+                        valor = "—"
+                    elif isinstance(valor, list):
+                        if not valor:
+                            valor = "—"
+                        else:
+                            # Lista de dicts (ex: inventário)
+                            if valor and isinstance(valor[0], dict):
+                                valor_formatado = []
+                                for item in valor:
+                                    if isinstance(item, dict):
+                                        nome_item = item.get("nome", "Item")
+                                        qtd = item.get("quantidade", 1)
+                                        valor_formatado.append(f"{nome_item} x{qtd}")
+                                    else:
+                                        valor_formatado.append(str(item))
+                                valor = "\n  • " + "\n  • ".join(valor_formatado)
+                            else:
+                                # Lista simples
+                                valor = ", ".join(str(item) for item in valor)
+                    elif isinstance(valor, dict):
+                        # Dict aninhado (ex: Equipado)
+                        valor_formatado = []
+                        for k, v in valor.items():
+                            valor_formatado.append(f"{k}: {v}")
+                        valor = "\n  • " + "\n  • ".join(valor_formatado)
+                    
+                    descricao += f"**{campo}:** {valor}\n"
+            else:
+                # Seção não é dict (texto puro)
+                descricao = str(conteudo_secao)
         else:
             # Formato antigo - exibe conteúdo bruto
             descricao = self.ficha_data.get("conteudo", "Ficha no formato antigo. Use !editarficha para atualizar.")[:4000]
         
+        if not descricao or descricao.strip() == "":
+            descricao = "— Nenhum dado nesta seção."
+        
         embed = discord.Embed(
             title=f"📜 {self.ficha_data.get('nome', 'Ficha')}",
-            description=descricao,
+            description=descricao[:4000],
             color=discord.Color.gold()
         )
         
-        embed.set_footer(text=f"Página {self.current_page + 1}/{self.max_pages} • {titulo} • Sistema: {SISTEMAS_DISPONIVEIS[self.sistema]['nome']}")
+        sistema_nome = SISTEMAS_DISPONIVEIS.get(self.sistema, {}).get('nome', self.sistema)
+        embed.set_footer(text=f"Página {self.current_page + 1}/{self.max_pages} • {titulo} • Sistema: {sistema_nome}")
         
         return embed
     

@@ -1,4 +1,4 @@
-# main.py (ATUALIZADO v3.0)
+# main.py
 import discord
 from discord.ext import commands
 import os
@@ -32,10 +32,10 @@ DATA_DIR.mkdir(exist_ok=True)
 @bot.event
 async def on_ready():
     await bot.change_presence(
-        activity=discord.Game(name="!rpghelp 🎲 v3.0")
+        activity=discord.Game(name="!rpghelp 🎲")
     )
 
-    print(f"🎲 {bot.user} está online! (v3.0)")
+    print(f"🎲 {bot.user} está online!")
     print(f"Conectado a {len(bot.guilds)} servidor(es)")
 
     print("📂 Carregando dados salvos...")
@@ -54,7 +54,7 @@ async def ping(ctx):
     await ctx.send(f"🏓 Pong! Latência: {latency}ms")
 
 # ==== REGISTRO DE MÓDULOS ====
-print("📦 Carregando módulos (v3.0)...")
+print("📦 Carregando módulos...")
 
 try:
     # 1. Comandos de sistemas
@@ -124,7 +124,6 @@ except Exception as e:
     import traceback
     traceback.print_exc()
 
-# ===== NOVOS MÓDULOS v3.0 =====
 try:
     # 9. Sistema de Inventário
     from commands.inventario_commands import register_inventario_commands
@@ -146,7 +145,7 @@ except Exception as e:
     traceback.print_exc()
 
 try:
-    # 11. Sistema de sessões (REFATORADO v3.0)
+    # 11. Sistema de sessões
     from sessoes_rpg import setup_sessoes
     
     # Cria wrapper de salvar_dados compatível com sessões
@@ -163,13 +162,13 @@ try:
         get_system_prompt,
         salvar_dados_wrapper,
     )
-    print("✅ Sistema de sessões carregado (v3.0)")
+    print("✅ Sistema de sessões carregado")
 except Exception as e:
     print(f"❌ Erro ao carregar sistema de sessões: {e}")
     import traceback
     traceback.print_exc()
 
-print("🎲 Todos os módulos carregados! (v3.0)")
+print("🎲 Todos os módulos carregados!")
 
 # ==== Tratamento de erros ====
 @bot.event
@@ -207,7 +206,7 @@ if __name__ == "__main__":
         print("   GROQ_API_KEY=sua_chave_groq_aqui")
     else:
         try:
-            print("🚀 Iniciando bot v3.0...")
+            print("🚀 Iniciando bot...")
             bot.run(TOKEN)
         except Exception as e:
             print(f"❌ Erro ao iniciar o bot: {e}")
